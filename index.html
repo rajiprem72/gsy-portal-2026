@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Global School of Yoga - Yoga Competitions</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Poppins',sans-serif;
+background:#f4f8fb;
+color:#333;
+}
+
+/* HERO */
+
+.hero{
+
+background:
+linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
+url('images/yoga-banner.jpg');
+
+background-size:cover;
+background-position:center;
+padding:90px 20px;
+text-align:center;
+color:white;
+
+}
+
+.hero h1{
+
+font-size:60px;
+font-weight:800;
+letter-spacing:2px;
+
+}
+
+.hero h2{
+
+margin-top:20px;
+font-size:34px;
+font-weight:600;
+
+}
+
+.hero p{
+
+margin-top:20px;
+font-size:22px;
+max-width:1000px;
+margin-left:auto;
+margin-right:auto;
+line-height:1.8;
+
+}
+
+/* Competition Cards */
+
+.container{
+
+max-width:1400px;
+margin:auto;
+padding:60px 20px;
+
+}
+
+.section-title{
+
+text-align:center;
+font-size:42px;
+font-weight:700;
+color:#004080;
+margin-bottom:50px;
+
+}
+
+.cards{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:30px;
+
+}
+
+.card{
+
+border-radius:20px;
+padding:40px 25px;
+color:white;
+text-align:center;
+transition:.4s;
+box-shadow:0 15px 35px rgba(0,0,0,.2);
+
+}
+
+.card:hover{
+
+transform:translateY(-10px);
+
+}
+
+.card h3{
+
+font-size:32px;
+margin-bottom:20px;
+
+}
+
+.card p{
+
+font-size:18px;
+line-height:1.8;
+margin-bottom:30px;
+
+}
+
+.btn{
+
+display:inline-block;
+padding:14px 35px;
+background:white;
+color:#222;
+text-decoration:none;
+border-radius:40px;
+font-weight:bold;
+transition:.3s;
+
+}
+
+.btn:hover{
+
+background:#000;
+color:white;
+
+}
+
+.international{
+
+background:linear-gradient(135deg,#7b2ff7,#9b23ea);
+
+}
+
+.national{
+
+background:linear-gradient(135deg,#2193b0,#6dd5ed);
+
+}
+
+.state{
+
+background:linear-gradient(135deg,#11998e,#38ef7d);
+
+}
+
+.district{
+
+background:linear-gradient(135deg,#ff8008,#ffc837);
+
+}
+
+/* Yogasana */
+
+.asana{
+
+padding:70px 20px;
+background:white;
+
+}
+
+.asana-grid{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:25px;
+max-width:1400px;
+margin:auto;
+
+}
+
+.asana-box{
+
+padding:35px;
+border-radius:18px;
+color:white;
+text-align:center;
+font-size:24px;
+font-weight:bold;
+box-shadow:0 10px 25px rgba(0,0,0,.15);
+
+}
+
+.a1{background:#009688;}
+.a2{background:#2196F3;}
+.a3{background:#FF5722;}
+.a4{background:#8E44AD;}
+.a5{background:#E67E22;}
+
+/* Footer */
+
+footer{
+
+background:#003366;
+color:white;
+text-align:center;
+padding:40px;
+margin-top:70px;
+font-size:20px;
+
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+.hero{
+
+padding:60px 15px;
+
+}
+
+.hero h1{
+
+font-size:36px;
+
+}
+
+.hero h2{
+
+font-size:22px;
+
+}
+
+.hero p{
+
+font-size:18px;
+
+}
+
+.section-title{
+
+font-size:32px;
+
+}
+
+.card h3{
+
+font-size:26px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- HERO -->
+
+<section class="hero">
+
+<h1>GLOBAL SCHOOL OF YOGA</h1>
+
+<h2>Yoga Competitions</h2>
+
+<p>
+
+From District Level to International Level...
+<br>
+
+A platform to nurture young Yoga talents and promote Yoga across the world.
+
+</p>
+
+</section>
+
+
+<!-- COMPETITION LEVELS -->
+
+<div class="container">
+
+<h2 class="section-title">
+
+Competition Levels
+
+</h2>
+
+<div class="cards">
+
+<div class="card international">
+
+<h3>
+
+🌎 International Level Yoga Competition
+
+</h3>
+
+<p>
+
+The ultimate destination where champions from different countries compete with excellence.
+
+</p>
+
+</div>
+
+<div class="card national">
+
+<h3>
+
+🇮🇳 National Level Yoga Competition
+
+</h3>
+
+<p>
+
+Bringing together the best Yoga practitioners from every state in India.
+
+</p>
+
+</div>
+
+<div class="card state">
+
+<h3>
+
+🏆 State Level Yoga Competition
+
+</h3>
+
+<p>
+
+State Champions compete for glory and qualify for the National Level.
+
+</p>
+
+<a href="state-index.html" class="btn">
+
+Enter
+
+</a>
+
+</div>
+
+<div class="card district">
+
+<h3>
+
+📍 District Level Yoga Competition
+
+</h3>
+
+<p>
+
+The first step where talented Yoga students compete within their districts.
+
+</p>
+
+<a href="district-index.html" class="btn">
+
+Enter
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- YOGASANA -->
+
+<section class="asana">
+
+<h2 class="section-title">
+
+Competition Categories
+
+</h2>
+
+<div class="asana-grid">
+
+<div class="asana-box a1">
+
+Traditional Yogasana
+
+</div>
+
+<div class="asana-box a2">
+
+Forward Bending Asanas
+
+</div>
+
+<div class="asana-box a3">
+
+Backward Bending Asanas
+
+</div>
+
+<div class="asana-box a4">
+
+Twisting Asanas
+
+</div>
+
+<div class="asana-box a5">
+
+Hand Balance Asanas
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ABOUT -->
+
+<div class="container">
+
+<h2 class="section-title">
+
+Our Vision
+
+</h2>
+
+<p style="font-size:22px;line-height:2;text-align:justify;">
+
+Global School of Yoga is committed to promoting Yoga across Tamil Nadu and India through systematic competitions. Beginning with District Level Yoga Competitions, talented participants progress to State Level, National Level and eventually International Level Yoga Competitions. Our mission is to inspire discipline, confidence, physical fitness, mental well-being and excellence among students while preserving the rich heritage of Yogasana.
+
+</p>
+
+</div>
+
+
+<footer>
+
+© 2026 Global School of Yoga
+
+<br><br>
+
+"Health • Harmony • Excellence"
+
+</footer>
+
+</body>
+</html>
