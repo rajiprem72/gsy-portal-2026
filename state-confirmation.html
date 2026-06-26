@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Registration Successful | DLYC 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7f6;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #2c5f2d;
+      text-align: center;
+    }
+
+    .success {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .details {
+      margin-top: 20px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .value {
+      color: #000;
+      text-align: right;
+      max-width: 60%;
+    }
+
+    .pay-box {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .amount {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      background: #2c5f2d;
+      color: #fff;
+      padding: 14px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background: #1e4220;
+    }
+
+    .note {
+      margin-top: 25px;
+      font-size: 14px;
+      color: #555;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>Registration Successful</h1>
+
+    <p class="success">
+      🙏 Thank you for registering for  
+      <strong>State Level Yogāsana Competitions – 2026</strong>
+    </p>
+
+    <div class="details">
+      <div class="row">
+        <div class="label">Registration ID</div>
+        <div class="value" id="regId">—</div>
+      </div>
+
+      <div class="row">
+        <div class="label">State / UI</div>
+        <div class="value" id="state">—</div>
+      </div>
+
+      <div class="row">
+        <div class="label">Events Selected</div>
+        <div class="value" id="events">—</div>
+      </div>
+
+      <div class="row">
+        <div class="label">Number of Events</div>
+        <div class="value" id="eventCount">—</div>
+      </div>
+    </div>
+
+    <div class="pay-box">
+      <div class="amount">
+        Amount Payable: ₹<span id="amount">0</span>
+      </div>
+
+      <!-- Payment button (we will wire Razorpay next) -->
+    <a id="payBtn" class="btn" href="#" target="_blank" rel="noopener noreferrer">
+      Proceed to Payment
+    </a>
+
+    </div>
+
+    <p class="note">
+      📧 A confirmation message will be sent after successful payment.<br>
+      Please keep your Registration ID for future reference.
+    </p>
+
+  </div>
+
+  <script>
+  // Read URL parameters
+  const params = new URLSearchParams(window.location.search);
+
+  const regId = params.get("regId") || "N/A";
+  const state = params.get("state") || "N/A";
+  const events = params.get("events") || "N/A";
+  const eventCount = parseInt(params.get("count") || "0", 10);
+
+  // IMPORTANT: Your display amount is based on the event labels (Rs.500),
+  // not the test Razorpay amounts. That's OK.
+  const amountDisplay = eventCount * 500;
+
+  // Display values
+  document.getElementById("regId").textContent = regId;
+  document.getElementById("state").textContent = state;
+  document.getElementById("events").textContent = events;
+  document.getElementById("eventCount").textContent = eventCount;
+  document.getElementById("amount").textContent = amountDisplay;
+
+  // 🔹 Razorpay links (replace with your TEST links or REAL links)
+  const razorpayLinks = {
+    1: "https://razorpay.me/@globalschoolofyoga?amount=EPec5evqGoRk2C8icWNJlQ%3D%3D",
+    2: "https://razorpay.me/@globalschoolofyoga?amount=tEDHZxxCtz0rKFL9kTzhOw%3D%3D",
+    3: "https://razorpay.me/@globalschoolofyoga?amount=t3S7X%2BkimO%2BolxVgImID0w%3D%3D",
+    4: "https://razorpay.me/@globalschoolofyoga?amount=kQAWFkeY3SRQGBXoGlT%2FBQ%3D%3D",
+    5: "https://razorpay.me/@globalschoolofyoga?amount=zgioswZa9n4qt5x9yD7i%2BQ%3D%3D"
+  };
+
+  const payBtn = document.getElementById("payBtn");
+
+  // Build payment URL
+  const base = razorpayLinks[eventCount];
+
+  if (base && regId !== "N/A") {
+    // Add a reference so webhook can match payment to registration
+    payBtn.href = base + "&reference=" + encodeURIComponent(regId);
+
+    // Optional: show where it will go (debug)
+    // console.log("Pay URL:", payBtn.href);
+
+  } else {
+    payBtn.href = "#";
+    payBtn.textContent = "Invalid Event Selection";
+    payBtn.style.background = "gray";
+    payBtn.style.pointerEvents = "none";
+  }
+</script>
+
+</body>
+</html>
