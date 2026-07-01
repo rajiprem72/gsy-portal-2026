@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DLYC 2026 | Score Card PDF Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f7f6; margin:0; padding:16px; }
+    .wrap { max-width: 720px; margin:0 auto; background:#fff; padding:18px; border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
+    h1 { margin:0 0 10px; font-size:20px; color:#1e4220; }
+    p { margin:6px 0 14px; color:#444; line-height:1.4; }
+    label { display:block; margin-top:12px; font-weight:600; color:#333; }
+    select, input { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:14px; margin-top:6px; }
+    .row { display:flex; gap:12px; }
+    .row > div { flex:1; }
+    .btn { margin-top:16px; width:100%; padding:12px; border:none; border-radius:8px; font-size:16px; cursor:pointer; background:#2c5f2d; color:#fff; }
+    .btn:disabled { background:#9bb39b; cursor:not-allowed; }
+    .status { margin-top:12px; font-size:14px; color:#333; white-space:pre-wrap; }
+    .small { font-size:12px; color:#666; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>Score Card PDF Generator</h1>
+    <p>
+      Select a district, choose From/To row range from that district registrations sheet, and generate score card PDFs.
+      PDFs will be emailed to <b>globalcompetition25@gmail.com</b>.
+    </p>
+
+    <label for="districtSelect">Select District</label>
+    <select id="districtSelect">
+      <option value="">Loading districts…</option>
+    </select>
+
+    <div class="row">
+      <div>
+        <label for="fromRow">From Row</label>
+        <input id="fromRow" type="number" min="2" value="2" />
+        <div class="small">Row 1 is header. Data starts from Row 2.</div>
+      </div>
+      <div>
+        <label for="toRow">To Row</label>
+        <input id="toRow" type="number" min="2" value="50" />
+      </div>
+    </div>
+
+    <button id="generateBtn" class="btn" disabled>Generate Score Card PDFs</button>
+    <div id="status" class="status"></div>
+
+    <p class="small" style="margin-top:14px;">
+      Note: This page calls a Google Apps Script Web App endpoint to fetch district list and generate PDFs.
+    </p>
+  </div>
+
+  <script>
+    // ✅ Put your Apps Script Web App URL here (ScoreCard API deployment)
+    // Example: https://script.google.com/macros/s/AKfycbxxxxxxx/exec
+    const API_BASE = "https://script.google.com/macros/s/AKfycbyFCgy4P45oxawOathb1Ex8EXAVjWqHhAy1PM69nWNEm9u7y4BZFmBGeKrm9MTIIkKQ/exec";
+
+    const districtSelect = document.getElementById("districtSelect");
+    const fromRowEl = document.getElementById("fromRow");
+    const toRowEl = document.getElementById("toRow");
+    const generateBtn = document.getElementById("generateBtn");
+    const statusEl = document.getElementById("status");
+
+    function setStatus(msg) {
+      statusEl.textContent = msg;
+    }
+
+    async function loadDistricts() {
+      try {
+        setStatus("Loading districts…");
+        districtSelect.innerHTML = `<option value="">Loading districts…</option>`;
+
+        const res = await fetch(`${API_BASE}?action=listDistricts`, { method: "GET" });
+        const data = await res.json();
+
+        if (!data.ok) throw new Error(data.error || "Failed to load districts");
+
+        districtSelect.innerHTML = `<option value="">-- Select District --</option>`;
+        data.districts.forEach(d => {
+          const opt = document.createElement("option");
+          opt.value = d.districtName;
+          opt.textContent = `${d.districtName} (${d.districtCode})`;
+          districtSelect.appendChild(opt);
+        });
+
+        setStatus("Districts loaded. Select a district and row range.");
+      } catch (err) {
+        setStatus("❌ " + err.message);
+      }
+    }
+
+    function validate() {
+      const district = districtSelect.value.trim();
+      const fromRow = parseInt(fromRowEl.value || "0", 10);
+      const toRow = parseInt(toRowEl.value || "0", 10);
+
+      const ok = district && fromRow >= 2 && toRow >= fromRow;
+      generateBtn.disabled = !ok;
+    }
+
+    districtSelect.addEventListener("change", validate);
+    fromRowEl.addEventListener("input", validate);
+    toRowEl.addEventListener("input", validate);
+
+    generateBtn.addEventListener("click", async () => {
+  const district = districtSelect.value.trim();
+  const fromRow = parseInt(fromRowEl.value, 10);
+  const toRow = parseInt(toRowEl.value, 10);
+
+  try {
+    generateBtn.disabled = true;
+    setStatus("Generating PDFs… Please wait.\n(Do not refresh this page)");
+
+    const url =
+      `${API_BASE}?action=generateScorecards` +
+      `&district=${encodeURIComponent(district)}` +
+      `&fromRow=${encodeURIComponent(fromRow)}` +
+      `&toRow=${encodeURIComponent(toRow)}` +
+      `&v=${Date.now()}`; // cache buster
+
+    const res = await fetch(url, { method: "GET" });
+    const data = await res.json();
+
+    if (!data.ok) {
+  const e = new Error(data.error || "Generation failed");
+  e.pendingList = data.pendingList || [];
+  throw e;
+  }
+
+
+   let msg =
+  "✅ Done!\n" +
+  `District: ${data.district}\n` +
+  `Rows: ${data.fromRow} to ${data.toRow}\n` +
+  `Scorecards generated (PAID only): ${data.totalScorecards}\n` +
+  `PDF files created: ${data.pdfCount}\n` +
+  "PDF(s) have been emailed.\n";
+
+if (data.pendingList && data.pendingList.length) {
+  msg += "\n⚠️ PENDING / NOT-PAID Participants (No PDF generated):\n";
+  msg += data.pendingList.map(p => {
+    return [
+      `Registration ID: ${p.regId}`,
+      `District: ${p.district}`,
+      `Age Group: ${p.ageCat}`,
+      `Events Selected: ${p.eventsSelected}`,
+      `No of Events: ${p.noOfEvents}`,
+      `Name: ${p.name}`,
+      `Father Name: ${p.fatherName}`,
+      `Mobile: ${p.mobile}`,
+      `WhatsApp: ${p.whatsapp}`,
+      `Email: ${p.email}`
+    ].join("\n");
+  }).join("\n--------------------------\n");
+}
+
+setStatus(msg);
+
+} catch (err) {
+  if (err && err.pendingList && err.pendingList.length) {
+    let msg = "❌ " + (err.message || "Generation failed") + "\n\n";
+    msg += "⚠️ PENDING / NOT-PAID Participants:\n";
+    msg += err.pendingList.map(p => {
+      return [
+        `Registration ID: ${p.regId}`,
+        `District: ${p.district}`,
+        `Age Group: ${p.ageCat}`,
+        `Events Selected: ${p.eventsSelected}`,
+        `No of Events: ${p.noOfEvents}`,
+        `Name: ${p.name}`,
+        `Father Name: ${p.fatherName}`,
+        `Mobile: ${p.mobile}`,
+        `WhatsApp: ${p.whatsapp}`,
+        `Email: ${p.email}`
+      ].join("\n");
+    }).join("\n--------------------------\n");
+    setStatus(msg);
+  } else {
+    setStatus("❌ " + (err && err.message ? err.message : String(err)));
+  }
+}
+
+   finally {
+    validate();
+  }
+});
+
+    // init
+    loadDistricts().then(validate);
+  </script>
+</body>
+</html>
