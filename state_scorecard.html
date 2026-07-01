@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>DLYC 2026 | Score Card PDF Generator</title>
+  <title>SLYC 2026 | Score Card PDF Generator</title>
   <style>
     body { font-family: Arial, sans-serif; background:#f4f7f6; margin:0; padding:16px; }
     .wrap { max-width: 720px; margin:0 auto; background:#fff; padding:18px; border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
@@ -24,13 +24,13 @@
   <div class="wrap">
     <h1>Score Card PDF Generator</h1>
     <p>
-      Select a district, choose From/To row range from that district registrations sheet, and generate score card PDFs.
+      Select a Stae, choose From/To row range from that state registrations sheet, and generate score card PDFs.
       PDFs will be emailed to <b>globalcompetition25@gmail.com</b>.
     </p>
 
-    <label for="districtSelect">Select District</label>
-    <select id="districtSelect">
-      <option value="">Loading districts…</option>
+    <label for="stateSelect">Select State</label>
+    <select id="stateSelect">
+      <option value="">Loading States…</option>
     </select>
 
     <div class="row">
@@ -49,7 +49,7 @@
     <div id="status" class="status"></div>
 
     <p class="small" style="margin-top:14px;">
-      Note: This page calls a Google Apps Script Web App endpoint to fetch district list and generate PDFs.
+      Note: This page calls a Google Apps Script Web App endpoint to fetch State list and generate PDFs.
     </p>
   </div>
 
@@ -58,7 +58,7 @@
     // Example: https://script.google.com/macros/s/AKfycbxxxxxxx/exec
     const API_BASE = "https://script.google.com/macros/s/AKfycbyFCgy4P45oxawOathb1Ex8EXAVjWqHhAy1PM69nWNEm9u7y4BZFmBGeKrm9MTIIkKQ/exec";
 
-    const districtSelect = document.getElementById("districtSelect");
+    const stateSelect = document.getElementById("stateSelect");
     const fromRowEl = document.getElementById("fromRow");
     const toRowEl = document.getElementById("toRow");
     const generateBtn = document.getElementById("generateBtn");
@@ -68,45 +68,45 @@
       statusEl.textContent = msg;
     }
 
-    async function loadDistricts() {
+    async function loadStates() {
       try {
-        setStatus("Loading districts…");
-        districtSelect.innerHTML = `<option value="">Loading districts…</option>`;
+        setStatus("Loading States…");
+        stateSelect.innerHTML = `<option value="">Loading States…</option>`;
 
-        const res = await fetch(`${API_BASE}?action=listDistricts`, { method: "GET" });
+        const res = await fetch(`${API_BASE}?action=liststates`, { method: "GET" });
         const data = await res.json();
 
-        if (!data.ok) throw new Error(data.error || "Failed to load districts");
+        if (!data.ok) throw new Error(data.error || "Failed to load States");
 
-        districtSelect.innerHTML = `<option value="">-- Select District --</option>`;
-        data.districts.forEach(d => {
+        stateSelect.innerHTML = `<option value="">-- Select State --</option>`;
+        data.states.forEach(d => {
           const opt = document.createElement("option");
-          opt.value = d.districtName;
-          opt.textContent = `${d.districtName} (${d.districtCode})`;
-          districtSelect.appendChild(opt);
+          opt.value = d.stateName;
+          opt.textContent = `${d.stateName} (${d.stateCode})`;
+          stateSelect.appendChild(opt);
         });
 
-        setStatus("Districts loaded. Select a district and row range.");
+        setStatus("States loaded. Select a State and row range.");
       } catch (err) {
         setStatus("❌ " + err.message);
       }
     }
 
     function validate() {
-      const district = districtSelect.value.trim();
+      const state = stateSelect.value.trim();
       const fromRow = parseInt(fromRowEl.value || "0", 10);
       const toRow = parseInt(toRowEl.value || "0", 10);
 
-      const ok = district && fromRow >= 2 && toRow >= fromRow;
+      const ok = state && fromRow >= 2 && toRow >= fromRow;
       generateBtn.disabled = !ok;
     }
 
-    districtSelect.addEventListener("change", validate);
+    stateSelect.addEventListener("change", validate);
     fromRowEl.addEventListener("input", validate);
     toRowEl.addEventListener("input", validate);
 
     generateBtn.addEventListener("click", async () => {
-  const district = districtSelect.value.trim();
+  const state = stateSelect.value.trim();
   const fromRow = parseInt(fromRowEl.value, 10);
   const toRow = parseInt(toRowEl.value, 10);
 
@@ -116,7 +116,7 @@
 
     const url =
       `${API_BASE}?action=generateScorecards` +
-      `&district=${encodeURIComponent(district)}` +
+      `&state=${encodeURIComponent(state)}` +
       `&fromRow=${encodeURIComponent(fromRow)}` +
       `&toRow=${encodeURIComponent(toRow)}` +
       `&v=${Date.now()}`; // cache buster
@@ -133,7 +133,7 @@
 
    let msg =
   "✅ Done!\n" +
-  `District: ${data.district}\n` +
+  `State: ${data.state}\n` +
   `Rows: ${data.fromRow} to ${data.toRow}\n` +
   `Scorecards generated (PAID only): ${data.totalScorecards}\n` +
   `PDF files created: ${data.pdfCount}\n` +
@@ -144,7 +144,7 @@ if (data.pendingList && data.pendingList.length) {
   msg += data.pendingList.map(p => {
     return [
       `Registration ID: ${p.regId}`,
-      `District: ${p.district}`,
+      `State: ${p.state}`,
       `Age Group: ${p.ageCat}`,
       `Events Selected: ${p.eventsSelected}`,
       `No of Events: ${p.noOfEvents}`,
@@ -166,7 +166,7 @@ setStatus(msg);
     msg += err.pendingList.map(p => {
       return [
         `Registration ID: ${p.regId}`,
-        `District: ${p.district}`,
+        `State: ${p.state}`,
         `Age Group: ${p.ageCat}`,
         `Events Selected: ${p.eventsSelected}`,
         `No of Events: ${p.noOfEvents}`,
@@ -189,7 +189,7 @@ setStatus(msg);
 });
 
     // init
-    loadDistricts().then(validate);
+    loadStates().then(validate);
   </script>
 </body>
 </html>
