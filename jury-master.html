@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base target="_top">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f6f9;
+      color: #222;
+    }
+
+    .header {
+      background: #174ea6;
+      color: white;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .header h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .header p {
+      margin: 5px 0 0;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 13px;
+      font-size: 17px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #174ea6;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #aaa;
+    }
+
+    .danger {
+      background: #d93025;
+    }
+
+    .success {
+      background: #188038;
+    }
+
+    .jury {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #174ea6;
+      margin-bottom: 10px;
+    }
+
+    .participant {
+      background: #eef4ff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .participant h3 {
+      margin: 0 0 8px;
+    }
+
+    .mark-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .mark-row label {
+      margin: 0;
+      flex: 1;
+    }
+
+    .mark-row input {
+      width: 100px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .total-box {
+      background: #e8f5e9;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .error {
+      background: #fdecea;
+      color: #b3261e;
+    }
+
+    .ok {
+      background: #e6f4ea;
+      color: #137333;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .logout {
+      background: #666;
+      margin-top: 10px;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+  <h2>GSY Yoga Festival</h2>
+
+  <p>Individual Events Jury Portal</p>
+
+</div>
+
+
+<div class="container">
+
+
+  <!-- LOGIN -->
+
+  <div id="loginCard" class="card">
+
+    <h3>Jury Login</h3>
+
+    <label>User ID</label>
+
+    <input
+      id="username"
+      type="text"
+      placeholder="Example: JURY1"
+      autocomplete="username"
+    >
+
+    <label>Password</label>
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+      autocomplete="current-password"
+    >
+
+    <button onclick="login()">
+      LOGIN
+    </button>
+
+    <div id="loginMessage"
+         class="message error"></div>
+
+  </div>
+
+
+  <!-- MAIN -->
+
+  <div id="mainCard" class="hidden">
+
+    <div class="card">
+
+      <div id="juryName"
+           class="jury">
+      </div>
+
+      <label>Yoga Mode</label>
+
+      <select id="yogaMode">
+
+        <option value="Individual">
+          Individual Event
+        </option>
+
+      </select>
+
+
+      <label>Yoga Event</label>
+
+      <select id="yogaEvent">
+
+        <option value="">
+          Loading Events...
+        </option>
+
+      </select>
+
+
+      <label>Participant ID</label>
+
+      <input
+        id="participantId"
+        type="text"
+        placeholder="Example: GSY13-2026-0004"
+      >
+
+      <button onclick="searchParticipant()">
+        SEARCH PARTICIPANT
+      </button>
+
+    </div>
+
+
+    <div id="participantCard"
+         class="card hidden">
+
+      <div class="participant">
+
+        <h3 id="participantName"></h3>
+
+        <div>
+          <b>Participant ID:</b>
+          <span id="displayParticipantId"></span>
+        </div>
+
+        <div>
+          <b>Age:</b>
+          <span id="participantAge"></span>
+        </div>
+
+        <div>
+          <b>Sex:</b>
+          <span id="participantSex"></span>
+        </div>
+
+        <div>
+          <b>Event:</b>
+          <span id="participantEvent"></span>
+        </div>
+
+      </div>
+
+
+      <div id="slotInfo"
+           class="message ok"
+           style="display:block;">
+      </div>
+
+
+      <div id="marksArea">
+
+        <h3>Your 5 Marks</h3>
+
+        <div class="mark-row">
+          <label>Yoga 1 / 10</label>
+          <input id="mark1"
+                 type="number"
+                 min="0"
+                 max="10"
+                 step="1">
+        </div>
+
+        <div class="mark-row">
+          <label>Yoga 2 / 10</label>
+          <input id="mark2"
+                 type="number"
+                 min="0"
+                 max="10"
+                 step="1">
+        </div>
+
+        <div class="mark-row">
+          <label>Yoga 3 / 10</label>
+          <input id="mark3"
+                 type="number"
+                 min="0"
+                 max="10"
+                 step="1">
+        </div>
+
+        <div class="mark-row">
+          <label>Yoga 4 / 10</label>
+          <input id="mark4"
+                 type="number"
+                 min="0"
+                 max="10"
+                 step="1">
+        </div>
+
+        <div class="mark-row">
+          <label>Yoga 5 / 10</label>
+          <input id="mark5"
+                 type="number"
+                 min="0"
+                 max="10"
+                 step="1">
+        </div>
+
+
+        <button
+          id="submitButton"
+          class="success"
+          onclick="submitMarks()">
+
+          SUBMIT MARKS
+
+        </button>
+
+      </div>
+
+
+      <div id="result"
+           class="message">
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <button
+        class="logout"
+        onclick="logout()">
+
+        LOGOUT
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+let currentJury = '';
+let currentParticipant = null;
+
+
+/*******************************************************
+ * LOGIN
+ *******************************************************/
+function login() {
+
+  const username =
+    document.getElementById('username').value.trim();
+
+  const password =
+    document.getElementById('password').value.trim();
+
+  const message =
+    document.getElementById('loginMessage');
+
+  message.style.display = 'none';
+
+  if (!username || !password) {
+
+    showLoginError(
+      'Please enter User ID and Password.'
+    );
+
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(function(result) {
+
+      if (!result.success) {
+
+        showLoginError(result.message);
+
+        return;
+      }
+
+      currentJury =
+        result.username;
+
+      document.getElementById('juryName')
+        .innerText =
+        'Logged in as ' + result.username;
+
+      document.getElementById('loginCard')
+        .classList.add('hidden');
+
+      document.getElementById('mainCard')
+        .classList.remove('hidden');
+
+      loadEvents();
+
+    })
+    .withFailureHandler(function(error) {
+
+      showLoginError(error.message);
+
+    })
+    .login(username, password);
+}
+
+
+function showLoginError(message) {
+
+  const box =
+    document.getElementById('loginMessage');
+
+  box.innerText = message;
+
+  box.style.display = 'block';
+}
+
+
+/*******************************************************
+ * LOAD EVENTS
+ *******************************************************/
+function loadEvents() {
+
+  google.script.run
+    .withSuccessHandler(function(events) {
+
+      const select =
+        document.getElementById('yogaEvent');
+
+      select.innerHTML =
+        '<option value="">Select Yoga Event</option>';
+
+      events.forEach(function(event) {
+
+        const option =
+          document.createElement('option');
+
+        option.value = event;
+        option.textContent = event;
+
+        select.appendChild(option);
+
+      });
+
+    })
+    .getYogaEvents();
+}
+
+
+/*******************************************************
+ * SEARCH PARTICIPANT
+ *******************************************************/
+function searchParticipant() {
+
+  const participantId =
+    document.getElementById('participantId')
+      .value.trim();
+
+  const event =
+    document.getElementById('yogaEvent')
+      .value;
+
+  if (!participantId) {
+
+    alert('Please enter Participant ID.');
+
+    return;
+  }
+
+  if (!event) {
+
+    alert('Please select Yoga Event.');
+
+    return;
+  }
+
+  document.getElementById('participantCard')
+    .classList.add('hidden');
+
+
+  google.script.run
+    .withSuccessHandler(function(result) {
+
+      if (!result.success) {
+
+        alert(result.message);
+
+        return;
+      }
+
+      currentParticipant = result;
+
+      document.getElementById('participantCard')
+        .classList.remove('hidden');
+
+      document.getElementById('participantName')
+        .innerText =
+        result.fullName;
+
+      document.getElementById('displayParticipantId')
+        .innerText =
+        result.participantId;
+
+      document.getElementById('participantAge')
+        .innerText =
+        result.age || '';
+
+      document.getElementById('participantSex')
+        .innerText =
+        result.sex || '';
+
+      document.getElementById('participantEvent')
+        .innerText =
+        result.event;
+
+      const slotInfo =
+        document.getElementById('slotInfo');
+
+      const marksArea =
+        document.getElementById('marksArea');
+
+      if (result.alreadyScored) {
+
+        slotInfo.className =
+          'message error';
+
+        slotInfo.style.display =
+          'block';
+
+        slotInfo.innerText =
+          '⚠️ This participant has already been scored by 3 Judges.';
+
+        marksArea.classList.add('hidden');
+
+        return;
+      }
+
+
+      slotInfo.className =
+        'message ok';
+
+      slotInfo.style.display =
+        'block';
+
+      slotInfo.innerText =
+        'You will be recorded as Jury Slot ' +
+        result.slot +
+        ' (' + currentJury + ')';
+
+      marksArea.classList.remove('hidden');
+
+      clearMarks();
+
+    })
+    .withFailureHandler(function(error) {
+
+      alert(error.message);
+
+    })
+    .findParticipant(
+      participantId,
+      event
+    );
+}
+
+
+/*******************************************************
+ * SUBMIT
+ *******************************************************/
+function submitMarks() {
+
+  if (!currentParticipant) {
+
+    alert('Please search a participant first.');
+
+    return;
+  }
+
+
+  const marks = [
+    document.getElementById('mark1').value,
+    document.getElementById('mark2').value,
+    document.getElementById('mark3').value,
+    document.getElementById('mark4').value,
+    document.getElementById('mark5').value
+  ];
+
+
+  for (let i = 0; i < marks.length; i++) {
+
+    if (
+      marks[i] === '' ||
+      Number(marks[i]) < 0 ||
+      Number(marks[i]) > 10
+    ) {
+
+      alert(
+        'Please enter all 5 marks between 0 and 10.'
+      );
+
+      return;
+    }
+  }
+
+
+  if (
+    !confirm(
+      'Submit these 5 marks for ' +
+      currentParticipant.fullName +
+      '?'
+    )
+  ) {
+
+    return;
+  }
+
+
+  const button =
+    document.getElementById('submitButton');
+
+  button.disabled = true;
+
+  button.innerText =
+    'SUBMITTING...';
+
+
+  const payload = {
+
+    jury: currentJury,
+
+    participantId:
+      currentParticipant.participantId,
+
+    yogaEvent:
+      currentParticipant.event,
+
+    row:
+      currentParticipant.row,
+
+    mark1: marks[0],
+    mark2: marks[1],
+    mark3: marks[2],
+    mark4: marks[3],
+    mark5: marks[4]
+
+  };
+
+
+  google.script.run
+    .withSuccessHandler(function(result) {
+
+      button.disabled = false;
+
+      button.innerText =
+        'SUBMIT MARKS';
+
+
+      const resultBox =
+        document.getElementById('result');
+
+
+      resultBox.style.display =
+        'block';
+
+
+      if (!result.success) {
+
+        resultBox.className =
+          'message error';
+
+        resultBox.innerText =
+          '❌ ' + result.message;
+
+        return;
+      }
+
+
+      resultBox.className =
+        'message ok';
+
+      resultBox.innerHTML =
+        '✅ Marks submitted successfully!<br><br>' +
+        '<b>Total:</b> ' +
+        result.total +
+        ' / 150<br>' +
+        '<b>Standing:</b> ' +
+        (result.standing || 'Not Qualified') +
+        '<br><br>' +
+        '<b>Judges completed:</b> ' +
+        result.completedJudges +
+        ' / 3';
+
+
+      document.getElementById('marksArea')
+        .classList.add('hidden');
+
+
+      document.getElementById('slotInfo')
+        .innerText =
+        '✅ Your marks have been recorded as ' +
+        currentJury;
+
+
+    })
+    .withFailureHandler(function(error) {
+
+      button.disabled = false;
+
+      button.innerText =
+        'SUBMIT MARKS';
+
+      alert(error.message);
+
+    })
+    .submitMarks(payload);
+}
+
+
+/*******************************************************
+ * CLEAR MARKS
+ *******************************************************/
+function clearMarks() {
+
+  for (let i = 1; i <= 5; i++) {
+
+    document.getElementById(
+      'mark' + i
+    ).value = '';
+
+  }
+
+  document.getElementById('result')
+    .style.display = 'none';
+}
+
+
+/*******************************************************
+ * LOGOUT
+ *******************************************************/
+function logout() {
+
+  currentJury = '';
+  currentParticipant = null;
+
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+
+  document.getElementById('mainCard')
+    .classList.add('hidden');
+
+  document.getElementById('loginCard')
+    .classList.remove('hidden');
+
+  document.getElementById('participantCard')
+    .classList.add('hidden');
+}
+
+</script>
+
+
+</body>
+
+</html>
