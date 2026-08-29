@@ -1205,55 +1205,64 @@ try {
     }
 
 
-    async function loadParticipantProfile() {
+   async function loadParticipantProfile() {
 
-      showStatus(
-        "Loading your participant profile...",
-        "info"
-      );
+  showStatus(
+    "Loading your participant profile...",
+    "info"
+  );
 
+  try {
 
-      try {
-
-        const data =
-          await getAuthenticatedParticipantProfile();
-
-
-        populateProfile(
-          data
-        );
+    const data =
+      await getAuthenticatedParticipantProfile();
 
 
-        showProfileSection();
+    populateProfile(
+      data
+    );
 
 
-        showStatus(
-          "Welcome back. Please review your participant profile.",
-          "success"
-        );
+    showProfileSection();
 
 
-      } catch (error) {
+    /*
+     * Profile has loaded successfully.
+     *
+     * Re-enable the Save Profile button
+     * so the participant can edit and save
+     * their information.
+     */
 
-        console.error(
-          "Profile loading error:",
-          error
-        );
-
-
-        showStatus(
-          error.message ||
-          "Unable to load your participant profile.",
-          "error"
-        );
+    setButtonsDisabled(false);
 
 
-        setButtonsDisabled(false);
+    showStatus(
+      "Welcome back. Please review your participant profile.",
+      "success"
+    );
 
-      }
 
-    }
+  } catch (error) {
 
+    console.error(
+      "Profile loading error:",
+      error
+    );
+
+
+    showStatus(
+      error.message ||
+      "Unable to load your participant profile.",
+      "error"
+    );
+
+
+    setButtonsDisabled(false);
+
+  }
+
+}
 
     async function sendAuthenticatedParticipantToBackend(
       user
