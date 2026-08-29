@@ -1154,8 +1154,34 @@
         );
 
 
-      const data =
-        await response.json();
+     const responseText =
+  await response.text();
+
+console.log(
+  "PROFILE RAW RESPONSE:",
+  responseText
+);
+
+let data;
+
+try {
+
+  data =
+    JSON.parse(responseText);
+
+} catch (parseError) {
+
+  console.error(
+    "PROFILE JSON PARSE ERROR:",
+    parseError
+  );
+
+  throw new Error(
+    "Profile API returned a non-JSON response. " +
+    "Please check the console for PROFILE RAW RESPONSE."
+  );
+
+}
 
 
       console.log(
