@@ -1616,6 +1616,161 @@ console.log(
 
 }
     window.testGetParticipantProfile =   testGetParticipantProfile;
+
+
+
+
+ async function testUpdateParticipantProfile() {
+
+  console.log(
+    "PROFILE UPDATE TEST: Starting..."
+  );
+
+  try {
+
+    const user =
+      auth.currentUser;
+
+    if (!user) {
+
+      console.error(
+        "PROFILE UPDATE TEST: No authenticated Firebase user."
+      );
+
+      return;
+
+    }
+
+    console.log(
+      "PROFILE UPDATE TEST: Authenticated user:",
+      user.email
+    );
+
+
+    /*
+     * Get a fresh Firebase ID token.
+     */
+
+    const idToken =
+      await user.getIdToken(true);
+
+
+    console.log(
+      "PROFILE UPDATE TEST: Firebase ID token obtained."
+    );
+
+
+    /*
+     * For this first real update test,
+     * we are changing ONLY the Full Name.
+     */
+
+    const profileData = {
+
+      fullName:
+        "Premanandhan Narayanan",
+
+      mobileNumber:
+        "",
+
+      dateOfBirth:
+        "",
+
+      gender:
+        "",
+
+      address:
+        "",
+
+      city:
+        "",
+
+      district:
+        "",
+
+      state:
+        "",
+
+      country:
+        "",
+
+      pincode:
+        ""
+
+    };
+
+
+    console.log(
+      "PROFILE UPDATE TEST: Sending profile data..."
+    );
+
+
+    const response =
+      await fetch(
+        APPS_SCRIPT_URL,
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type":
+              "text/plain;charset=utf-8"
+
+          },
+
+          body:
+            JSON.stringify({
+
+              action:
+                "updateAuthenticatedParticipantProfile",
+
+              idToken:
+                idToken,
+
+              profileData:
+                profileData
+
+            })
+
+        }
+      );
+
+
+    console.log(
+      "PROFILE UPDATE TEST: HTTP status:",
+      response.status
+    );
+
+
+    const data =
+      await response.json();
+
+
+    console.log(
+      "PROFILE UPDATE TEST: Response:",
+      JSON.stringify(
+        data,
+        null,
+        2
+      )
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "PROFILE UPDATE TEST ERROR:",
+      error
+    );
+
+  }
+
+}
+
+window.testUpdateParticipantProfile =    testUpdateParticipantProfile;    
+
+    
   </script>
 
 
