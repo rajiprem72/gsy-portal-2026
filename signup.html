@@ -1078,9 +1078,8 @@
           );
 
 
-        const user =
-          result.user;
-
+        const user = result.user;
+        const idToken = await user.getIdToken();
 
         /*
          * Firebase automatically creates the
