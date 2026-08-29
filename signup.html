@@ -507,6 +507,80 @@
 
   </script>
 
+  <script type="module">
+
+  // =====================================================
+  // FIREBASE SDK
+  // =====================================================
+
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    createUserWithEmailAndPassword
+  }
+    from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+
+  // =====================================================
+  // FIREBASE CONFIGURATION
+  // =====================================================
+
+  const firebaseConfig = {
+
+    apiKey: "AIzaSyCHak_GwY6N5ZF4Aph-6ZJiDNepmeVhNH0",
+
+    authDomain:
+      "global-school-of-yoga-portal.firebaseapp.com",
+
+    projectId:
+      "global-school-of-yoga-portal",
+
+    storageBucket:
+      "global-school-of-yoga-portal.firebasestorage.app",
+
+    messagingSenderId:
+      "273342913555",
+
+    appId:
+      "1:273342913555:web:76cfdd1a5e26f55339f3e6"
+
+  };
+
+
+  // =====================================================
+  // INITIALIZE FIREBASE
+  // =====================================================
+
+  const app =
+    initializeApp(firebaseConfig);
+
+
+  // =====================================================
+  // INITIALIZE FIREBASE AUTHENTICATION
+  // =====================================================
+
+  const auth =
+    getAuth(app);
+
+
+  // =====================================================
+  // GOOGLE AUTHENTICATION PROVIDER
+  // =====================================================
+
+  const googleProvider =
+    new GoogleAuthProvider();
+
+
+  console.log(
+    "Firebase Authentication initialized successfully."
+  );
+
+</script>
+
 </body>
 </html>
 ```
