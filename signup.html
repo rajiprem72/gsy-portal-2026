@@ -1503,7 +1503,118 @@ console.log(
       "Global School of Yoga Firebase Authentication initialized successfully."
     );
 
+  async function testGetParticipantProfile() {
 
+  console.log(
+    "PROFILE TEST: Starting..."
+  );
+
+
+  try {
+
+    /*
+     * Make sure the Firebase user is authenticated.
+     */
+
+    const user =
+      auth.currentUser;
+
+
+    if (!user) {
+
+      console.error(
+        "PROFILE TEST: No authenticated Firebase user."
+      );
+
+      return;
+
+    }
+
+
+    console.log(
+      "PROFILE TEST: Authenticated user:",
+      user.email
+    );
+
+
+    /*
+     * Get a fresh Firebase ID token.
+     */
+
+    const idToken =
+      await user.getIdToken(
+        true
+      );
+
+
+    console.log(
+      "PROFILE TEST: Firebase ID token obtained."
+    );
+
+
+    /*
+     * Send the token to Apps Script.
+     */
+
+    const response =
+      await fetch(
+        APPS_SCRIPT_URL,
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type":
+              "text/plain;charset=utf-8"
+
+          },
+
+          body:
+            JSON.stringify({
+
+              action:
+                "getAuthenticatedParticipantProfile",
+
+              idToken:
+                idToken
+
+            })
+
+        }
+      );
+
+
+    console.log(
+      "PROFILE TEST: HTTP status:",
+      response.status
+    );
+
+
+    const data =
+      await response.json();
+
+
+    console.log(
+      "PROFILE TEST: Response:",
+      JSON.stringify(
+        data,
+        null,
+        2
+      )
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "PROFILE TEST ERROR:",
+      error
+    );
+
+  }
+
+}
   </script>
 
 
