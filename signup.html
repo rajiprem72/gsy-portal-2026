@@ -1,0 +1,512 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Global School of Yoga | Participant Sign Up</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #e8f5e9, #f9fbe7);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+    }
+
+    .signup-container {
+      width: 100%;
+      max-width: 480px;
+      margin: 30px 15px;
+    }
+
+    .signup-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 35px 30px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo-icon {
+      font-size: 48px;
+      margin-bottom: 8px;
+    }
+
+    .organization-name {
+      font-size: 25px;
+      font-weight: 700;
+      color: #2c5f2d;
+      margin-bottom: 8px;
+    }
+
+    .festival-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #555;
+      line-height: 1.4;
+    }
+
+    .signup-title {
+      text-align: center;
+      font-size: 25px;
+      font-weight: 700;
+      margin-top: 25px;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .signup-subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    /* Google Button */
+
+    .google-btn {
+      width: 100%;
+      padding: 13px 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #333;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: 0.2s;
+    }
+
+    .google-btn:hover {
+      background: #f7f7f7;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .google-icon {
+      font-size: 21px;
+      font-weight: bold;
+    }
+
+    /* Divider */
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 25px 0;
+      color: #888;
+      font-size: 14px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #ddd;
+    }
+
+    .divider span {
+      padding: 0 12px;
+    }
+
+    /* Form */
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: #2c5f2d;
+      box-shadow: 0 0 0 2px rgba(44,95,45,0.08);
+    }
+
+    .password-note {
+      font-size: 12px;
+      color: #777;
+      margin-top: 5px;
+    }
+
+    .create-account-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #2c5f2d;
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 5px;
+      transition: 0.2s;
+    }
+
+    .create-account-btn:hover {
+      background: #234d24;
+      transform: translateY(-1px);
+    }
+
+    .login-section {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .login-section a {
+      color: #2c5f2d;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .login-section a:hover {
+      text-decoration: underline;
+    }
+
+    .info-box {
+      margin-top: 25px;
+      padding: 14px;
+      background: #f1f8e9;
+      border: 1px solid #c8e6c9;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #455a40;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #555;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .back-link:hover {
+      color: #2c5f2d;
+    }
+
+    @media (max-width: 500px) {
+
+      .signup-card {
+        padding: 28px 20px;
+      }
+
+      .organization-name {
+        font-size: 22px;
+      }
+
+      .festival-name {
+        font-size: 16px;
+      }
+
+      .signup-title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="signup-container">
+
+    <div class="signup-card">
+
+      <!-- =========================================
+           ORGANIZATION / FESTIVAL HEADER
+      ========================================== -->
+
+      <div class="logo-section">
+
+        <div class="logo-icon">
+          🧘
+        </div>
+
+        <div class="organization-name">
+          Global School of Yoga
+        </div>
+
+        <div class="festival-name">
+          National Level Yoga Festival – 2026
+        </div>
+
+      </div>
+
+
+      <!-- =========================================
+           SIGN UP TITLE
+      ========================================== -->
+
+      <div class="signup-title">
+        Create Your Participant Account
+      </div>
+
+      <div class="signup-subtitle">
+        Create your Global School of Yoga participant account
+        to register for the National Level Yoga Festival.
+      </div>
+
+
+      <!-- =========================================
+           GOOGLE SIGN UP
+      ========================================== -->
+
+      <button
+        type="button"
+        class="google-btn"
+        onclick="googleSignUp()">
+
+        <span class="google-icon">G</span>
+
+        Continue with Google
+
+      </button>
+
+
+      <!-- =========================================
+           DIVIDER
+      ========================================== -->
+
+      <div class="divider">
+        <span>OR</span>
+      </div>
+
+
+      <!-- =========================================
+           EMAIL SIGN UP
+      ========================================== -->
+
+      <form id="emailSignupForm" onsubmit="emailSignUp(event)">
+
+        <div class="form-group">
+
+          <label for="email">
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email address"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="password">
+            Password
+          </label>
+
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Create a password"
+            minlength="8"
+            required>
+
+          <div class="password-note">
+            Password must contain at least 8 characters.
+          </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="confirmPassword">
+            Confirm Password
+          </label>
+
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="Re-enter your password"
+            minlength="8"
+            required>
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="create-account-btn">
+
+          Create Participant Account
+
+        </button>
+
+      </form>
+
+
+      <!-- =========================================
+           INFORMATION
+      ========================================== -->
+
+      <div class="info-box">
+
+        🔐 <strong>Your account is unique.</strong><br>
+
+        Your email address will be associated with
+        your Global School of Yoga Participant ID.
+
+        You can use the same account for future
+        Global School of Yoga events.
+
+      </div>
+
+
+      <!-- =========================================
+           LOGIN
+      ========================================== -->
+
+      <div class="login-section">
+
+        Already have a participant account?
+
+        <a href="login.html">
+          Login
+        </a>
+
+      </div>
+
+
+      <!-- =========================================
+           BACK TO FESTIVAL
+      ========================================== -->
+
+      <a
+        href="index.html"
+        class="back-link">
+
+        ← Back to National Yoga Festival
+
+      </a>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       JAVASCRIPT
+  ========================================== -->
+
+  <script>
+
+    /*
+     * GOOGLE SIGN UP
+     *
+     * This function will be connected to the
+     * actual Google authentication system.
+     */
+
+    function googleSignUp() {
+
+      alert(
+        "Google Sign Up will be connected in the next step."
+      );
+
+    }
+
+
+    /*
+     * EMAIL SIGN UP
+     *
+     * This function currently performs basic
+     * validation only.
+     *
+     * We will connect this to the secure
+     * authentication backend later.
+     */
+
+    function emailSignUp(event) {
+
+      event.preventDefault();
+
+      const email =
+        document.getElementById("email").value.trim();
+
+      const password =
+        document.getElementById("password").value;
+
+      const confirmPassword =
+        document.getElementById("confirmPassword").value;
+
+
+      if (password !== confirmPassword) {
+
+        alert(
+          "Password and Confirm Password do not match."
+        );
+
+        return;
+
+      }
+
+
+      if (password.length < 8) {
+
+        alert(
+          "Password must contain at least 8 characters."
+        );
+
+        return;
+
+      }
+
+
+      alert(
+        "Email account creation will be connected to the secure authentication system in the next step."
+      );
+
+    }
+
+  </script>
+
+</body>
+</html>
+```
