@@ -1060,109 +1060,247 @@
        GOOGLE SIGN UP
     ================================================= */
 
+
     async function googleSignUp() {
 
-      showStatus(
-        "Opening Google Sign-In...",
-        "info"
+  showStatus(
+    "Opening Google Sign-In...",
+    "info"
+  );
+
+  setButtonsDisabled(true);
+
+
+  try {
+
+    /*
+     * =====================================================
+     * STEP 1
+     * SIGN IN WITH GOOGLE
+     * =====================================================
+     */
+
+    const result =
+      await signInWithPopup(
+        auth,
+        googleProvider
       );
 
 
-      setButtonsDisabled(true);
+    const user =
+      result.user;
 
 
-      try {
+    /*
+     * =====================================================
+     * STEP 2
+     * GET FIREBASE ID TOKEN
+     * =====================================================
+     *
+     * This token proves to our Apps Script backend
+     * that Firebase has authenticated this user.
+     */
+
+    const idToken =
+      await user.getIdToken();
 
 
-        const result =
-          await signInWithPopup(
-            auth,
-            googleProvider
-          );
+    console.log(
+      "Firebase authentication successful."
+    );
 
 
-        const user = result.user;
-        const idToken = await user.getIdToken();
+    /*
+     * =====================================================
+     * STEP 3
+     * SEND AUTHENTICATED USER TO APPS SCRIPT
+     * =====================================================
+     */
 
-        /*
-         * Firebase automatically creates the
-         * account when this is the user's first
-         * Google authentication.
-         */
-
-        if (
-          result._tokenResponse &&
-          result._tokenResponse.isNewUser === false
-        ) {
-
-          showStatus(
-
-            "A Global School of Yoga account " +
-            "already exists for this Google account. " +
-            "Please use the Login page for future access.",
-
-            "info"
-
-          );
+    showStatus(
+      "Verifying your participant account...",
+      "info"
+    );
 
 
-          setButtonsDisabled(false);
+    const response =
+      await fetch(
+        APPS_SCRIPT_URL,
+        {
 
-          return;
+          method: "POST",
+
+          headers: {
+
+            "Content-Type":
+              "text/plain;charset=utf-8"
+
+          },
+
+          body:
+            JSON.stringify({
+
+              action:
+                "createAuthenticatedParticipant",
+
+              idToken:
+                idToken
+
+            })
 
         }
+      );
 
 
-        showStatus(
+    /*
+     * =====================================================
+     * STEP 4
+     * READ APPS SCRIPT RESPONSE
+     * =====================================================
+     */
 
-          "Google authentication successful. " +
-          "Welcome, " +
-          (user.displayName || "Participant") +
-          "!",
-
-          "success"
-
-        );
-
-
-        console.log(
-          "Firebase Google user:",
-          user
-        );
+    const data =
+      await response.json();
 
 
-        /*
-         * We will connect this authenticated
-         * Firebase user to Apps Script in the
-         * next stage.
-         */
-
-      }
-
-      catch (error) {
+    console.log(
+      "Apps Script response:",
+      data
+    );
 
 
-        console.error(
-          "Google Sign-Up Error:",
-          error
-        );
+    /*
+     * =====================================================
+     * STEP 5
+     * CHECK RESULT
+     * =====================================================
+     */
+
+    if (!data.success) {
+
+      showStatus(
+
+        data.message ||
+        "Unable to create participant account.",
+
+        "error"
+
+      );
 
 
-        showStatus(
+      setButtonsDisabled(false);
 
-          getFriendlyFirebaseError(error),
-
-          "error"
-
-        );
-
-
-        setButtonsDisabled(false);
-
-      }
+      return;
 
     }
 
+
+    /*
+     * =====================================================
+     * STEP 6
+     * EXISTING PARTICIPANT
+     * =====================================================
+     */
+
+    if (data.alreadyExists) {
+
+      showStatus(
+
+        "Welcome back, " +
+        (data.fullName || user.displayName || "Participant") +
+        "! " +
+        "Your GSY Participant ID is " +
+        data.participantId +
+        ".",
+
+        "success"
+
+      );
+
+
+      console.log(
+        "Existing participant:",
+        data.participantId
+      );
+
+
+      setButtonsDisabled(false);
+
+      return;
+
+    }
+
+
+    /*
+     * =====================================================
+     * STEP 7
+     * NEW PARTICIPANT
+     * =====================================================
+     */
+
+    showStatus(
+
+      "Welcome to Global School of Yoga, " +
+      (data.fullName || user.displayName || "Participant") +
+      "! " +
+      "Your GSY Participant ID is " +
+      data.participantId +
+      ".",
+
+      "success"
+
+    );
+
+
+    console.log(
+      "NEW GSY Participant created:",
+      data.participantId
+    );
+
+
+    /*
+     * =====================================================
+     * STEP 8
+     * TEMPORARY DEVELOPMENT MESSAGE
+     * =====================================================
+     *
+     * We will replace this with the proper
+     * Participant Profile / Event Registration
+     * screen after the database integration is
+     * completely verified.
+     */
+
+    console.log(
+      "Firebase UID:",
+      data.firebaseUid
+    );
+
+  }
+
+
+  catch (error) {
+
+    console.error(
+      "Google Sign-Up Error:",
+      error
+    );
+
+
+    showStatus(
+
+      "Unable to complete Google Sign-Up. " +
+      "Please try again.",
+
+      "error"
+
+    );
+
+
+    setButtonsDisabled(false);
+
+  }
+
+}
 
     /* =================================================
        EMAIL + PASSWORD SIGN UP
