@@ -1108,7 +1108,14 @@
     console.log(
       "Firebase authentication successful."
     );
+    console.log(
+      "Step 2: Preparing to contact Apps Script..."
+    );
 
+console.log(
+  "Apps Script URL:",
+  APPS_SCRIPT_URL
+);
 
     /*
      * =====================================================
@@ -1122,7 +1129,9 @@
       "info"
     );
 
-
+    console.log(
+        "Step 3: Sending Firebase ID token to Apps Script..."
+      );
     const response =
       await fetch(
         APPS_SCRIPT_URL,
@@ -1158,7 +1167,14 @@
      * READ APPS SCRIPT RESPONSE
      * =====================================================
      */
-
+    console.log(
+        "Step 4: Apps Script response received."
+      );
+    
+    console.log(
+      "HTTP status:",
+      response.status
+    );
     const data =
       await response.json();
 
