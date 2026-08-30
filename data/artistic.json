@@ -1,0 +1,17 @@
+{
+  "mode": "Artistic",
+  "currency": "INR",
+  "selectionMessage": "Artistic Yogasana requires a minimum of 6 persons. The fee is ₹1000 per person. 6 persons = ₹6000, 7 persons = ₹7000, 8 persons = ₹8000, 9 persons = ₹9000, 10 persons = ₹10000, 11 persons = ₹11000, 12 persons = ₹12000.",
+  "perPersonFee": 1000,
+  "minimumParticipants": 6,
+  "maximumParticipants": 12,
+  "events": [
+    {
+      "eventId": "ART001",
+      "eventName": "Artistic Yogasana",
+      "perPersonFee": 1000,
+      "minimumParticipants": 6,
+      "maximumParticipants": 12
+    }
+  ]
+}
