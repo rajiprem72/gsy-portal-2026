@@ -456,6 +456,23 @@
         padding: 12px 10px 30px;
       }
     }
+
+
+  .payment-action {
+  margin-top: 16px;
+  background: #8e24aa;
+}
+
+.payment-action:hover {
+  background: #6a1b9a;
+}
+
+.payment-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+    
   </style>
 </head>
 
@@ -951,6 +968,10 @@
         "selectionTotal"
       );
 
+    const proceedToPaymentBtn =
+      document.getElementById(
+        "proceedToPaymentBtn"
+      );
     const backModeBtn =
       document.getElementById(
         "backModeBtn"
