@@ -250,6 +250,10 @@
       opacity: 0.7;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
     .join-panel {
       margin-top: 20px;
       padding: 22px;
@@ -417,29 +421,6 @@
       color: #2c5f2d;
       font-weight: 700;
       cursor: pointer;
-    }
-
-    @media (max-width: 520px) {
-      .mode-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .event-option {
-        display: block;
-      }
-
-      .event-option input {
-        margin-bottom: 8px;
-      }
-
-      .event-fee {
-        display: block;
-        margin-top: 6px;
-      }
-    }
-
-    .hidden {
-      display: none !important;
     }
 
     @media (max-width: 700px) {
@@ -654,76 +635,39 @@
 
           <div class="mode-grid">
 
-            <button
-              type="button"
-              class="mode-card"
-              data-mode="Individual">
-
+            <button type="button" class="mode-card" data-mode="Individual">
               <div class="mode-icon">🧘</div>
-
-              <div class="mode-name">
-                Individual
-              </div>
-
+              <div class="mode-name">Individual</div>
               <div class="mode-description">
                 Participate individually in your selected event.
               </div>
-
             </button>
 
-            <button
-              type="button"
-              class="mode-card"
-              data-mode="Pair">
-
+            <button type="button" class="mode-card" data-mode="Pair">
               <div class="mode-icon">🧘‍♀️🧘</div>
-
-              <div class="mode-name">
-                Pair
-              </div>
-
+              <div class="mode-name">Pair</div>
               <div class="mode-description">
                 Participate with one other GSY participant.
               </div>
-
             </button>
 
-            <button
-              type="button"
-              class="mode-card"
-              data-mode="Rhythmic">
-
+            <button type="button" class="mode-card" data-mode="Rhythmic">
               <div class="mode-icon">🎵🧘</div>
-
-              <div class="mode-name">
-                Rhythmic Group
-              </div>
-
+              <div class="mode-name">Rhythmic Group</div>
               <div class="mode-description">
                 Group participation for exactly 5 participants.
               </div>
-
             </button>
 
-            <button
-              type="button"
-              class="mode-card"
-              data-mode="Artistic">
-
+            <button type="button" class="mode-card" data-mode="Artistic">
               <div class="mode-icon">🏆🧘</div>
-
-              <div class="mode-name">
-                Artistic Group
-              </div>
-
+              <div class="mode-name">Artistic Group</div>
               <div class="mode-description">
                 Group participation for 6 to 12 participants.
               </div>
-
             </button>
 
           </div>
-
         </div>
 
 
@@ -765,7 +709,6 @@
               id="selectionTotal">
               Total: ₹0
             </div>
-
           </div>
 
           <button
@@ -948,66 +891,55 @@
       );
 
 
-
     const joinAnotherEventBtn =
       document.getElementById(
         "joinAnotherEventBtn"
       );
-
 
     const joinPanel =
       document.getElementById(
         "joinPanel"
       );
 
-
     const cataloguePanel =
       document.getElementById(
         "cataloguePanel"
       );
-
 
     const catalogueTitle =
       document.getElementById(
         "catalogueTitle"
       );
 
-
     const catalogueSubtitle =
       document.getElementById(
         "catalogueSubtitle"
       );
-
 
     const catalogueList =
       document.getElementById(
         "catalogueList"
       );
 
-
     const selectionSummary =
       document.getElementById(
         "selectionSummary"
       );
-
 
     const selectionMessage =
       document.getElementById(
         "selectionMessage"
       );
 
-
     const selectionCount =
       document.getElementById(
         "selectionCount"
       );
 
-
     const selectionTotal =
       document.getElementById(
         "selectionTotal"
       );
-
 
     const backModeBtn =
       document.getElementById(
@@ -1119,6 +1051,539 @@
       return data;
 
     }
+
+
+
+    let currentMode = "";
+    let currentEventData = null;
+
+
+    function formatINR(amount) {
+
+      return (
+        "₹" +
+        Number(
+          amount || 0
+        ).toLocaleString(
+          "en-IN"
+        )
+      );
+
+    }
+
+
+    function updateSelectionSummary() {
+
+      const selected =
+        Array.from(
+          document.querySelectorAll(
+            ".event-option input[type='checkbox']:checked"
+          )
+        );
+
+
+      let total = 0;
+
+
+      selected.forEach(
+        function(checkbox) {
+
+          total +=
+            Number(
+              checkbox.dataset.fee || 0
+            );
+
+        }
+      );
+
+
+      selectionCount.textContent =
+        selected.length === 1
+          ? "1 event selected"
+          : selected.length +
+            " events selected";
+
+
+      selectionTotal.textContent =
+        "Total: " +
+        formatINR(total);
+
+
+      selectionMessage.textContent =
+        currentEventData &&
+        currentEventData.selectionMessage
+          ? currentEventData.selectionMessage
+          : "";
+
+
+      selectionSummary.classList.remove(
+        "hidden"
+      );
+
+    }
+
+
+    function renderEventCatalogue(
+      mode,
+      data
+    ) {
+
+      currentEventData =
+        data;
+
+
+      catalogueTitle.textContent =
+        mode +
+        " Events";
+
+
+      catalogueSubtitle.textContent =
+        data.selectionMessage ||
+        "Select the event or events you would like to join.";
+
+
+      catalogueList.innerHTML =
+        "";
+
+
+      const events =
+        Array.isArray(data.events)
+          ? data.events
+          : [];
+
+
+      if (
+        events.length === 0
+      ) {
+
+        selectionSummary.classList.add(
+          "hidden"
+        );
+
+
+        catalogueSubtitle.textContent =
+          "No events are currently available for this mode.";
+
+
+        return;
+
+      }
+
+
+      events.forEach(
+        function(event, index) {
+
+          const row =
+            document.createElement(
+              "div"
+            );
+
+
+          row.className =
+            "event-option";
+
+
+          const checkbox =
+            document.createElement(
+              "input"
+            );
+
+
+          checkbox.type =
+            "checkbox";
+
+
+          const rawId =
+            event.eventId ||
+            (
+              mode +
+              "_" +
+              index
+            );
+
+
+          const safeId =
+            String(rawId)
+              .replace(
+                /[^a-zA-Z0-9_-]/g,
+                "_"
+              );
+
+
+          checkbox.id =
+            "event_" +
+            safeId;
+
+
+          checkbox.dataset.eventId =
+            event.eventId || "";
+
+
+          checkbox.dataset.fee =
+            event.fee !== undefined
+              ? event.fee
+              : (
+                  event.perPersonFee ||
+                  0
+                );
+
+
+          const label =
+            document.createElement(
+              "label"
+            );
+
+
+          label.className =
+            "event-option-label";
+
+
+          label.htmlFor =
+            checkbox.id;
+
+
+          const name =
+            document.createElement(
+              "div"
+            );
+
+
+          name.className =
+            "event-name";
+
+
+          name.textContent =
+            event.eventName ||
+            "Event";
+
+
+          label.appendChild(
+            name
+          );
+
+
+          if (event.round) {
+
+            const round =
+              document.createElement(
+                "div"
+              );
+
+
+            round.className =
+              "event-round";
+
+
+            round.textContent =
+              event.round;
+
+
+            label.appendChild(
+              round
+            );
+
+          }
+
+
+          const fee =
+            document.createElement(
+              "div"
+            );
+
+
+          fee.className =
+            "event-fee";
+
+
+          if (
+            event.fee !== undefined
+          ) {
+
+            fee.textContent =
+              formatINR(
+                event.fee
+              );
+
+          } else if (
+            event.perPersonFee !== undefined
+          ) {
+
+            fee.textContent =
+              formatINR(
+                event.perPersonFee
+              ) +
+              " / person";
+
+          }
+
+
+          checkbox.addEventListener(
+            "change",
+            updateSelectionSummary
+          );
+
+
+          row.appendChild(
+            checkbox
+          );
+
+
+          row.appendChild(
+            label
+          );
+
+
+          row.appendChild(
+            fee
+          );
+
+
+          catalogueList.appendChild(
+            row
+          );
+
+        }
+      );
+
+
+      updateSelectionSummary();
+
+    }
+
+
+    async function loadEventCatalogue(
+      mode
+    ) {
+
+      const fileNameMap = {
+
+        Individual:
+          "individual.json",
+
+        Pair:
+          "pair.json",
+
+        Rhythmic:
+          "rhythmic.json",
+
+        Artistic:
+          "artistic.json"
+
+      };
+
+
+      const fileName =
+        fileNameMap[mode];
+
+
+      if (!fileName) {
+
+        throw new Error(
+          "Invalid Yoga Mode."
+        );
+
+      }
+
+
+      catalogueTitle.textContent =
+        mode +
+        " Events";
+
+
+      catalogueSubtitle.textContent =
+        "Loading " +
+        mode +
+        " events...";
+
+
+      catalogueList.innerHTML =
+        "";
+
+
+      selectionSummary.classList.add(
+        "hidden"
+      );
+
+
+      const response =
+        await fetch(
+          "data/" +
+          fileName,
+          {
+            cache: "no-store"
+          }
+        );
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          "Unable to load " +
+          fileName +
+          " from the data folder."
+        );
+
+      }
+
+
+      const data =
+        await response.json();
+
+
+      renderEventCatalogue(
+        mode,
+        data
+      );
+
+    }
+
+
+    joinAnotherEventBtn.addEventListener(
+      "click",
+      function() {
+
+        const isOpen =
+          !joinPanel.classList.contains(
+            "hidden"
+          );
+
+
+        if (isOpen) {
+
+          joinPanel.classList.add(
+            "hidden"
+          );
+
+
+          cataloguePanel.classList.add(
+            "hidden"
+          );
+
+
+          joinAnotherEventBtn.textContent =
+            "➕ Join Another Event";
+
+
+          return;
+
+        }
+
+
+        joinPanel.classList.remove(
+          "hidden"
+        );
+
+
+        cataloguePanel.classList.add(
+          "hidden"
+        );
+
+
+        joinAnotherEventBtn.textContent =
+          "✖ Close Event Selection";
+
+
+        showStatus(
+          "Choose a Yoga Mode.",
+          "info"
+        );
+
+      }
+    );
+
+
+    document
+      .querySelectorAll(
+        ".mode-card"
+      )
+      .forEach(
+        function(button) {
+
+          button.addEventListener(
+            "click",
+            async function() {
+
+              currentMode =
+                button.dataset.mode ||
+                "";
+
+
+              joinPanel.classList.add(
+                "hidden"
+              );
+
+
+              cataloguePanel.classList.remove(
+                "hidden"
+              );
+
+
+              try {
+
+                showStatus(
+                  "Loading " +
+                  currentMode +
+                  " event options...",
+                  "info"
+                );
+
+
+                await loadEventCatalogue(
+                  currentMode
+                );
+
+
+                showStatus(
+                  currentMode +
+                  " event options are ready.",
+                  "success"
+                );
+
+
+              } catch (error) {
+
+                console.error(
+                  "Event catalogue error:",
+                  error
+                );
+
+
+                showStatus(
+                  error.message ||
+                  "Unable to load event options.",
+                  "error"
+                );
+
+              }
+
+            }
+          );
+
+        }
+      );
+
+
+    backModeBtn.addEventListener(
+      "click",
+      function() {
+
+        cataloguePanel.classList.add(
+          "hidden"
+        );
+
+
+        joinPanel.classList.remove(
+          "hidden"
+        );
+
+
+        showStatus(
+          "Choose a Yoga Mode.",
+          "info"
+        );
+
+      }
+    );
 
 
     async function loadDashboard() {
