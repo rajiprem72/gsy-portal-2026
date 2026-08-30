@@ -5,127 +5,127 @@
   "events": [
     {
       "eventId": "IND001",
-      "eventName": "Common Category Individual Event",
+      "eventName": "Common Category ",
       "fee": 1000,
       "round": "Common Category"
     },
     {
       "eventId": "IND002",
-      "eventName": "Yoga World Record  Individual Event",
+      "eventName": "Yoga World Record  ",
       "fee": 1000,
       "round": "Yoga World Record"
     },
     {
       "eventId": "IND003",
-      "eventName": "Traditional Yoga Individual Event",
+      "eventName": "Traditional Yoga ",
       "fee": 1000,
       "round": "Traditional Yoga"
     },
     {
       "eventId": "IND004",
-      "eventName": "Forward Bend  Individual Event",
+      "eventName": "Forward Bend  ",
       "fee": 1000,
       "round": "Regular"
     },
     {
       "eventId": "IND005",
-      "eventName": "Back Bend Individual Event",
+      "eventName": "Back Bend ",
       "fee": 1000,
       "round": "Regular"
     },
     {
       "eventId": "IND006",
-      "eventName": "Twisting Individual Event",
+      "eventName": "Twisting ",
       "fee": 1000,
       "round": "Regular"
     },
     {
       "eventId": "IND007",
-      "eventName": "Leg Balance Individual Event",
+      "eventName": "Leg Balance ",
       "fee": 1000,
       "round": "Regular"
     },
     {
       "eventId": "IND008",
-      "eventName": "Hand Balance Individual Event",
+      "eventName": "Hand Balance ",
       "fee": 1000,
       "round": "Regular"
     },
     {
       "eventId": "IND009",
-      "eventName": "Inverted Individual Event",
+      "eventName": "Inverted ",
       "fee": 1000,
       "round": "Regular"
     },
     {
       "eventId": "IND010",
-      "eventName": "Artistic Yogasana Individual Event",
+      "eventName": "Artistic Yogasana ",
       "fee": 1000,
       "round": "Regular"
     },
     {
       "eventId": "IND011",
-      "eventName": "Rhythmic Yogasana  Individual Event",
+      "eventName": "Rhythmic Yogasana  ",
       "fee": 1000,
       "round": "Regular"
     },
     {
       "eventId": "IND012",
-      "eventName": "Forward Bend Individual Event - Champion Round:.",
+      "eventName": "Forward Bend  - Champion Round:.",
       "fee": 1500,
       "round": "Champion Round"
     },
     {
       "eventId": "IND013",
-      "eventName": "Back Bend Individual Event - Champion Round:.",
+      "eventName": "Back Bend  - Champion Round:.",
       "fee": 1500,
       "round": "Champion Round"
     },
     {
       "eventId": "IND014",
-      "eventName": "Twisting Individual Event - Champion Round:.",
+      "eventName": "Twisting  - Champion Round:.",
       "fee": 1500,
       "round": "Champion Round"
     },
     {
       "eventId": "IND015",
-      "eventName": "Leg Balance Individual Event - Champion Round:.",
+      "eventName": "Leg Balance  - Champion Round:.",
       "fee": 1500,
       "round": "Champion Round"
     },
     {
       "eventId": "IND016",
-      "eventName": "Hand Balance Individual Event - Champion Round:.",
+      "eventName": "Hand Balance  - Champion Round:.",
       "fee": 1500,
       "round": "Champion Round"
     },
     {
       "eventId": "IND017",
-      "eventName": "Forward Bend Individual Event - Champion of Champions Round",
+      "eventName": "Forward Bend  - Champion of Champions Round",
       "fee": 1800,
       "round": "Champion of Champions Round"
     },
     {
       "eventId": "IND018",
-      "eventName": "Back Bend Individual Event - Champion of Champions Round",
+      "eventName": "Back Bend  - Champion of Champions Round",
       "fee": 1800,
       "round": "Champion of Champions Round"
     },
     {
       "eventId": "IND019",
-      "eventName": "Twisting Individual Event - Champion of Champions Round",
+      "eventName": "Twisting  - Champion of Champions Round",
       "fee": 1800,
       "round": "Champion of Champions Round"
     },
     {
       "eventId": "IND020",
-      "eventName": "Leg Balance Individual Event - Champion of Champions Round",
+      "eventName": "Leg Balance  - Champion of Champions Round",
       "fee": 1800,
       "round": "Champion of Champions Round"
     },
     {
       "eventId": "IND021",
-      "eventName": "Hand Balance Individual Event - Champion of Champions Round",
+      "eventName": "Hand Balance  - Champion of Champions Round",
       "fee": 1800,
       "round": "Champion of Champions Round"
     }
