@@ -1,0 +1,23 @@
+{
+  "mode": "Pair",
+  "currency": "INR",
+  "selectionMessage": "For Pair events, the fee is ₹1000 per person. For 2 persons, the total amount is ₹2000.",
+  "perPersonFee": 1000,
+  "totalParticipants": 2,
+  "events": [
+    {
+      "eventId": "PAIR001",
+      "eventName": "Artistic Yogasana",
+      "fee": 2000,
+      "perPersonFee": 1000,
+      "participants": 2
+    },
+    {
+      "eventId": "PAIR002",
+      "eventName": "Rhythmic Yogasana",
+      "fee": 2000,
+      "perPersonFee": 1000,
+      "participants": 2
+    }
+  ]
+}
