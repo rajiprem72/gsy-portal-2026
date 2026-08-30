@@ -528,6 +528,65 @@
 
 
     /* =========================================
+       PERSONAL PROFILE
+    ========================================== */
+
+    .profile-section {
+
+      margin-top: 25px;
+      padding: 20px;
+
+      background:
+        #fbfdf9;
+
+      border:
+        1px solid #c8e6c9;
+
+      border-radius:
+        12px;
+
+    }
+
+
+    .profile-section.hidden {
+      display: none;
+    }
+
+
+    .profile-title {
+
+      font-size:
+        21px;
+
+      font-weight:
+        700;
+
+      color:
+        #2c5f2d;
+
+      margin-bottom:
+        6px;
+
+    }
+
+
+    .profile-subtitle {
+
+      font-size:
+        14px;
+
+      line-height:
+        1.5;
+
+      color:
+        #666;
+
+      margin-bottom:
+        18px;
+
+    }
+
+    /* =========================================
        MOBILE
     ========================================== */
 
@@ -746,6 +805,245 @@
            INFORMATION
       ========================================== -->
 
+      <!-- =========================================
+           PERSONAL PROFILE
+      ========================================== -->
+
+      <div
+        id="personalProfileSection"
+        class="profile-section hidden">
+
+        <div class="profile-title">
+          Complete Your Personal Profile
+        </div>
+
+        <div class="profile-subtitle">
+          Please review and complete your personal details.
+          These details will be associated with your GSY Participant ID.
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profileFullName">
+            Full Name
+          </label>
+
+          <input
+            type="text"
+            id="profileFullName"
+            autocomplete="name"
+            placeholder="Enter your full name"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profileMobileNumber">
+            Mobile Number
+          </label>
+
+          <input
+            type="tel"
+            id="profileMobileNumber"
+            inputmode="numeric"
+            autocomplete="tel"
+            placeholder="Enter your mobile number">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profileDateOfBirth">
+            Date of Birth
+          </label>
+
+          <input
+            type="date"
+            id="profileDateOfBirth">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profileGender">
+            Gender
+          </label>
+
+          <select
+            id="profileGender"
+            style="
+              width:100%;
+              padding:13px 14px;
+              border:1px solid #ccc;
+              border-radius:8px;
+              font-size:16px;
+              background:#fff;
+              outline:none;
+            ">
+
+            <option value="">
+              Select Gender
+            </option>
+
+            <option value="Male">
+              Male
+            </option>
+
+            <option value="Female">
+              Female
+            </option>
+
+            <option value="Other">
+              Other
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profileAddress">
+            Address
+          </label>
+
+          <textarea
+            id="profileAddress"
+            rows="3"
+            placeholder="Enter your address"
+            style="
+              width:100%;
+              padding:13px 14px;
+              border:1px solid #ccc;
+              border-radius:8px;
+              font-size:16px;
+              font-family:Arial,sans-serif;
+              resize:vertical;
+              outline:none;
+            "></textarea>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profileCity">
+            City
+          </label>
+
+          <input
+            type="text"
+            id="profileCity"
+            placeholder="Enter your city"
+            autocomplete="address-level2">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profileDistrict">
+            District
+          </label>
+
+          <input
+            type="text"
+            id="profileDistrict"
+            placeholder="Enter your district">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profileState">
+            State
+          </label>
+
+          <input
+            type="text"
+            id="profileState"
+            placeholder="Enter your state"
+            autocomplete="address-level1">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profileCountry">
+            Country
+          </label>
+
+          <input
+            type="text"
+            id="profileCountry"
+            placeholder="Enter your country"
+            autocomplete="country-name">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profilePincode">
+            Pincode
+          </label>
+
+          <input
+            type="text"
+            id="profilePincode"
+            inputmode="numeric"
+            autocomplete="postal-code"
+            placeholder="Enter your pincode">
+
+        </div>
+
+
+        <button
+          type="button"
+          class="create-account-btn"
+          id="saveProfileBtn">
+
+          Save Profile
+
+        </button>
+
+
+        <div
+          id="profileSavedMessage"
+          class="status-message">
+        </div>
+
+
+        <a
+          href="profile.html"
+          id="profileDashboardLink"
+          style="
+            display:none;
+            margin-top:16px;
+            padding:13px 16px;
+            border-radius:8px;
+            background:#2c5f2d;
+            color:#fff;
+            text-align:center;
+            font-weight:700;
+            text-decoration:none;
+          ">
+
+          🏆 Go to My Dashboard
+
+        </a>
+
+      </div>
+
+
       <div class="info-box">
 
         🔐 <strong>Your account is unique.</strong>
@@ -800,15 +1098,18 @@
        FIREBASE AUTHENTICATION
   ================================================== -->
 
+
   <script type="module">
 
-
     /* =================================================
-       IMPORT FIREBASE
+       GLOBAL SCHOOL OF YOGA
+       SIGN UP + PERSONAL PROFILE
     ================================================= */
 
+
     const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbyfo75KniotK2fpfh-zBGYeqwOw3sfLJh-gu1T5_j8U48BFxrZSIIBxo7d5wtgNypIN/exec";
+      "https://script.google.com/macros/s/AKfycbyfo75KniotK2fpfh-zBGYeqwOw3sfLJh-gu1T5_j8U48BFxrZSIIBxo7d5wtgNypIN/exec";
+
 
     import {
       initializeApp
@@ -855,32 +1156,22 @@
     };
 
 
-    /* =================================================
-       INITIALIZE FIREBASE
-    ================================================= */
-
     const app =
-      initializeApp(firebaseConfig);
+      initializeApp(
+        firebaseConfig
+      );
 
-
-    /* =================================================
-       INITIALIZE AUTHENTICATION
-    ================================================= */
 
     const auth =
       getAuth(app);
 
-
-    /* =================================================
-       GOOGLE PROVIDER
-    ================================================= */
 
     const googleProvider =
       new GoogleAuthProvider();
 
 
     /* =================================================
-       GET PAGE ELEMENTS
+       PAGE ELEMENTS
     ================================================= */
 
     const googleSignUpBtn =
@@ -925,8 +1216,92 @@
       );
 
 
+    const personalProfileSection =
+      document.getElementById(
+        "personalProfileSection"
+      );
+
+
+    const profileFullName =
+      document.getElementById(
+        "profileFullName"
+      );
+
+
+    const profileMobileNumber =
+      document.getElementById(
+        "profileMobileNumber"
+      );
+
+
+    const profileDateOfBirth =
+      document.getElementById(
+        "profileDateOfBirth"
+      );
+
+
+    const profileGender =
+      document.getElementById(
+        "profileGender"
+      );
+
+
+    const profileAddress =
+      document.getElementById(
+        "profileAddress"
+      );
+
+
+    const profileCity =
+      document.getElementById(
+        "profileCity"
+      );
+
+
+    const profileDistrict =
+      document.getElementById(
+        "profileDistrict"
+      );
+
+
+    const profileState =
+      document.getElementById(
+        "profileState"
+      );
+
+
+    const profileCountry =
+      document.getElementById(
+        "profileCountry"
+      );
+
+
+    const profilePincode =
+      document.getElementById(
+        "profilePincode"
+      );
+
+
+    const saveProfileBtn =
+      document.getElementById(
+        "saveProfileBtn"
+      );
+
+
+    const profileSavedMessage =
+      document.getElementById(
+        "profileSavedMessage"
+      );
+
+
+    const profileDashboardLink =
+      document.getElementById(
+        "profileDashboardLink"
+      );
+
+
     /* =================================================
-       STATUS MESSAGE FUNCTION
+       STATUS HELPERS
     ================================================= */
 
     function showStatus(
@@ -938,14 +1313,26 @@
         message;
 
       statusMessage.className =
-        "status-message " + type;
+        "status-message " +
+        type;
 
     }
 
 
-    /* =================================================
-       BUTTON STATE
-    ================================================= */
+    function showProfileStatus(
+      message,
+      type
+    ) {
+
+      profileSavedMessage.textContent =
+        message;
+
+      profileSavedMessage.className =
+        "status-message " +
+        type;
+
+    }
+
 
     function setButtonsDisabled(
       disabled
@@ -960,22 +1347,32 @@
     }
 
 
+    function setProfileControlsDisabled(
+      disabled
+    ) {
+
+      saveProfileBtn.disabled =
+        disabled;
+
+    }
+
+
     /* =================================================
-       FIREBASE ERROR MESSAGE
+       FRIENDLY FIREBASE ERRORS
     ================================================= */
 
     function getFriendlyFirebaseError(
       error
     ) {
 
-      switch (error.code) {
-
+      switch (
+        error.code
+      ) {
 
         case "auth/email-already-in-use":
 
           return (
-            "An account already exists " +
-            "with this email address. " +
+            "An account already exists with this email address. " +
             "Please use the Login page."
           );
 
@@ -998,57 +1395,51 @@
         case "auth/popup-closed-by-user":
 
           return (
-            "The Google sign-in window was " +
-            "closed before completing sign-up."
+            "The Google sign-in window was closed before completing sign-up."
           );
 
 
         case "auth/popup-blocked":
 
           return (
-            "Your browser blocked the Google " +
-            "sign-in window. Please allow " +
-            "pop-ups for this website."
+            "Your browser blocked the Google sign-in window. " +
+            "Please allow pop-ups for this website."
           );
 
 
         case "auth/cancelled-popup-request":
 
           return (
-            "Another Google sign-in request " +
-            "is already in progress."
+            "Another Google sign-in request is already in progress."
           );
 
 
         case "auth/network-request-failed":
 
           return (
-            "A network error occurred. " +
-            "Please check your internet connection."
+            "A network error occurred. Please check your internet connection."
           );
 
 
         case "auth/operation-not-allowed":
 
           return (
-            "This sign-in method has not been " +
-            "enabled in Firebase Authentication."
+            "This sign-in method has not been enabled in Firebase Authentication."
           );
 
 
         case "auth/account-exists-with-different-credential":
 
           return (
-            "An account already exists with " +
-            "this email using another sign-in method."
+            "An account already exists with this email using another sign-in method."
           );
 
 
         default:
 
           return (
-            "Unable to create the account. " +
-            "Please try again."
+            error.message ||
+            "Unable to complete the account operation. Please try again."
           );
 
       }
@@ -1057,287 +1448,337 @@
 
 
     /* =================================================
-       GOOGLE SIGN UP
+       CALL APPS SCRIPT
     ================================================= */
 
+    async function callAppsScript(
+      payload
+    ) {
 
-    async function googleSignUp() {
+      const response =
+        await fetch(
+          APPS_SCRIPT_URL,
+          {
 
-  showStatus(
-    "Opening Google Sign-In...",
-    "info"
-  );
+            method:
+              "POST",
 
-  setButtonsDisabled(true);
+            headers:
+              {
+                "Content-Type":
+                  "text/plain;charset=utf-8"
+              },
 
+            body:
+              JSON.stringify(
+                payload
+              )
 
-  try {
-
-    /*
-     * =====================================================
-     * STEP 1
-     * SIGN IN WITH GOOGLE
-     * =====================================================
-     */
-
-    const result =
-      await signInWithPopup(
-        auth,
-        googleProvider
-      );
-
-
-    const user =
-      result.user;
+          }
+        );
 
 
-    /*
-     * =====================================================
-     * STEP 2
-     * GET FIREBASE ID TOKEN
-     * =====================================================
-     *
-     * This token proves to our Apps Script backend
-     * that Firebase has authenticated this user.
-     */
-
-    const idToken =
-      await user.getIdToken();
+      const responseText =
+        await response.text();
 
 
-    console.log(
-      "Firebase authentication successful."
-    );
-    console.log(
-      "Step 2: Preparing to contact Apps Script..."
-    );
-
-console.log(
-  "Apps Script URL:",
-  APPS_SCRIPT_URL
-);
-
-    /*
-     * =====================================================
-     * STEP 3
-     * SEND AUTHENTICATED USER TO APPS SCRIPT
-     * =====================================================
-     */
-
-    showStatus(
-      "Verifying your participant account...",
-      "info"
-    );
-
-    console.log(
-        "Step 3: Sending Firebase ID token to Apps Script..."
-      );
-    const response =
-      await fetch(
-        APPS_SCRIPT_URL,
-        {
-
-          method: "POST",
-
-          headers: {
-
-            "Content-Type":
-              "text/plain;charset=utf-8"
-
-          },
-
-          body:
-            JSON.stringify({
-
-              action:
-                "createAuthenticatedParticipant",
-
-              idToken:
-                idToken
-
-            })
-
-        }
-      );
-
-
-    /*
-     * =====================================================
-     * STEP 4
-     * READ APPS SCRIPT RESPONSE
-     * =====================================================
-     */
-    console.log(
-        "Step 4: Apps Script response received."
-      );
-    
-    console.log(
-      "HTTP status:",
-      response.status
-    );
-    const data =
-      await response.json();
-
-
-    console.log(
-        "Apps Script response:",
-        JSON.stringify(data, null, 2)
-      );
-
-    /*
-     * =====================================================
-     * STEP 5
-     * CHECK RESULT
-     * =====================================================
-     */
-
-    if (!data.success) {
-
-      showStatus(
-
-        data.message ||
-        "Unable to create participant account.",
-
-        "error"
-
-      );
-
-
-      setButtonsDisabled(false);
-
-      return;
-
-    }
-
-
-    /*
-     * =====================================================
-     * STEP 6
-     * EXISTING PARTICIPANT
-     * =====================================================
-     */
-
-    if (data.alreadyExists) {
-
-      showStatus(
-
-        "Welcome back, " +
-        (data.fullName || user.displayName || "Participant") +
-        "! " +
-        "Your GSY Participant ID is " +
-        data.participantId +
-        ".",
-
-        "success"
-
+      console.log(
+        "Apps Script HTTP status:",
+        response.status
       );
 
 
       console.log(
-        "Existing participant:",
-        data.participantId
+        "Apps Script raw response:",
+        responseText
       );
 
 
-      setButtonsDisabled(false);
+      let data;
 
-      return;
+
+      try {
+
+        data =
+          JSON.parse(
+            responseText
+          );
+
+      } catch (error) {
+
+        throw new Error(
+          "The participant service returned an invalid response."
+        );
+
+      }
+
+
+      return data;
 
     }
 
 
-    /*
-     * =====================================================
-     * STEP 7
-     * NEW PARTICIPANT
-     * =====================================================
-     */
+    /* =================================================
+       SHOW PERSONAL PROFILE
+    ================================================= */
 
-    showStatus(
+    function showPersonalProfile(
+      initialData
+    ) {
 
-      "Welcome to Global School of Yoga, " +
-      (data.fullName || user.displayName || "Participant") +
-      "! " +
-      "Your GSY Participant ID is " +
-      data.participantId +
-      ".",
-
-      "success"
-
-    );
+      personalProfileSection.classList.remove(
+        "hidden"
+      );
 
 
-    console.log(
-      "NEW GSY Participant created:",
-      data.participantId
-    );
+      if (
+        initialData
+      ) {
+
+        profileFullName.value =
+          initialData.fullName ||
+          "";
+
+        profileMobileNumber.value =
+          initialData.mobileNumber ||
+          "";
+
+        profileDateOfBirth.value =
+          initialData.dateOfBirth ||
+          "";
+
+        profileGender.value =
+          initialData.gender ||
+          "";
+
+        profileAddress.value =
+          initialData.address ||
+          "";
+
+        profileCity.value =
+          initialData.city ||
+          "";
+
+        profileDistrict.value =
+          initialData.district ||
+          "";
+
+        profileState.value =
+          initialData.state ||
+          "";
+
+        profileCountry.value =
+          initialData.country ||
+          "";
+
+        profilePincode.value =
+          initialData.pincode ||
+          "";
+
+      }
+
+      personalProfileSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+    }
 
 
-    /*
-     * =====================================================
-     * STEP 8
-     * TEMPORARY DEVELOPMENT MESSAGE
-     * =====================================================
-     *
-     * We will replace this with the proper
-     * Participant Profile / Event Registration
-     * screen after the database integration is
-     * completely verified.
-     */
+    /* =================================================
+       GOOGLE SIGN UP
+    ================================================= */
 
-    console.log(
-      "Firebase UID:",
-      data.firebaseUid
-    );
+    async function googleSignUp() {
 
-  }
+      showStatus(
+        "Opening Google Sign-In...",
+        "info"
+      );
 
 
-  catch (error) {
-
-    console.error(
-      "Google Sign-Up Error:",
-      error
-    );
+      setButtonsDisabled(
+        true
+      );
 
 
-    showStatus(
+      try {
 
-      "Unable to complete Google Sign-Up. " +
-      "Please try again.",
+        const result =
+          await signInWithPopup(
+            auth,
+            googleProvider
+          );
 
-      "error"
 
-    );
+        const user =
+          result.user;
 
 
-    setButtonsDisabled(false);
+        const idToken =
+          await user.getIdToken(
+            true
+          );
 
-  }
 
-}
+        showStatus(
+          "Verifying your participant account...",
+          "info"
+        );
+
+
+        const data =
+          await callAppsScript({
+
+            action:
+              "createAuthenticatedParticipant",
+
+            idToken:
+              idToken
+
+          });
+
+
+        if (
+          !data.success
+        ) {
+
+          throw new Error(
+            data.message ||
+            "Unable to create your GSY participant account."
+          );
+
+        }
+
+
+        console.log(
+          "GOOGLE SIGNUP: Participant response:",
+          data
+        );
+
+
+        const profileData = {
+
+          fullName:
+            data.fullName ||
+            user.displayName ||
+            "",
+
+          mobileNumber:
+            data.mobileNumber ||
+            "",
+
+          dateOfBirth:
+            data.dateOfBirth ||
+            "",
+
+          gender:
+            data.gender ||
+            "",
+
+          address:
+            data.address ||
+            "",
+
+          city:
+            data.city ||
+            "",
+
+          district:
+            data.district ||
+            "",
+
+          state:
+            data.state ||
+            "",
+
+          country:
+            data.country ||
+            "",
+
+          pincode:
+            data.pincode ||
+            ""
+
+        };
+
+
+        showStatus(
+
+          "Welcome to Global School of Yoga! " +
+          "Your Participant ID is " +
+          data.participantId +
+          ". Please complete your personal profile below.",
+
+          "success"
+
+        );
+
+
+        showPersonalProfile(
+          profileData
+        );
+
+
+        setButtonsDisabled(
+          false
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "GOOGLE SIGNUP ERROR:",
+          error
+        );
+
+
+        showStatus(
+          getFriendlyFirebaseError(
+            error
+          ),
+          "error"
+        );
+
+
+        setButtonsDisabled(
+          false
+        );
+
+      }
+
+    }
+
 
     /* =================================================
        EMAIL + PASSWORD SIGN UP
     ================================================= */
 
-    async function emailSignUp(event) {
+    async function emailSignUp(
+      event
+    ) {
 
       event.preventDefault();
+
 
       const email =
         emailInput.value
           .trim()
           .toLowerCase();
 
+
       const password =
         passwordInput.value;
+
 
       const confirmPassword =
         confirmPasswordInput.value;
 
 
-      if (password !== confirmPassword) {
+      if (
+        password !==
+        confirmPassword
+      ) {
 
         showStatus(
           "Password and Confirm Password do not match.",
@@ -1349,7 +1790,9 @@ console.log(
       }
 
 
-      if (password.length < 8) {
+      if (
+        password.length < 8
+      ) {
 
         showStatus(
           "Password must contain at least 8 characters.",
@@ -1366,14 +1809,18 @@ console.log(
         "info"
       );
 
-      setButtonsDisabled(true);
+
+      setButtonsDisabled(
+        true
+      );
 
 
       try {
 
-        /* -----------------------------------------
-           STEP 1 - CREATE FIREBASE ACCOUNT
-        ----------------------------------------- */
+        /*
+         * STEP 1
+         * Create Firebase Email/Password user.
+         */
 
         const userCredential =
           await createUserWithEmailAndPassword(
@@ -1381,6 +1828,7 @@ console.log(
             email,
             password
           );
+
 
         const user =
           userCredential.user;
@@ -1392,11 +1840,14 @@ console.log(
         );
 
 
-        /* -----------------------------------------
-           STEP 2 - SEND VERIFICATION EMAIL
-        ----------------------------------------- */
+        /*
+         * STEP 2
+         * Send verification email.
+         */
 
-        await sendEmailVerification(user);
+        await sendEmailVerification(
+          user
+        );
 
 
         console.log(
@@ -1404,17 +1855,21 @@ console.log(
         );
 
 
-        /* -----------------------------------------
-           STEP 3 - GET FIREBASE ID TOKEN
-        ----------------------------------------- */
+        /*
+         * STEP 3
+         * Obtain verified Firebase identity token.
+         */
 
         const idToken =
-          await user.getIdToken(true);
+          await user.getIdToken(
+            true
+          );
 
 
-        /* -----------------------------------------
-           STEP 4 - CREATE/FIND GSY PARTICIPANT
-        ----------------------------------------- */
+        /*
+         * STEP 4
+         * Create/find GSY participant.
+         */
 
         showStatus(
           "Creating your GSY participant profile...",
@@ -1422,64 +1877,21 @@ console.log(
         );
 
 
-        const response =
-          await fetch(
-            APPS_SCRIPT_URL,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type":
-                  "text/plain;charset=utf-8"
-              },
-              body: JSON.stringify({
-                action:
-                  "createAuthenticatedParticipant",
-                idToken:
-                  idToken
-              })
-            }
-          );
+        const data =
+          await callAppsScript({
+
+            action:
+              "createAuthenticatedParticipant",
+
+            idToken:
+              idToken
+
+          });
 
 
-        const responseText =
-          await response.text();
-
-
-        console.log(
-          "EMAIL SIGNUP: Apps Script HTTP status:",
-          response.status
-        );
-
-
-        console.log(
-          "EMAIL SIGNUP: Apps Script raw response:",
-          responseText
-        );
-
-
-        let data;
-
-
-        try {
-
-          data =
-            JSON.parse(responseText);
-
-        } catch (parseError) {
-
-          console.error(
-            "EMAIL SIGNUP: JSON parse error:",
-            parseError
-          );
-
-          throw new Error(
-            "The participant service returned an invalid response."
-          );
-
-        }
-
-
-        if (!data.success) {
+        if (
+          !data.success
+        ) {
 
           throw new Error(
             data.message ||
@@ -1489,125 +1901,302 @@ console.log(
         }
 
 
-        /* -----------------------------------------
-           STEP 5 - SHOW PARTICIPANT ID
-        ----------------------------------------- */
+        console.log(
+          "EMAIL SIGNUP: Participant response:",
+          data
+        );
 
-        const displayName =
-          data.fullName ||
-          user.displayName ||
-          email.split("@")[0];
+
+        /*
+         * STEP 5
+         * Show personal profile immediately.
+         */
+
+        const profileData = {
+
+          fullName:
+            data.fullName ||
+            user.displayName ||
+            "",
+
+          mobileNumber:
+            data.mobileNumber ||
+            "",
+
+          dateOfBirth:
+            data.dateOfBirth ||
+            "",
+
+          gender:
+            data.gender ||
+            "",
+
+          address:
+            data.address ||
+            "",
+
+          city:
+            data.city ||
+            "",
+
+          district:
+            data.district ||
+            "",
+
+          state:
+            data.state ||
+            "",
+
+          country:
+            data.country ||
+            "",
+
+          pincode:
+            data.pincode ||
+            ""
+
+        };
 
 
         showStatus(
-          "Welcome to Global School of Yoga, " +
-          displayName +
-          "! Your GSY Participant ID is " +
+
+          "Your account has been created successfully. " +
+          "Your Participant ID is " +
           data.participantId +
-          ". A verification email has been sent to " +
+          ". " +
+          "A verification email has also been sent to " +
           email +
-          ". Please verify your email before continuing.",
+          ". Please complete your profile below.",
+
           "success"
+
         );
 
 
-        console.log(
-          "EMAIL SIGNUP: Participant ID:",
-          data.participantId
+        showPersonalProfile(
+          profileData
         );
 
 
-        /* -----------------------------------------
-           STEP 6 - DASHBOARD LINK
-        ----------------------------------------- */
+        /*
+         * The Firebase user remains signed in.
+         * Do not redirect to login here.
+         */
 
-        const oldLink =
-          document.getElementById(
-            "dashboardLink"
-          );
-
-        if (oldLink) {
-          oldLink.remove();
-        }
-
-
-        const dashboardLink =
-          document.createElement("a");
-
-
-        dashboardLink.id =
-          "dashboardLink";
-
-
-        dashboardLink.href =
-          "profile.html";
-
-
-        dashboardLink.textContent =
-          "🏆 Go to My Dashboard";
-
-
-        dashboardLink.style.display =
-          "block";
-
-
-        dashboardLink.style.marginTop =
-          "16px";
-
-
-        dashboardLink.style.padding =
-          "13px 16px";
-
-
-        dashboardLink.style.borderRadius =
-          "8px";
-
-
-        dashboardLink.style.background =
-          "#2c5f2d";
-
-
-        dashboardLink.style.color =
-          "#ffffff";
-
-
-        dashboardLink.style.textAlign =
-          "center";
-
-
-        dashboardLink.style.fontWeight =
-          "700";
-
-
-        dashboardLink.style.textDecoration =
-          "none";
-
-
-        statusMessage.insertAdjacentElement(
-          "afterend",
-          dashboardLink
+        setButtonsDisabled(
+          false
         );
-
-
-        setButtonsDisabled(false);
 
       }
 
       catch (error) {
 
         console.error(
-          "EMAIL SIGNUP: Error:",
+          "EMAIL SIGNUP ERROR:",
           error
         );
 
 
         showStatus(
-          getFriendlyFirebaseError(error),
+          getFriendlyFirebaseError(
+            error
+          ),
           "error"
         );
 
 
-        setButtonsDisabled(false);
+        setButtonsDisabled(
+          false
+        );
+
+      }
+
+    }
+
+
+    /* =================================================
+       SAVE PERSONAL PROFILE
+    ================================================= */
+
+    async function savePersonalProfile() {
+
+      const user =
+        auth.currentUser;
+
+
+      if (!user) {
+
+        showProfileStatus(
+          "Your login session is no longer active. Please log in again.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const fullName =
+        profileFullName.value
+          .trim();
+
+
+      if (
+        !fullName
+      ) {
+
+        showProfileStatus(
+          "Please enter your full name.",
+          "error"
+        );
+
+        profileFullName.focus();
+
+        return;
+
+      }
+
+
+      const mobile =
+        profileMobileNumber.value
+          .trim();
+
+
+      const pincode =
+        profilePincode.value
+          .trim();
+
+
+      setProfileControlsDisabled(
+        true
+      );
+
+
+      showProfileStatus(
+        "Saving your personal profile...",
+        "info"
+      );
+
+
+      try {
+
+        const idToken =
+          await user.getIdToken(
+            true
+          );
+
+
+        const profileData = {
+
+          fullName:
+            fullName,
+
+          mobileNumber:
+            mobile,
+
+          dateOfBirth:
+            profileDateOfBirth.value ||
+            "",
+
+          gender:
+            profileGender.value ||
+            "",
+
+          address:
+            profileAddress.value
+              .trim(),
+
+          city:
+            profileCity.value
+              .trim(),
+
+          district:
+            profileDistrict.value
+              .trim(),
+
+          state:
+            profileState.value
+              .trim(),
+
+          country:
+            profileCountry.value
+              .trim(),
+
+          pincode:
+            pincode
+
+        };
+
+
+        const data =
+          await callAppsScript({
+
+            action:
+              "updateAuthenticatedParticipantProfile",
+
+            idToken:
+              idToken,
+
+            profileData:
+              profileData
+
+          });
+
+
+        if (
+          !data.success
+        ) {
+
+          throw new Error(
+            data.message ||
+            "Unable to save your personal profile."
+          );
+
+        }
+
+
+        console.log(
+          "PROFILE SAVE: Response:",
+          data
+        );
+
+
+        showProfileStatus(
+          "✅ Your personal profile has been saved successfully.",
+          "success"
+        );
+
+
+        profileDashboardLink.style.display =
+          "block";
+
+
+        profileDashboardLink.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+
+
+      } catch (error) {
+
+        console.error(
+          "PROFILE SAVE ERROR:",
+          error
+        );
+
+
+        showProfileStatus(
+          error.message ||
+          "Unable to save your personal profile.",
+          "error"
+        );
+
+
+      } finally {
+
+        setProfileControlsDisabled(
+          false
+        );
 
       }
 
@@ -1630,18 +2219,17 @@ console.log(
     );
 
 
-    /* =================================================
-       FIREBASE INITIALIZATION CONFIRMATION
-    ================================================= */
-
-    console.log(
-      "Global School of Yoga Firebase Authentication initialized successfully."
+    saveProfileBtn.addEventListener(
+      "click",
+      savePersonalProfile
     );
 
 
+    console.log(
+      "Global School of Yoga Signup initialized successfully."
+    );
+
   </script>
 
-
 </body>
-
 </html>
