@@ -71,31 +71,31 @@
     },
     {
       "eventId": "IND012",
-      "eventName": "Forward Bend  - Champion Round:.",
+      "eventName": "Forward Bend  - Champion Round",
       "fee": 1500,
       "round": "Champion Round"
     },
     {
       "eventId": "IND013",
-      "eventName": "Back Bend  - Champion Round:.",
+      "eventName": "Back Bend  - Champion Round",
       "fee": 1500,
       "round": "Champion Round"
     },
     {
       "eventId": "IND014",
-      "eventName": "Twisting  - Champion Round:.",
+      "eventName": "Twisting  - Champion Round",
       "fee": 1500,
       "round": "Champion Round"
     },
     {
       "eventId": "IND015",
-      "eventName": "Leg Balance  - Champion Round:.",
+      "eventName": "Leg Balance  - Champion Round",
       "fee": 1500,
       "round": "Champion Round"
     },
     {
       "eventId": "IND016",
-      "eventName": "Hand Balance  - Champion Round:.",
+      "eventName": "Hand Balance  - Champion Round",
       "fee": 1500,
       "round": "Champion Round"
     },
