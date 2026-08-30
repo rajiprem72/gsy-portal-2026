@@ -834,47 +834,29 @@
        FIREBASE AUTHENTICATION
   ================================================== -->
 
+
   <script type="module">
 
     const APPS_SCRIPT_URL =
       "https://script.google.com/macros/s/AKfycbyfo75KniotK2fpfh-zBGYeqwOw3sfLJh-gu1T5_j8U48BFxrZSIIBxo7d5wtgNypIN/exec";
 
-
     import {
       initializeApp
-    }
-    from
-      "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 
     import {
       getAuth,
       onAuthStateChanged
-    }
-    from
-      "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
 
     const firebaseConfig = {
-
-      apiKey:
-        "AIzaSyCHak_GwY6N5ZF4Aph-6ZJiDNepmeVhNH0",
-
-      authDomain:
-        "global-school-of-yoga-portal.firebaseapp.com",
-
-      projectId:
-        "global-school-of-yoga-portal",
-
-      storageBucket:
-        "global-school-of-yoga-portal.firebasestorage.app",
-
-      messagingSenderId:
-        "273342913555",
-
-      appId:
-        "1:273342913555:web:76cfdd1a5e26f55339f3e6"
-
+      apiKey: "AIzaSyCHak_GwY6N5ZF4Aph-6ZJiDNepmeVhNH0",
+      authDomain: "global-school-of-yoga-portal.firebaseapp.com",
+      projectId: "global-school-of-yoga-portal",
+      storageBucket: "global-school-of-yoga-portal.firebasestorage.app",
+      messagingSenderId: "273342913555",
+      appId: "1:273342913555:web:76cfdd1a5e26f55339f3e6"
     };
 
 
@@ -883,381 +865,308 @@
         firebaseConfig
       );
 
-
     const auth =
       getAuth(app);
 
 
     const welcomeTitle =
-      document.getElementById(
-        "welcomeTitle"
-      );
-
+      document.getElementById("welcomeTitle");
 
     const participantId =
-      document.getElementById(
-        "participantId"
-      );
-
+      document.getElementById("participantId");
 
     const participantName =
-      document.getElementById(
-        "participantName"
-      );
-
+      document.getElementById("participantName");
 
     const loginEmail =
-      document.getElementById(
-        "loginEmail"
-      );
-
+      document.getElementById("loginEmail");
 
     const statusMessage =
-      document.getElementById(
-        "statusMessage"
-      );
-
+      document.getElementById("statusMessage");
 
     const joinAnotherEventBtn =
-      document.getElementById(
-        "joinAnotherEventBtn"
-      );
+      document.getElementById("joinAnotherEventBtn");
 
     const joinPanel =
-      document.getElementById(
-        "joinPanel"
-      );
+      document.getElementById("joinPanel");
 
     const cataloguePanel =
-      document.getElementById(
-        "cataloguePanel"
-      );
+      document.getElementById("cataloguePanel");
 
     const catalogueTitle =
-      document.getElementById(
-        "catalogueTitle"
-      );
+      document.getElementById("catalogueTitle");
 
     const catalogueSubtitle =
-      document.getElementById(
-        "catalogueSubtitle"
-      );
+      document.getElementById("catalogueSubtitle");
 
     const catalogueList =
-      document.getElementById(
-        "catalogueList"
-      );
+      document.getElementById("catalogueList");
 
     const selectionSummary =
-      document.getElementById(
-        "selectionSummary"
-      );
+      document.getElementById("selectionSummary");
 
     const selectionMessage =
-      document.getElementById(
-        "selectionMessage"
-      );
+      document.getElementById("selectionMessage");
 
     const selectionCount =
-      document.getElementById(
-        "selectionCount"
-      );
+      document.getElementById("selectionCount");
 
     const selectionTotal =
-      document.getElementById(
-        "selectionTotal"
-      );
+      document.getElementById("selectionTotal");
 
     const proceedToPaymentBtn =
-      document.getElementById(
-        "proceedToPaymentBtn"
-      );
+      document.getElementById("proceedToPaymentBtn");
+
     const backModeBtn =
-      document.getElementById(
-        "backModeBtn"
-      );
-
-
-    function showStatus(
-      message,
-      type
-    ) {
-
-      statusMessage.textContent =
-        message;
-
-      statusMessage.className =
-        "status-message " + type;
-
-    }
-
-
-    async function getAuthenticatedParticipantProfile() {
-
-      const user =
-        auth.currentUser;
-
-
-      if (!user) {
-
-        throw new Error(
-          "No authenticated Firebase user."
-        );
-
-      }
-
-
-      const idToken =
-        await user.getIdToken(
-          true
-        );
-
-
-      const response =
-        await fetch(
-          APPS_SCRIPT_URL,
-          {
-
-            method: "POST",
-
-            headers: {
-
-              "Content-Type":
-                "text/plain;charset=utf-8"
-
-            },
-
-            body:
-              JSON.stringify({
-
-                action:
-                  "getAuthenticatedParticipantProfile",
-
-                idToken:
-                  idToken
-
-              })
-
-          }
-        );
-
-
-      const responseText =
-        await response.text();
-
-
-      let data;
-
-      try {
-
-        data =
-          JSON.parse(
-            responseText
-          );
-
-      } catch (error) {
-
-        console.error(
-          "Dashboard raw API response:",
-          responseText
-        );
-
-        throw new Error(
-          "Unable to read participant profile from the server."
-        );
-
-      }
-
-
-      if (!data.success) {
-
-        throw new Error(
-          data.message ||
-          "Unable to retrieve participant profile."
-        );
-
-      }
-
-
-      return data;
-
-    }
-
+      document.getElementById("backModeBtn");
 
 
     let currentMode = "";
     let currentEventData = null;
 
 
-    function formatINR(amount) {
+    function showStatus(message, type) {
+      statusMessage.textContent = message;
+      statusMessage.className =
+        "status-message " + type;
+    }
 
+
+    function formatINR(amount) {
       return (
         "₹" +
-        Number(
-          amount || 0
-        ).toLocaleString(
-          "en-IN"
-        )
+        Number(amount || 0).toLocaleString("en-IN")
       );
-
     }
 
 
-  function updateSelectionSummary() {
+    async function getAuthenticatedParticipantProfile() {
 
-  const selected =
-    Array.from(
-      document.querySelectorAll(
-        ".event-option input[type='checkbox']:checked"
-      )
-    );
+      const user = auth.currentUser;
 
+      if (!user) {
+        throw new Error(
+          "No authenticated Firebase user."
+        );
+      }
 
-  let total = 0;
+      const idToken =
+        await user.getIdToken(true);
 
-
-  selected.forEach(
-    function(checkbox) {
-
-      total +=
-        Number(
-          checkbox.dataset.fee || 0
+      const response =
+        await fetch(
+          APPS_SCRIPT_URL,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify({
+              action:
+                "getAuthenticatedParticipantProfile",
+              idToken:
+                idToken
+            })
+          }
         );
 
+      const responseText =
+        await response.text();
+
+      let data;
+
+      try {
+        data =
+          JSON.parse(responseText);
+      } catch (error) {
+        console.error(
+          "PROFILE: Raw response:",
+          responseText
+        );
+        throw new Error(
+          "Unable to read participant profile from the server."
+        );
+      }
+
+      if (!data.success) {
+        throw new Error(
+          data.message ||
+          "Unable to retrieve participant profile."
+        );
+      }
+
+      return data;
     }
-  );
 
 
-  selectionCount.textContent =
-    selected.length === 1
-      ? "1 event selected"
-      : selected.length +
-        " events selected";
+    async function loadDashboard() {
+
+      try {
+
+        showStatus(
+          "Loading your GSY dashboard...",
+          "info"
+        );
+
+        const profile =
+          await getAuthenticatedParticipantProfile();
+
+        welcomeTitle.textContent =
+          "Welcome, " +
+          (
+            profile.fullName ||
+            "Participant"
+          );
+
+        participantId.textContent =
+          profile.participantId || "—";
+
+        participantName.textContent =
+          profile.fullName || "—";
+
+        loginEmail.textContent =
+          profile.loginEmail || "—";
+
+        showStatus(
+          "Your participant dashboard is ready.",
+          "success"
+        );
+
+      } catch (error) {
+
+        console.error(
+          "PROFILE: Dashboard loading error:",
+          error
+        );
+
+        showStatus(
+          error.message ||
+          "Unable to load your participant dashboard.",
+          "error"
+        );
+
+        participantId.textContent = "—";
+        participantName.textContent = "—";
+        loginEmail.textContent = "—";
+      }
+    }
 
 
-  selectionTotal.textContent =
-    "Total: " +
-    formatINR(total);
+    function updateSelectionSummary() {
+
+      const selected =
+        Array.from(
+          document.querySelectorAll(
+            ".event-option input[type='checkbox']:checked"
+          )
+        );
+
+      let total = 0;
+
+      selected.forEach(
+        function(checkbox) {
+          total +=
+            Number(
+              checkbox.dataset.fee || 0
+            );
+        }
+      );
+
+      selectionCount.textContent =
+        selected.length === 1
+          ? "1 event selected"
+          : selected.length + " events selected";
+
+      selectionTotal.textContent =
+        "Total: " + formatINR(total);
+
+      selectionMessage.textContent =
+        currentEventData &&
+        currentEventData.selectionMessage
+          ? currentEventData.selectionMessage
+          : "";
+
+      selectionSummary.classList.remove(
+        "hidden"
+      );
+
+      proceedToPaymentBtn.disabled =
+        selected.length === 0;
+    }
 
 
-  selectionMessage.textContent =
-    currentEventData &&
-    currentEventData.selectionMessage
-      ? currentEventData.selectionMessage
-      : "";
-
-
-  selectionSummary.classList.remove(
-    "hidden"
-  );
-
-
-  /*
-   * Enable payment only when at least
-   * one event has been selected.
-   */
-
-  proceedToPaymentBtn.disabled =
-    selected.length === 0;
-
-}
-
-    
     function renderEventCatalogue(
       mode,
       data
     ) {
 
-      currentEventData =
-        data;
-
+      currentEventData = data;
 
       catalogueTitle.textContent =
-        mode +
-        " Events";
-
+        mode + " Events";
 
       catalogueSubtitle.textContent =
         data.selectionMessage ||
         "Select the event or events you would like to join.";
 
+      catalogueList.innerHTML = "";
 
-      catalogueList.innerHTML =
-        "";
+      selectionSummary.classList.add(
+        "hidden"
+      );
 
+      proceedToPaymentBtn.disabled = true;
 
       const events =
         Array.isArray(data.events)
           ? data.events
           : [];
 
-
-      if (
-        events.length === 0
-      ) {
-
-        selectionSummary.classList.add(
-          "hidden"
-        );
-
+      if (events.length === 0) {
 
         catalogueSubtitle.textContent =
           "No events are currently available for this mode.";
 
-
         return;
-
       }
-
 
       events.forEach(
         function(event, index) {
 
           const row =
-            document.createElement(
-              "div"
-            );
-
+            document.createElement("div");
 
           row.className =
             "event-option";
 
-
           const checkbox =
-            document.createElement(
-              "input"
+            document.createElement("input");
+
+          checkbox.type = "checkbox";
+
+          const eventId =
+            String(
+              event.eventId ||
+              mode + "_" + index
             );
-
-
-          checkbox.type =
-            "checkbox";
-
-
-          const rawId =
-            event.eventId ||
-            (
-              mode +
-              "_" +
-              index
-            );
-
 
           const safeId =
-            String(rawId)
-              .replace(
-                /[^a-zA-Z0-9_-]/g,
-                "_"
-              );
-
+            eventId.replace(
+              /[^a-zA-Z0-9_-]/g,
+              "_"
+            );
 
           checkbox.id =
-            "event_" +
-            safeId;
-
+            "event_" + safeId;
 
           checkbox.dataset.eventId =
             event.eventId || "";
 
+          /*
+           * Display-only fee.
+           * The backend must calculate the real payable amount.
+           */
 
           checkbox.dataset.fee =
             event.fee !== undefined
@@ -1267,270 +1176,360 @@
                   0
                 );
 
-
           const label =
-            document.createElement(
-              "label"
-            );
-
+            document.createElement("label");
 
           label.className =
             "event-option-label";
 
-
           label.htmlFor =
             checkbox.id;
 
-
           const name =
-            document.createElement(
-              "div"
-            );
-
+            document.createElement("div");
 
           name.className =
             "event-name";
-
 
           name.textContent =
             event.eventName ||
             "Event";
 
-
-          label.appendChild(
-            name
-          );
-
+          label.appendChild(name);
 
           if (event.round) {
 
             const round =
-              document.createElement(
-                "div"
-              );
-
+              document.createElement("div");
 
             round.className =
               "event-round";
 
-
             round.textContent =
               event.round;
 
-
-            label.appendChild(
-              round
-            );
-
+            label.appendChild(round);
           }
 
-
           const fee =
-            document.createElement(
-              "div"
-            );
-
+            document.createElement("div");
 
           fee.className =
             "event-fee";
 
-
-          if (
-            event.fee !== undefined
-          ) {
+          if (event.fee !== undefined) {
 
             fee.textContent =
-              formatINR(
-                event.fee
-              );
+              formatINR(event.fee);
 
-          } else if (
-            event.perPersonFee !== undefined
-          ) {
+          } else if (event.perPersonFee !== undefined) {
 
             fee.textContent =
-              formatINR(
-                event.perPersonFee
-              ) +
+              formatINR(event.perPersonFee) +
               " / person";
-
           }
-
 
           checkbox.addEventListener(
             "change",
             updateSelectionSummary
           );
 
+          row.appendChild(checkbox);
+          row.appendChild(label);
+          row.appendChild(fee);
 
-          row.appendChild(
-            checkbox
-          );
-
-
-          row.appendChild(
-            label
-          );
-
-
-          row.appendChild(
-            fee
-          );
-
-
-          catalogueList.appendChild(
-            row
-          );
-
+          catalogueList.appendChild(row);
         }
       );
 
-
       updateSelectionSummary();
-
     }
 
 
-    async function loadEventCatalogue(
-      mode
-    ) {
+    async function loadEventCatalogue(mode) {
 
       const fileNameMap = {
-
-        Individual:
-          "individual.json",
-
-        Pair:
-          "pair.json",
-
-        Rhythmic:
-          "rhythmic.json",
-
-        Artistic:
-          "artistic.json"
-
+        Individual: "individual.json",
+        Pair: "pair.json",
+        Rhythmic: "rhythmic.json",
+        Artistic: "artistic.json"
       };
-
 
       const fileName =
         fileNameMap[mode];
 
-
       if (!fileName) {
-
         throw new Error(
           "Invalid Yoga Mode."
         );
-
       }
 
-
       catalogueTitle.textContent =
-        mode +
-        " Events";
-
+        mode + " Events";
 
       catalogueSubtitle.textContent =
-        "Loading " +
-        mode +
-        " events...";
+        "Loading " + mode + " events...";
 
-
-      catalogueList.innerHTML =
-        "";
-
+      catalogueList.innerHTML = "";
 
       selectionSummary.classList.add(
         "hidden"
       );
 
+      proceedToPaymentBtn.disabled = true;
 
       const response =
         await fetch(
-          "data/" +
-          fileName,
+          "data/" + fileName,
           {
             cache: "no-store"
           }
         );
 
-
       if (!response.ok) {
-
         throw new Error(
           "Unable to load " +
           fileName +
           " from the data folder."
         );
-
       }
-
 
       const data =
         await response.json();
-
 
       renderEventCatalogue(
         mode,
         data
       );
-
     }
 
+
+    async function createIndividualPaymentLink() {
+
+      const selectedCheckboxes =
+        Array.from(
+          document.querySelectorAll(
+            ".event-option input[type='checkbox']:checked"
+          )
+        );
+
+      if (selectedCheckboxes.length === 0) {
+        showStatus(
+          "Please select at least one Individual event.",
+          "error"
+        );
+        return;
+      }
+
+      const eventIds =
+        selectedCheckboxes
+          .map(
+            function(checkbox) {
+              return checkbox.dataset.eventId;
+            }
+          )
+          .filter(
+            function(eventId) {
+              return Boolean(eventId);
+            }
+          );
+
+      if (eventIds.length === 0) {
+        showStatus(
+          "Unable to identify the selected event.",
+          "error"
+        );
+        return;
+      }
+
+      const user =
+        auth.currentUser;
+
+      if (!user) {
+        showStatus(
+          "Your login session has expired. Please log in again.",
+          "error"
+        );
+        return;
+      }
+
+      try {
+
+        proceedToPaymentBtn.disabled = true;
+
+        proceedToPaymentBtn.textContent =
+          "⏳ Creating Payment Link...";
+
+        showStatus(
+          "Preparing your Razorpay payment...",
+          "info"
+        );
+
+        const idToken =
+          await user.getIdToken(true);
+
+        console.log(
+          "PAYMENT: Selected Event IDs:",
+          eventIds
+        );
+
+        const response =
+          await fetch(
+            APPS_SCRIPT_URL,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type":
+                  "text/plain;charset=utf-8"
+              },
+              body: JSON.stringify({
+                action:
+                  "createIndividualPaymentLink",
+                idToken:
+                  idToken,
+                eventIds:
+                  eventIds
+              })
+            }
+          );
+
+        const responseText =
+          await response.text();
+
+        console.log(
+          "PAYMENT: HTTP status:",
+          response.status
+        );
+
+        console.log(
+          "PAYMENT: Raw response:",
+          responseText
+        );
+
+        let data;
+
+        try {
+          data =
+            JSON.parse(responseText);
+        } catch (parseError) {
+
+          console.error(
+            "PAYMENT: JSON parse error:",
+            parseError
+          );
+
+          throw new Error(
+            "The payment service returned an invalid response."
+          );
+        }
+
+        console.log(
+          "PAYMENT: Response:",
+          data
+        );
+
+        if (!data.success) {
+          throw new Error(
+            data.message ||
+            "Unable to create the Razorpay payment link."
+          );
+        }
+
+        if (!data.paymentUrl) {
+          throw new Error(
+            "Razorpay payment link was not returned."
+          );
+        }
+
+        showStatus(
+          "Payment link created. Redirecting to Razorpay...",
+          "success"
+        );
+
+        setTimeout(
+          function() {
+            window.location.href =
+              data.paymentUrl;
+          },
+          700
+        );
+
+      } catch (error) {
+
+        console.error(
+          "PAYMENT: Payment Link Error:",
+          error
+        );
+
+        showStatus(
+          error.message ||
+          "Unable to create the payment link.",
+          "error"
+        );
+
+        proceedToPaymentBtn.disabled = false;
+
+        proceedToPaymentBtn.textContent =
+          "💳 Proceed to Payment";
+      }
+    }
+
+
+    /*
+     * =======================================================
+     * JOIN ANOTHER EVENT
+     * =======================================================
+     */
 
     joinAnotherEventBtn.addEventListener(
       "click",
       function() {
 
-        const isOpen =
+        const open =
           !joinPanel.classList.contains(
             "hidden"
           );
 
-
-        if (isOpen) {
+        if (open) {
 
           joinPanel.classList.add(
             "hidden"
           );
 
-
           cataloguePanel.classList.add(
             "hidden"
           );
 
-
           joinAnotherEventBtn.textContent =
             "➕ Join Another Event";
 
-
           return;
-
         }
-
 
         joinPanel.classList.remove(
           "hidden"
         );
 
-
         cataloguePanel.classList.add(
           "hidden"
         );
 
-
         joinAnotherEventBtn.textContent =
           "✖ Close Event Selection";
-
 
         showStatus(
           "Choose a Yoga Mode.",
           "info"
         );
-
       }
     );
 
+
+    /*
+     * =======================================================
+     * YOGA MODE SELECTION
+     * =======================================================
+     */
 
     document
       .querySelectorAll(
@@ -1547,16 +1546,13 @@
                 button.dataset.mode ||
                 "";
 
-
               joinPanel.classList.add(
                 "hidden"
               );
 
-
               cataloguePanel.classList.remove(
                 "hidden"
               );
-
 
               try {
 
@@ -1567,11 +1563,9 @@
                   "info"
                 );
 
-
                 await loadEventCatalogue(
                   currentMode
                 );
-
 
                 showStatus(
                   currentMode +
@@ -1579,29 +1573,30 @@
                   "success"
                 );
 
-
               } catch (error) {
 
                 console.error(
-                  "Event catalogue error:",
+                  "EVENT: Catalogue error:",
                   error
                 );
-
 
                 showStatus(
                   error.message ||
                   "Unable to load event options.",
                   "error"
                 );
-
               }
-
             }
           );
-
         }
       );
 
+
+    /*
+     * =======================================================
+     * BACK TO YOGA MODE
+     * =======================================================
+     */
 
     backModeBtn.addEventListener(
       "click",
@@ -1611,689 +1606,35 @@
           "hidden"
         );
 
-
         joinPanel.classList.remove(
           "hidden"
         );
-
 
         showStatus(
           "Choose a Yoga Mode.",
           "info"
         );
-
       }
     );
 
 
-
-    async function createIndividualPaymentLink() {
-
-  const selectedCheckboxes =
-    Array.from(
-      document.querySelectorAll(
-        ".event-option input[type='checkbox']:checked"
-      )
-    );
-
-
-  if (
-    selectedCheckboxes.length === 0
-  ) {
-
-    showStatus(
-      "Please select at least one Individual event.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  const eventIds =
-    selectedCheckboxes
-      .map(
-        function(checkbox) {
-          return checkbox.dataset.eventId;
-        }
-      )
-      .filter(
-        function(eventId) {
-          return eventId;
-        }
-      );
-
-
-  if (
-    eventIds.length === 0
-  ) {
-
-    showStatus(
-      "Unable to identify the selected event.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  const user =
-    auth.currentUser;
-
-
-  if (!user) {
-
-    showStatus(
-      "Your login session has expired. Please log in again.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  try {
-
-    proceedToPaymentBtn.disabled =
-      true;
-
-
-    proceedToPaymentBtn.textContent =
-      "⏳ Creating Payment Link...";
-
-
-    showStatus(
-      "Preparing your Razorpay payment...",
-      "info"
-    );
-
-
-    const idToken =
-      await user.getIdToken(
-        true
-      );
-
-
-    const response =
-      await fetch(
-        APPS_SCRIPT_URL,
-        {
-
-          method: "POST",
-
-          headers: {
-
-            "Content-Type":
-              "text/plain;charset=utf-8"
-
-          },
-
-          body:
-            JSON.stringify({
-
-              action:
-                "createIndividualPaymentLink",
-
-              idToken:
-                idToken,
-
-              eventIds:
-                eventIds
-
-            })
-
-        }
-      );
-
-
-    const responseText =
-      await response.text();
-
-
-    let data;
-
-
-    try {
-
-      data =
-        JSON.parse(
-          responseText
-        );
-
-    } catch (error) {
-
-      console.error(
-        "Payment API raw response:",
-        responseText
-      );
-
-      throw new Error(
-        "The payment service returned an invalid response."
-      );
-
-    }
-
-
-    console.log(
-      "Razorpay Payment Link response:",
-      data
-    );
-
-
-    if (!data.success) {
-
-      throw new Error(
-        data.message ||
-        "Unable to create the Razorpay payment link."
-      );
-
-    }
-
-
-    if (!data.paymentUrl) {
-
-      throw new Error(
-        "Razorpay payment link was not returned."
-      );
-
-    }
-
-
-    showStatus(
-      "Payment link created. Redirecting to Razorpay...",
-      "success"
+    /*
+     * =======================================================
+     * PAYMENT BUTTON
+     * =======================================================
+     */
+
+    proceedToPaymentBtn.addEventListener(
+      "click",
+      createIndividualPaymentLink
     );
 
 
     /*
-     * Give the success message a moment
-     * to appear before redirecting.
+     * =======================================================
+     * FIREBASE SESSION
+     * =======================================================
      */
-
-    setTimeout(
-      function() {
-
-        window.location.href =
-          data.paymentUrl;
-
-      },
-      700
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      "Payment Link Error:",
-      error
-    );
-
-
-    showStatus(
-      error.message ||
-      "Unable to create the payment link.",
-      "error"
-    );
-
-
-    proceedToPaymentBtn.disabled =
-      false;
-
-
-    proceedToPaymentBtn.textContent =
-      "💳 Proceed to Payment";
-
-  }
-
-}
-
-
- /* =======================================================
-   CREATE INDIVIDUAL RAZORPAY PAYMENT LINK
-======================================================= */
-
-async function createIndividualPaymentLink() {
-
-  const selectedCheckboxes =
-    Array.from(
-      document.querySelectorAll(
-        ".event-option input[type='checkbox']:checked"
-      )
-    );
-
-
-  /*
-   * -------------------------------------------------------
-   * STEP 1
-   * Make sure at least one event is selected.
-   * -------------------------------------------------------
-   */
-
-  if (
-    selectedCheckboxes.length === 0
-  ) {
-
-    showStatus(
-      "Please select at least one Individual event.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  /*
-   * -------------------------------------------------------
-   * STEP 2
-   * Get the selected Event IDs.
-   * -------------------------------------------------------
-   */
-
-  const eventIds =
-    selectedCheckboxes
-      .map(
-        function(checkbox) {
-
-          return checkbox.dataset.eventId;
-
-        }
-      )
-      .filter(
-        function(eventId) {
-
-          return eventId;
-
-        }
-      );
-
-
-  if (
-    eventIds.length === 0
-  ) {
-
-    showStatus(
-      "Unable to identify the selected event.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  /*
-   * -------------------------------------------------------
-   * STEP 3
-   * Make sure Firebase user is still logged in.
-   * -------------------------------------------------------
-   */
-
-  const user =
-    auth.currentUser;
-
-
-  if (!user) {
-
-    showStatus(
-      "Your login session has expired. Please log in again.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  /*
-   * -------------------------------------------------------
-   * STEP 4
-   * Create Razorpay Payment Link.
-   * -------------------------------------------------------
-   */
-
-  try {
-
-    proceedToPaymentBtn.disabled =
-      true;
-
-
-    proceedToPaymentBtn.textContent =
-      "⏳ Creating Payment Link...";
-
-
-    showStatus(
-      "Preparing your Razorpay payment...",
-      "info"
-    );
-
-
-    /*
-     * Get a fresh Firebase ID token.
-     */
-
-    const idToken =
-      await user.getIdToken(
-        true
-      );
-
-
-    console.log(
-      "PAYMENT: Firebase ID token obtained."
-    );
-
-
-    console.log(
-      "PAYMENT: Selected Event IDs:",
-      eventIds
-    );
-
-
-    /*
-     * Send the authenticated request
-     * to Apps Script.
-     */
-
-    const response =
-      await fetch(
-        APPS_SCRIPT_URL,
-        {
-
-          method: "POST",
-
-          headers: {
-
-            "Content-Type":
-              "text/plain;charset=utf-8"
-
-          },
-
-          body:
-            JSON.stringify({
-
-              action:
-                "createIndividualPaymentLink",
-
-              idToken:
-                idToken,
-
-              eventIds:
-                eventIds
-
-            })
-
-        }
-      );
-
-
-    console.log(
-      "PAYMENT: HTTP status:",
-      response.status
-    );
-
-
-    /*
-     * Read the raw response first.
-     * This helps us diagnose JSON problems.
-     */
-
-    const responseText =
-      await response.text();
-
-
-    console.log(
-      "PAYMENT: Raw response:",
-      responseText
-    );
-
-
-    let data;
-
-
-    try {
-
-      data =
-        JSON.parse(
-          responseText
-        );
-
-    } catch (parseError) {
-
-      console.error(
-        "PAYMENT: JSON parse error:",
-        parseError
-      );
-
-      throw new Error(
-        "The payment service returned an invalid response."
-      );
-
-    }
-
-
-    console.log(
-      "PAYMENT: Razorpay response:",
-      data
-    );
-
-
-    /*
-     * -------------------------------------------------------
-     * STEP 5
-     * Check Apps Script result.
-     * -------------------------------------------------------
-     */
-
-    if (
-      !data.success
-    ) {
-
-      throw new Error(
-        data.message ||
-        "Unable to create the Razorpay payment link."
-      );
-
-    }
-
-
-    /*
-     * -------------------------------------------------------
-     * STEP 6
-     * Make sure a payment URL was returned.
-     * -------------------------------------------------------
-     */
-
-    if (
-      !data.paymentUrl
-    ) {
-
-      throw new Error(
-        "Razorpay payment link was not returned."
-      );
-
-    }
-
-
-    /*
-     * -------------------------------------------------------
-     * STEP 7
-     * Redirect participant to Razorpay.
-     * -------------------------------------------------------
-     */
-
-    showStatus(
-      "Payment link created. Redirecting to Razorpay...",
-      "success"
-    );
-
-
-    setTimeout(
-      function() {
-
-        window.location.href =
-          data.paymentUrl;
-
-      },
-      700
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      "PAYMENT: Payment Link Error:",
-      error
-    );
-
-
-    showStatus(
-      error.message ||
-      "Unable to create the payment link.",
-      "error"
-    );
-
-
-    /*
-     * Re-enable the button after an error.
-     */
-
-    proceedToPaymentBtn.disabled =
-      false;
-
-
-    proceedToPaymentBtn.textContent =
-      "💳 Proceed to Payment";
-
-  }
-
-}
-
-
-/* =======================================================
-   PAYMENT BUTTON EVENT LISTENER
-======================================================= */
-
-proceedToPaymentBtn.addEventListener(
-  "click",
-  createIndividualPaymentLink
-);
-
-
-/* =======================================================
-   FIREBASE SESSION
-======================================================= */
-
-onAuthStateChanged(
-  auth,
-  function(user) {
-
-    if (!user) {
-
-      showStatus(
-        "Please log in to access your participant dashboard.",
-        "error"
-      );
-
-
-      setTimeout(
-        function() {
-
-          window.location.href =
-            "login.html";
-
-        },
-        1800
-      );
-
-
-      return;
-
-    }
-
-
-    loadDashboard();
-
-  }
-);
-
-    
-
-    async function loadDashboard() {
-
-      try {
-
-        showStatus(
-          "Loading your GSY dashboard...",
-          "info"
-        );
-
-
-        const profile =
-          await getAuthenticatedParticipantProfile();
-
-
-        welcomeTitle.textContent =
-          "Welcome, " +
-          (
-            profile.fullName ||
-            "Participant"
-          );
-
-
-        participantId.textContent =
-          profile.participantId ||
-          "—";
-
-
-        participantName.textContent =
-          profile.fullName ||
-          "—";
-
-
-        loginEmail.textContent =
-          profile.loginEmail ||
-          "—";
-
-
-        showStatus(
-          "Your participant dashboard is ready.",
-          "success"
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Dashboard loading error:",
-          error
-        );
-
-
-        showStatus(
-          error.message ||
-          "Unable to load your participant dashboard.",
-          "error"
-        );
-
-
-        participantId.textContent =
-          "—";
-
-
-        participantName.textContent =
-          "—";
-
-
-        loginEmail.textContent =
-          "—";
-
-      }
-
-    }
-
 
     onAuthStateChanged(
       auth,
@@ -2306,7 +1647,6 @@ onAuthStateChanged(
             "error"
           );
 
-
           setTimeout(
             function() {
 
@@ -2317,14 +1657,10 @@ onAuthStateChanged(
             1800
           );
 
-
           return;
-
         }
 
-
         loadDashboard();
-
       }
     );
 
