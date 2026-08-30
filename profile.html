@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Global School of Yoga | Participant Dashboard</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #e8f5e9, #f9fbe7);
+      min-height: 100vh;
+      color: #222;
+    }
+
+    .dashboard-container {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 16px 45px;
+    }
+
+    .dashboard-card {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+
+    .top-header {
+      padding: 30px 32px 26px;
+      background: linear-gradient(135deg, #2c5f2d, #4f7f43);
+      color: white;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      font-size: 44px;
+      line-height: 1;
+    }
+
+    .organization-name {
+      font-size: 25px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .festival-name {
+      font-size: 15px;
+      opacity: 0.92;
+    }
+
+    .welcome-section {
+      padding: 30px 32px 22px;
+    }
+
+    .welcome-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2c5f2d;
+      margin-bottom: 8px;
+    }
+
+    .welcome-subtitle {
+      color: #666;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .identity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding: 0 32px 28px;
+    }
+
+    .identity-card {
+      border: 1px solid #dcedc8;
+      background: #f8fbf5;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .identity-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 7px;
+    }
+
+    .identity-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2c5f2d;
+      word-break: break-word;
+    }
+
+    .section {
+      padding: 0 32px 30px;
+    }
+
+    .section-title {
+      font-size: 21px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 14px;
+    }
+
+    .section-subtitle {
+      color: #777;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .events-box {
+      border: 1px solid #e0e0e0;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .empty-events {
+      padding: 34px 22px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #444;
+      margin-bottom: 7px;
+    }
+
+    .empty-message {
+      font-size: 14px;
+      color: #777;
+      line-height: 1.5;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .primary-action {
+      display: block;
+      width: 100%;
+      margin-top: 18px;
+      padding: 15px 18px;
+      border: none;
+      border-radius: 10px;
+      background: #2c5f2d;
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    .primary-action:hover {
+      background: #234d24;
+      transform: translateY(-1px);
+    }
+
+    .secondary-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .secondary-action {
+      display: block;
+      padding: 13px 16px;
+      border: 1px solid #c8e6c9;
+      border-radius: 10px;
+      background: #f8fbf5;
+      color: #2c5f2d;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      transition: 0.2s;
+    }
+
+    .secondary-action:hover {
+      background: #eef7e9;
+    }
+
+    .status-message {
+      display: none;
+      margin: 0 32px 25px;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .status-message.success {
+      display: block;
+      background: #e8f5e9;
+      border: 1px solid #a5d6a7;
+      color: #2e7d32;
+    }
+
+    .status-message.error {
+      display: block;
+      background: #ffebee;
+      border: 1px solid #ef9a9a;
+      color: #c62828;
+    }
+
+    .status-message.info {
+      display: block;
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
+      color: #1565c0;
+    }
+
+    .footer {
+      padding: 0 32px 30px;
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .loading {
+      opacity: 0.7;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 700px) {
+      .identity-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top-header,
+      .welcome-section,
+      .identity-grid,
+      .section,
+      .footer {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .status-message {
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+
+      .welcome-title {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .secondary-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-container {
+        padding: 12px 10px 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="dashboard-container">
+
+    <div class="dashboard-card">
+
+      <!-- =================================================
+           HEADER
+      ================================================== -->
+
+      <div class="top-header">
+
+        <div class="brand">
+
+          <div class="logo-icon">🧘</div>
+
+          <div>
+            <div class="organization-name">
+              Global School of Yoga
+            </div>
+
+            <div class="festival-name">
+              National Level Yoga Festival – 2026
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           WELCOME
+      ================================================== -->
+
+      <section class="welcome-section">
+
+        <div
+          class="welcome-title"
+          id="welcomeTitle">
+          Welcome!
+        </div>
+
+        <div class="welcome-subtitle">
+          Your GSY participant dashboard is your central place
+          to manage event participation and view your results.
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           PARTICIPANT IDENTITY
+      ================================================== -->
+
+      <div class="identity-grid">
+
+        <div class="identity-card">
+
+          <div class="identity-label">
+            Participant ID
+          </div>
+
+          <div
+            class="identity-value"
+            id="participantId">
+            Loading...
+          </div>
+
+        </div>
+
+
+        <div class="identity-card">
+
+          <div class="identity-label">
+            Name
+          </div>
+
+          <div
+            class="identity-value"
+            id="participantName">
+            Loading...
+          </div>
+
+        </div>
+
+
+        <div class="identity-card">
+
+          <div class="identity-label">
+            Login Email
+          </div>
+
+          <div
+            class="identity-value"
+            id="loginEmail">
+            Loading...
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           STATUS
+      ================================================== -->
+
+      <div
+        id="statusMessage"
+        class="status-message">
+      </div>
+
+
+      <!-- =================================================
+           MY EVENTS
+      ================================================== -->
+
+      <section class="section">
+
+        <div class="section-title">
+          My Registered Events
+        </div>
+
+        <div class="section-subtitle">
+          Your successfully paid event registrations will appear here.
+        </div>
+
+
+        <div class="events-box">
+
+          <div class="empty-events">
+
+            <div class="empty-icon">
+              🏆
+            </div>
+
+            <div class="empty-title">
+              No registered events yet
+            </div>
+
+            <div class="empty-message">
+              Once you successfully complete payment for an event,
+              your registration will appear here.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <a
+          href="event-registration.html"
+          class="primary-action">
+
+          ➕ Join Another Event
+
+        </a>
+
+
+        <div class="secondary-actions">
+
+          <a
+            href="signup.html"
+            class="secondary-action">
+
+            👤 My Profile
+
+          </a>
+
+
+          <a
+            href="#"
+            class="secondary-action"
+            id="resultsLink">
+
+            🏅 My Results
+
+          </a>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           RESULTS
+      ================================================== -->
+
+      <section class="section">
+
+        <div class="section-title">
+          Results
+        </div>
+
+        <div class="section-subtitle">
+          Event scores, rankings, awards and judge remarks
+          will appear here after results are published.
+        </div>
+
+        <div class="events-box">
+
+          <div class="empty-events">
+
+            <div class="empty-icon">
+              📊
+            </div>
+
+            <div class="empty-title">
+              Results will appear here
+            </div>
+
+            <div class="empty-message">
+              Once your event marks are published,
+              your scores and ranking can be shown in this dashboard.
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           FOOTER
+      ================================================== -->
+
+      <div class="footer">
+
+        Global School of Yoga<br>
+        National Level Yoga Festival – 2026
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       FIREBASE AUTHENTICATION
+  ================================================== -->
+
+  <script type="module">
+
+    const APPS_SCRIPT_URL =
+      "https://script.google.com/macros/s/AKfycbyfo75KniotK2fpfh-zBGYeqwOw3sfLJh-gu1T5_j8U48BFxrZSIIBxo7d5wtgNypIN/exec";
+
+
+    import {
+      initializeApp
+    }
+    from
+      "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
+
+    import {
+      getAuth,
+      onAuthStateChanged
+    }
+    from
+      "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+
+    const firebaseConfig = {
+
+      apiKey:
+        "AIzaSyCHak_GwY6N5ZF4Aph-6ZJiDNepmeVhNH0",
+
+      authDomain:
+        "global-school-of-yoga-portal.firebaseapp.com",
+
+      projectId:
+        "global-school-of-yoga-portal",
+
+      storageBucket:
+        "global-school-of-yoga-portal.firebasestorage.app",
+
+      messagingSenderId:
+        "273342913555",
+
+      appId:
+        "1:273342913555:web:76cfdd1a5e26f55339f3e6"
+
+    };
+
+
+    const app =
+      initializeApp(
+        firebaseConfig
+      );
+
+
+    const auth =
+      getAuth(app);
+
+
+    const welcomeTitle =
+      document.getElementById(
+        "welcomeTitle"
+      );
+
+
+    const participantId =
+      document.getElementById(
+        "participantId"
+      );
+
+
+    const participantName =
+      document.getElementById(
+        "participantName"
+      );
+
+
+    const loginEmail =
+      document.getElementById(
+        "loginEmail"
+      );
+
+
+    const statusMessage =
+      document.getElementById(
+        "statusMessage"
+      );
+
+
+    function showStatus(
+      message,
+      type
+    ) {
+
+      statusMessage.textContent =
+        message;
+
+      statusMessage.className =
+        "status-message " + type;
+
+    }
+
+
+    async function getAuthenticatedParticipantProfile() {
+
+      const user =
+        auth.currentUser;
+
+
+      if (!user) {
+
+        throw new Error(
+          "No authenticated Firebase user."
+        );
+
+      }
+
+
+      const idToken =
+        await user.getIdToken(
+          true
+        );
+
+
+      const response =
+        await fetch(
+          APPS_SCRIPT_URL,
+          {
+
+            method: "POST",
+
+            headers: {
+
+              "Content-Type":
+                "text/plain;charset=utf-8"
+
+            },
+
+            body:
+              JSON.stringify({
+
+                action:
+                  "getAuthenticatedParticipantProfile",
+
+                idToken:
+                  idToken
+
+              })
+
+          }
+        );
+
+
+      const responseText =
+        await response.text();
+
+
+      let data;
+
+      try {
+
+        data =
+          JSON.parse(
+            responseText
+          );
+
+      } catch (error) {
+
+        console.error(
+          "Dashboard raw API response:",
+          responseText
+        );
+
+        throw new Error(
+          "Unable to read participant profile from the server."
+        );
+
+      }
+
+
+      if (!data.success) {
+
+        throw new Error(
+          data.message ||
+          "Unable to retrieve participant profile."
+        );
+
+      }
+
+
+      return data;
+
+    }
+
+
+    async function loadDashboard() {
+
+      try {
+
+        showStatus(
+          "Loading your GSY dashboard...",
+          "info"
+        );
+
+
+        const profile =
+          await getAuthenticatedParticipantProfile();
+
+
+        welcomeTitle.textContent =
+          "Welcome, " +
+          (
+            profile.fullName ||
+            "Participant"
+          );
+
+
+        participantId.textContent =
+          profile.participantId ||
+          "—";
+
+
+        participantName.textContent =
+          profile.fullName ||
+          "—";
+
+
+        loginEmail.textContent =
+          profile.loginEmail ||
+          "—";
+
+
+        showStatus(
+          "Your participant dashboard is ready.",
+          "success"
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Dashboard loading error:",
+          error
+        );
+
+
+        showStatus(
+          error.message ||
+          "Unable to load your participant dashboard.",
+          "error"
+        );
+
+
+        participantId.textContent =
+          "—";
+
+
+        participantName.textContent =
+          "—";
+
+
+        loginEmail.textContent =
+          "—";
+
+      }
+
+    }
+
+
+    onAuthStateChanged(
+      auth,
+      function(user) {
+
+        if (!user) {
+
+          showStatus(
+            "Please log in to access your participant dashboard.",
+            "error"
+          );
+
+
+          setTimeout(
+            function() {
+
+              window.location.href =
+                "login.html";
+
+            },
+            1800
+          );
+
+
+          return;
+
+        }
+
+
+        loadDashboard();
+
+      }
+    );
+
+
+    console.log(
+      "Global School of Yoga Participant Dashboard initialized successfully."
+    );
+
+  </script>
+
+</body>
+</html>
