@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+  <title>
+    Global School of Yoga | Participant Login
+  </title>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    body {
+
+      margin: 0;
+      padding: 0;
+
+      font-family:
+        Arial,
+        sans-serif;
+
+      background:
+        linear-gradient(
+          135deg,
+          #e8f5e9,
+          #f9fbe7
+        );
+
+      min-height:
+        100vh;
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+      color:
+        #222;
+
+    }
+
+
+    .login-container {
+
+      width:
+        100%;
+
+      max-width:
+        480px;
+
+      margin:
+        30px 15px;
+
+    }
+
+
+    .login-card {
+
+      background:
+        #ffffff;
+
+      border-radius:
+        18px;
+
+      padding:
+        35px 30px;
+
+      box-shadow:
+        0 10px 35px
+        rgba(0, 0, 0, 0.12);
+
+    }
+
+
+    .logo-section {
+
+      text-align:
+        center;
+
+      margin-bottom:
+        20px;
+
+    }
+
+
+    .logo-icon {
+
+      font-size:
+        48px;
+
+      margin-bottom:
+        8px;
+
+    }
+
+
+    .organization-name {
+
+      font-size:
+        25px;
+
+      font-weight:
+        700;
+
+      color:
+        #2c5f2d;
+
+      margin-bottom:
+        8px;
+
+    }
+
+
+    .festival-name {
+
+      font-size:
+        18px;
+
+      font-weight:
+        600;
+
+      color:
+        #555;
+
+      line-height:
+        1.4;
+
+    }
+
+
+    .login-title {
+
+      text-align:
+        center;
+
+      font-size:
+        25px;
+
+      font-weight:
+        700;
+
+      margin-top:
+        25px;
+
+      margin-bottom:
+        8px;
+
+      color:
+        #333;
+
+    }
+
+
+    .login-subtitle {
+
+      text-align:
+        center;
+
+      color:
+        #666;
+
+      font-size:
+        15px;
+
+      line-height:
+        1.5;
+
+      margin-bottom:
+        25px;
+
+    }
+
+
+    /* =========================================
+       GOOGLE BUTTON
+    ========================================== */
+
+    .google-btn {
+
+      width:
+        100%;
+
+      padding:
+        13px 15px;
+
+      border:
+        1px solid #ccc;
+
+      border-radius:
+        8px;
+
+      background:
+        #ffffff;
+
+      color:
+        #333;
+
+      font-size:
+        16px;
+
+      font-weight:
+        600;
+
+      cursor:
+        pointer;
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+      gap:
+        12px;
+
+      transition:
+        0.2s;
+
+    }
+
+
+    .google-btn:hover {
+
+      background:
+        #f7f7f7;
+
+      box-shadow:
+        0 3px 10px
+        rgba(0, 0, 0, 0.08);
+
+    }
+
+
+    .google-btn:disabled {
+
+      opacity:
+        0.6;
+
+      cursor:
+        not-allowed;
+
+    }
+
+
+    .google-icon {
+
+      font-size:
+        21px;
+
+      font-weight:
+        bold;
+
+    }
+
+
+    /* =========================================
+       DIVIDER
+    ========================================== */
+
+    .divider {
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      margin:
+        25px 0;
+
+      color:
+        #888;
+
+      font-size:
+        14px;
+
+    }
+
+
+    .divider::before,
+    .divider::after {
+
+      content:
+        "";
+
+      flex:
+        1;
+
+      height:
+        1px;
+
+      background:
+        #ddd;
+
+    }
+
+
+    .divider span {
+
+      padding:
+        0 12px;
+
+    }
+
+
+    /* =========================================
+       FORM
+    ========================================== */
+
+    .form-group {
+
+      margin-bottom:
+        18px;
+
+    }
+
+
+    .form-group label {
+
+      display:
+        block;
+
+      margin-bottom:
+        7px;
+
+      font-size:
+        14px;
+
+      font-weight:
+        600;
+
+      color:
+        #444;
+
+    }
+
+
+    .form-group input {
+
+      width:
+        100%;
+
+      padding:
+        13px 14px;
+
+      border:
+        1px solid #ccc;
+
+      border-radius:
+        8px;
+
+      font-size:
+        16px;
+
+      outline:
+        none;
+
+      transition:
+        border-color 0.2s;
+
+    }
+
+
+    .form-group input:focus {
+
+      border-color:
+        #2c5f2d;
+
+      box-shadow:
+        0 0 0 2px
+        rgba(44, 95, 45, 0.08);
+
+    }
+
+
+    .login-btn {
+
+      width:
+        100%;
+
+      padding:
+        14px;
+
+      border:
+        none;
+
+      border-radius:
+        8px;
+
+      background:
+        #2c5f2d;
+
+      color:
+        white;
+
+      font-size:
+        17px;
+
+      font-weight:
+        700;
+
+      cursor:
+        pointer;
+
+      margin-top:
+        5px;
+
+      transition:
+        0.2s;
+
+    }
+
+
+    .login-btn:hover {
+
+      background:
+        #234d24;
+
+      transform:
+        translateY(-1px);
+
+    }
+
+
+    .login-btn:disabled {
+
+      opacity:
+        0.6;
+
+      cursor:
+        not-allowed;
+
+      transform:
+        none;
+
+    }
+
+
+    /* =========================================
+       FORGOT PASSWORD
+    ========================================== */
+
+    .forgot-password {
+
+      display:
+        block;
+
+      text-align:
+        right;
+
+      margin-top:
+        9px;
+
+      font-size:
+        13px;
+
+      color:
+        #2c5f2d;
+
+      text-decoration:
+        none;
+
+      cursor:
+        pointer;
+
+    }
+
+
+    .forgot-password:hover {
+
+      text-decoration:
+        underline;
+
+    }
+
+
+    /* =========================================
+       STATUS
+    ========================================== */
+
+    .status-message {
+
+      display:
+        none;
+
+      margin-top:
+        20px;
+
+      padding:
+        14px;
+
+      border-radius:
+        10px;
+
+      font-size:
+        14px;
+
+      line-height:
+        1.5;
+
+      text-align:
+        center;
+
+    }
+
+
+    .status-message.success {
+
+      display:
+        block;
+
+      background:
+        #e8f5e9;
+
+      border:
+        1px solid #a5d6a7;
+
+      color:
+        #2e7d32;
+
+    }
+
+
+    .status-message.error {
+
+      display:
+        block;
+
+      background:
+        #ffebee;
+
+      border:
+        1px solid #ef9a9a;
+
+      color:
+        #c62828;
+
+    }
+
+
+    .status-message.info {
+
+      display:
+        block;
+
+      background:
+        #e3f2fd;
+
+      border:
+        1px solid #90caf9;
+
+      color:
+        #1565c0;
+
+    }
+
+
+    /* =========================================
+       LINKS
+    ========================================== */
+
+    .signup-section {
+
+      text-align:
+        center;
+
+      margin-top:
+        25px;
+
+      font-size:
+        14px;
+
+      color:
+        #666;
+
+    }
+
+
+    .signup-section a {
+
+      color:
+        #2c5f2d;
+
+      font-weight:
+        700;
+
+      text-decoration:
+        none;
+
+    }
+
+
+    .signup-section a:hover {
+
+      text-decoration:
+        underline;
+
+    }
+
+
+    .back-link {
+
+      display:
+        block;
+
+      text-align:
+        center;
+
+      margin-top:
+        20px;
+
+      color:
+        #555;
+
+      text-decoration:
+        none;
+
+      font-size:
+        14px;
+
+    }
+
+
+    .back-link:hover {
+
+      color:
+        #2c5f2d;
+
+    }
+
+
+    /* =========================================
+       RESPONSIVE
+    ========================================== */
+
+    @media (max-width: 500px) {
+
+      .login-card {
+
+        padding:
+          28px 20px;
+
+      }
+
+
+      .organization-name {
+
+        font-size:
+          22px;
+
+      }
+
+
+      .festival-name {
+
+        font-size:
+          16px;
+
+      }
+
+
+      .login-title {
+
+        font-size:
+          22px;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <div class="login-container">
+
+
+    <div class="login-card">
+
+
+      <!-- =========================================
+           HEADER
+      ========================================== -->
+
+      <div class="logo-section">
+
+        <div class="logo-icon">
+          🧘
+        </div>
+
+        <div class="organization-name">
+          Global School of Yoga
+        </div>
+
+        <div class="festival-name">
+          National Level Yoga Festival – 2026
+        </div>
+
+      </div>
+
+
+      <!-- =========================================
+           TITLE
+      ========================================== -->
+
+      <div class="login-title">
+        Participant Login
+      </div>
+
+
+      <div class="login-subtitle">
+
+        Login to access your GSY Participant
+        Dashboard and event registrations.
+
+      </div>
+
+
+      <!-- =========================================
+           GOOGLE LOGIN
+      ========================================== -->
+
+      <button
+        type="button"
+        class="google-btn"
+        id="googleLoginBtn">
+
+        <span class="google-icon">
+          G
+        </span>
+
+        Continue with Google
+
+      </button>
+
+
+      <!-- =========================================
+           DIVIDER
+      ========================================== -->
+
+      <div class="divider">
+
+        <span>OR</span>
+
+      </div>
+
+
+      <!-- =========================================
+           EMAIL + PASSWORD LOGIN
+      ========================================== -->
+
+      <form
+        id="emailLoginForm">
+
+        <div class="form-group">
+
+          <label for="email">
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            id="email"
+            autocomplete="email"
+            placeholder="Enter your email address"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="password">
+            Password
+          </label>
+
+          <input
+            type="password"
+            id="password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            required>
+
+        </div>
+
+
+        <a
+          href="#"
+          class="forgot-password"
+          id="forgotPasswordLink">
+
+          Forgot Password?
+
+        </a>
+
+
+        <button
+          type="submit"
+          class="login-btn"
+          id="loginBtn">
+
+          Login
+
+        </button>
+
+      </form>
+
+
+      <!-- =========================================
+           STATUS
+      ========================================== -->
+
+      <div
+        id="statusMessage"
+        class="status-message">
+      </div>
+
+
+      <!-- =========================================
+           SIGN UP
+      ========================================== -->
+
+      <div class="signup-section">
+
+        Don't have a participant account?
+
+        <a href="signup.html">
+          Create Account
+        </a>
+
+      </div>
+
+
+      <!-- =========================================
+           BACK TO FESTIVAL
+      ========================================== -->
+
+      <a
+        href="index.html"
+        class="back-link">
+
+        ← Back to National Yoga Festival
+
+      </a>
+
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       FIREBASE AUTHENTICATION
+  ================================================== -->
+
+  <script type="module">
+
+    const APPS_SCRIPT_URL =
+      "https://script.google.com/macros/s/AKfycbyfo75KniotK2fpfh-zBGYeqwOw3sfLJh-gu1T5_j8U48BFxrZSIIBxo7d5wtgNypIN/exec";
+
+
+    import {
+      initializeApp
+    }
+    from
+      "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
+
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signInWithEmailAndPassword,
+      sendPasswordResetEmail
+    }
+    from
+      "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+
+    /* =================================================
+       FIREBASE CONFIGURATION
+    ================================================= */
+
+    const firebaseConfig = {
+
+      apiKey:
+        "AIzaSyCHak_GwY6N5ZF4Aph-6ZJiDNepmeVhNH0",
+
+      authDomain:
+        "global-school-of-yoga-portal.firebaseapp.com",
+
+      projectId:
+        "global-school-of-yoga-portal",
+
+      storageBucket:
+        "global-school-of-yoga-portal.firebasestorage.app",
+
+      messagingSenderId:
+        "273342913555",
+
+      appId:
+        "1:273342913555:web:76cfdd1a5e26f55339f3e6"
+
+    };
+
+
+    const app =
+      initializeApp(
+        firebaseConfig
+      );
+
+
+    const auth =
+      getAuth(app);
+
+
+    const googleProvider =
+      new GoogleAuthProvider();
+
+
+    /* =================================================
+       PAGE ELEMENTS
+    ================================================= */
+
+    const googleLoginBtn =
+      document.getElementById(
+        "googleLoginBtn"
+      );
+
+
+    const emailLoginForm =
+      document.getElementById(
+        "emailLoginForm"
+      );
+
+
+    const emailInput =
+      document.getElementById(
+        "email"
+      );
+
+
+    const passwordInput =
+      document.getElementById(
+        "password"
+      );
+
+
+    const loginBtn =
+      document.getElementById(
+        "loginBtn"
+      );
+
+
+    const forgotPasswordLink =
+      document.getElementById(
+        "forgotPasswordLink"
+      );
+
+
+    const statusMessage =
+      document.getElementById(
+        "statusMessage"
+      );
+
+
+    /* =================================================
+       STATUS
+    ================================================= */
+
+    function showStatus(
+      message,
+      type
+    ) {
+
+      statusMessage.textContent =
+        message;
+
+      statusMessage.className =
+        "status-message " +
+        type;
+
+    }
+
+
+    function setButtonsDisabled(
+      disabled
+    ) {
+
+      googleLoginBtn.disabled =
+        disabled;
+
+      loginBtn.disabled =
+        disabled;
+
+    }
+
+
+    /* =================================================
+       FRIENDLY FIREBASE ERRORS
+    ================================================= */
+
+    function getFriendlyFirebaseError(
+      error
+    ) {
+
+      switch (
+        error.code
+      ) {
+
+        case "auth/invalid-credential":
+
+          return (
+            "The email address or password is incorrect."
+          );
+
+
+        case "auth/wrong-password":
+
+          return (
+            "The email address or password is incorrect."
+          );
+
+
+        case "auth/user-not-found":
+
+          return (
+            "No participant account was found with this email address."
+          );
+
+
+        case "auth/invalid-email":
+
+          return (
+            "Please enter a valid email address."
+          );
+
+
+        case "auth/user-disabled":
+
+          return (
+            "This participant account has been disabled."
+          );
+
+
+        case "auth/too-many-requests":
+
+          return (
+            "Too many unsuccessful attempts. Please wait a while and try again."
+          );
+
+
+        case "auth/network-request-failed":
+
+          return (
+            "A network error occurred. Please check your internet connection."
+          );
+
+
+        case "auth/popup-closed-by-user":
+
+          return (
+            "The Google sign-in window was closed before completing login."
+          );
+
+
+        case "auth/popup-blocked":
+
+          return (
+            "Your browser blocked the Google sign-in window. Please allow pop-ups for this website."
+          );
+
+
+        case "auth/cancelled-popup-request":
+
+          return (
+            "Another Google sign-in request is already in progress."
+          );
+
+
+        case "auth/operation-not-allowed":
+
+          return (
+            "This sign-in method has not been enabled in Firebase Authentication."
+          );
+
+
+        default:
+
+          return (
+            error.message ||
+            "Unable to complete login. Please try again."
+          );
+
+      }
+
+    }
+
+
+    /* =================================================
+       LOAD PARTICIPANT PROFILE
+    ================================================= */
+
+    async function verifyParticipantAndOpenDashboard(
+      user
+    ) {
+
+      const idToken =
+        await user.getIdToken(
+          true
+        );
+
+
+      console.log(
+        "LOGIN: Firebase authentication successful:",
+        user.email
+      );
+
+
+      showStatus(
+        "Loading your GSY participant profile...",
+        "info"
+      );
+
+
+      const response =
+        await fetch(
+          APPS_SCRIPT_URL,
+          {
+
+            method:
+              "POST",
+
+            headers:
+              {
+                "Content-Type":
+                  "text/plain;charset=utf-8"
+              },
+
+            body:
+              JSON.stringify({
+
+                action:
+                  "getAuthenticatedParticipantProfile",
+
+                idToken:
+                  idToken
+
+              })
+
+          }
+        );
+
+
+      const responseText =
+        await response.text();
+
+
+      console.log(
+        "LOGIN: Profile raw response:",
+        responseText
+      );
+
+
+      let data;
+
+
+      try {
+
+        data =
+          JSON.parse(
+            responseText
+          );
+
+      } catch (error) {
+
+        throw new Error(
+          "The participant profile service returned an invalid response."
+        );
+
+      }
+
+
+      if (
+        !data.success
+      ) {
+
+        throw new Error(
+          data.message ||
+          "Unable to retrieve your participant profile."
+        );
+
+      }
+
+
+      console.log(
+        "LOGIN: Participant profile:",
+        data
+      );
+
+
+      showStatus(
+        "Login successful. Opening your dashboard...",
+        "success"
+      );
+
+
+      setTimeout(
+        function() {
+
+          window.location.href =
+            "profile.html";
+
+        },
+        500
+      );
+
+    }
+
+
+    /* =================================================
+       GOOGLE LOGIN
+    ================================================= */
+
+    async function googleLogin() {
+
+      showStatus(
+        "Opening Google Sign-In...",
+        "info"
+      );
+
+
+      setButtonsDisabled(
+        true
+      );
+
+
+      try {
+
+        const result =
+          await signInWithPopup(
+            auth,
+            googleProvider
+          );
+
+
+        const user =
+          result.user;
+
+
+        await verifyParticipantAndOpenDashboard(
+          user
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "GOOGLE LOGIN ERROR:",
+          error
+        );
+
+
+        showStatus(
+          getFriendlyFirebaseError(
+            error
+          ),
+          "error"
+        );
+
+
+        setButtonsDisabled(
+          false
+        );
+
+      }
+
+    }
+
+
+    /* =================================================
+       EMAIL + PASSWORD LOGIN
+    ================================================= */
+
+    async function emailLogin(
+      event
+    ) {
+
+      event.preventDefault();
+
+
+      const email =
+        emailInput.value
+          .trim()
+          .toLowerCase();
+
+
+      const password =
+        passwordInput.value;
+
+
+      if (
+        !email ||
+        !password
+      ) {
+
+        showStatus(
+          "Please enter your email address and password.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      showStatus(
+        "Signing you in...",
+        "info"
+      );
+
+
+      setButtonsDisabled(
+        true
+      );
+
+
+      try {
+
+        const userCredential =
+          await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+
+
+        const user =
+          userCredential.user;
+
+
+        /*
+         * We require the email to be verified
+         * before granting normal portal access.
+         */
+
+        if (
+          !user.emailVerified
+        ) {
+
+          showStatus(
+            "Your email address has not been verified yet. " +
+            "Please open the verification email sent to " +
+            email +
+            " and verify your account, then return here and log in again.",
+            "error"
+          );
+
+
+          setButtonsDisabled(
+            false
+          );
+
+
+          return;
+
+        }
+
+
+        await verifyParticipantAndOpenDashboard(
+          user
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "EMAIL LOGIN ERROR:",
+          error
+        );
+
+
+        showStatus(
+          getFriendlyFirebaseError(
+            error
+          ),
+          "error"
+        );
+
+
+        setButtonsDisabled(
+          false
+        );
+
+      }
+
+    }
+
+
+    /* =================================================
+       FORGOT PASSWORD
+    ================================================= */
+
+    async function forgotPassword(
+      event
+    ) {
+
+      event.preventDefault();
+
+
+      const email =
+        emailInput.value
+          .trim()
+          .toLowerCase();
+
+
+      if (!email) {
+
+        showStatus(
+          "Please enter your email address first.",
+          "error"
+        );
+
+
+        emailInput.focus();
+
+
+        return;
+
+      }
+
+
+      try {
+
+        showStatus(
+          "Sending password reset email...",
+          "info"
+        );
+
+
+        await sendPasswordResetEmail(
+          auth,
+          email
+        );
+
+
+        showStatus(
+          "Password reset email sent to " +
+          email +
+          ". Please check your inbox.",
+          "success"
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "FORGOT PASSWORD ERROR:",
+          error
+        );
+
+
+        showStatus(
+          getFriendlyFirebaseError(
+            error
+          ),
+          "error"
+        );
+
+      }
+
+    }
+
+
+    /* =================================================
+       EVENT LISTENERS
+    ================================================= */
+
+    googleLoginBtn.addEventListener(
+      "click",
+      googleLogin
+    );
+
+
+    emailLoginForm.addEventListener(
+      "submit",
+      emailLogin
+    );
+
+
+    forgotPasswordLink.addEventListener(
+      "click",
+      forgotPassword
+    );
+
+
+    console.log(
+      "Global School of Yoga Login initialized successfully."
+    );
+
+  </script>
+
+</body>
+
+</html>
