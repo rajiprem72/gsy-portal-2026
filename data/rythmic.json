@@ -1,0 +1,16 @@
+{
+  "mode": "Rhythmic",
+  "currency": "INR",
+  "selectionMessage": "For Rhythmic Group events, the fee is ₹1000 per person. For 5 persons, the total amount is ₹5000.",
+  "perPersonFee": 1000,
+  "totalParticipants": 5,
+  "events": [
+    {
+      "eventId": "RHY001",
+      "eventName": "Rhythmic Yogasana Group Event",
+      "fee": 5000,
+      "perPersonFee": 1000,
+      "participants": 5
+    }
+  ]
+}
