@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+  <title>
+    Global School of Yoga | Participant Sign Up
+  </title>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    body {
+
+      margin: 0;
+      padding: 0;
+
+      font-family: Arial, sans-serif;
+
+      background:
+        linear-gradient(
+          135deg,
+          #e8f5e9,
+          #f9fbe7
+        );
+
+      min-height: 100vh;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      color: #222;
+
+    }
+
+
+    .signup-container {
+
+      width: 100%;
+
+      max-width: 480px;
+
+      margin: 30px 15px;
+
+    }
+
+
+    .signup-card {
+
+      background: #ffffff;
+
+      border-radius: 18px;
+
+      padding: 35px 30px;
+
+      box-shadow:
+        0 10px 35px
+        rgba(0, 0, 0, 0.12);
+
+    }
+
+
+    .logo-section {
+
+      text-align: center;
+
+      margin-bottom: 20px;
+
+    }
+
+
+    .logo-icon {
+
+      font-size: 48px;
+
+      margin-bottom: 8px;
+
+    }
+
+
+    .organization-name {
+
+      font-size: 25px;
+
+      font-weight: 700;
+
+      color: #2c5f2d;
+
+      margin-bottom: 8px;
+
+    }
+
+
+    .festival-name {
+
+      font-size: 18px;
+
+      font-weight: 600;
+
+      color: #555;
+
+      line-height: 1.4;
+
+    }
+
+
+    .signup-title {
+
+      text-align: center;
+
+      font-size: 25px;
+
+      font-weight: 700;
+
+      margin-top: 25px;
+
+      margin-bottom: 8px;
+
+      color: #333;
+
+    }
+
+
+    .signup-subtitle {
+
+      text-align: center;
+
+      color: #666;
+
+      font-size: 15px;
+
+      line-height: 1.5;
+
+      margin-bottom: 25px;
+
+    }
+
+
+    /* =========================================
+       GOOGLE BUTTON
+    ========================================== */
+
+    .google-btn {
+
+      width: 100%;
+
+      padding: 13px 15px;
+
+      border: 1px solid #ccc;
+
+      border-radius: 8px;
+
+      background: #ffffff;
+
+      color: #333;
+
+      font-size: 16px;
+
+      font-weight: 600;
+
+      cursor: pointer;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 12px;
+
+      transition: 0.2s;
+
+    }
+
+
+    .google-btn:hover {
+
+      background: #f7f7f7;
+
+      box-shadow:
+        0 3px 10px
+        rgba(0, 0, 0, 0.08);
+
+    }
+
+
+    .google-btn:disabled {
+
+      opacity: 0.6;
+
+      cursor: not-allowed;
+
+    }
+
+
+    .google-icon {
+
+      font-size: 21px;
+
+      font-weight: bold;
+
+    }
+
+
+    /* =========================================
+       DIVIDER
+    ========================================== */
+
+    .divider {
+
+      display: flex;
+
+      align-items: center;
+
+      margin: 25px 0;
+
+      color: #888;
+
+      font-size: 14px;
+
+    }
+
+
+    .divider::before,
+    .divider::after {
+
+      content: "";
+
+      flex: 1;
+
+      height: 1px;
+
+      background: #ddd;
+
+    }
+
+
+    .divider span {
+
+      padding: 0 12px;
+
+    }
+
+
+    /* =========================================
+       FORM
+    ========================================== */
+
+    .form-group {
+
+      margin-bottom: 18px;
+
+    }
+
+
+    .form-group label {
+
+      display: block;
+
+      margin-bottom: 7px;
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      color: #444;
+
+    }
+
+
+    .form-group input {
+
+      width: 100%;
+
+      padding: 13px 14px;
+
+      border: 1px solid #ccc;
+
+      border-radius: 8px;
+
+      font-size: 16px;
+
+      outline: none;
+
+      transition: border-color 0.2s;
+
+    }
+
+
+    .form-group input:focus {
+
+      border-color: #2c5f2d;
+
+      box-shadow:
+        0 0 0 2px
+        rgba(44, 95, 45, 0.08);
+
+    }
+
+
+    .form-group input:disabled {
+
+      background: #f5f5f5;
+
+    }
+
+
+    .password-note {
+
+      font-size: 12px;
+
+      color: #777;
+
+      margin-top: 5px;
+
+    }
+
+
+    .create-account-btn {
+
+      width: 100%;
+
+      padding: 14px;
+
+      border: none;
+
+      border-radius: 8px;
+
+      background: #2c5f2d;
+
+      color: white;
+
+      font-size: 17px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      margin-top: 5px;
+
+      transition: 0.2s;
+
+    }
+
+
+    .create-account-btn:hover {
+
+      background: #234d24;
+
+      transform: translateY(-1px);
+
+    }
+
+
+    .create-account-btn:disabled {
+
+      opacity: 0.6;
+
+      cursor: not-allowed;
+
+      transform: none;
+
+    }
+
+
+    /* =========================================
+       STATUS MESSAGE
+    ========================================== */
+
+    .status-message {
+
+      display: none;
+
+      margin-top: 20px;
+
+      padding: 14px;
+
+      border-radius: 10px;
+
+      font-size: 14px;
+
+      line-height: 1.5;
+
+      text-align: center;
+
+    }
+
+
+    .status-message.success {
+
+      display: block;
+
+      background: #e8f5e9;
+
+      border: 1px solid #a5d6a7;
+
+      color: #2e7d32;
+
+    }
+
+
+    .status-message.error {
+
+      display: block;
+
+      background: #ffebee;
+
+      border: 1px solid #ef9a9a;
+
+      color: #c62828;
+
+    }
+
+
+    .status-message.info {
+
+      display: block;
+
+      background: #e3f2fd;
+
+      border: 1px solid #90caf9;
+
+      color: #1565c0;
+
+    }
+
+
+    /* =========================================
+       LOGIN
+    ========================================== */
+
+    .login-section {
+
+      text-align: center;
+
+      margin-top: 25px;
+
+      font-size: 14px;
+
+      color: #666;
+
+    }
+
+
+    .login-section a {
+
+      color: #2c5f2d;
+
+      font-weight: 700;
+
+      text-decoration: none;
+
+    }
+
+
+    .login-section a:hover {
+
+      text-decoration: underline;
+
+    }
+
+
+    /* =========================================
+       INFORMATION BOX
+    ========================================== */
+
+    .info-box {
+
+      margin-top: 25px;
+
+      padding: 14px;
+
+      background: #f1f8e9;
+
+      border: 1px solid #c8e6c9;
+
+      border-radius: 10px;
+
+      font-size: 13px;
+
+      line-height: 1.6;
+
+      color: #455a40;
+
+    }
+
+
+    /* =========================================
+       BACK LINK
+    ========================================== */
+
+    .back-link {
+
+      display: block;
+
+      text-align: center;
+
+      margin-top: 20px;
+
+      color: #555;
+
+      text-decoration: none;
+
+      font-size: 14px;
+
+    }
+
+
+    .back-link:hover {
+
+      color: #2c5f2d;
+
+    }
+
+
+    /* =========================================
+       MOBILE
+    ========================================== */
+
+    @media (max-width: 500px) {
+
+      .signup-card {
+
+        padding: 28px 20px;
+
+      }
+
+
+      .organization-name {
+
+        font-size: 22px;
+
+      }
+
+
+      .festival-name {
+
+        font-size: 16px;
+
+      }
+
+
+      .signup-title {
+
+        font-size: 22px;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <div class="signup-container">
+
+
+    <div class="signup-card">
+
+
+      <!-- =========================================
+           ORGANIZATION / FESTIVAL HEADER
+      ========================================== -->
+
+      <div class="logo-section">
+
+
+        <div class="logo-icon">
+          🧘
+        </div>
+
+
+        <div class="organization-name">
+          Global School of Yoga
+        </div>
+
+
+        <div class="festival-name">
+          National Level Yoga Festival – 2026
+        </div>
+
+
+      </div>
+
+
+      <!-- =========================================
+           SIGN UP TITLE
+      ========================================== -->
+
+      <div class="signup-title">
+        Create Your Participant Account
+      </div>
+
+
+      <div class="signup-subtitle">
+
+        Create your Global School of Yoga
+        participant account to register for
+        the National Level Yoga Festival.
+
+      </div>
+
+
+      <!-- =========================================
+           GOOGLE SIGN UP
+      ========================================== -->
+
+      <button
+        type="button"
+        class="google-btn"
+        id="googleSignUpBtn">
+
+        <span class="google-icon">
+          G
+        </span>
+
+        Continue with Google
+
+      </button>
+
+
+      <!-- =========================================
+           DIVIDER
+      ========================================== -->
+
+      <div class="divider">
+
+        <span>OR</span>
+
+      </div>
+
+
+      <!-- =========================================
+           EMAIL SIGN UP
+      ========================================== -->
+
+      <form id="emailSignupForm">
+
+
+        <div class="form-group">
+
+          <label for="email">
+            Email Address
+          </label>
+
+
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email address"
+            autocomplete="email"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="password">
+            Password
+          </label>
+
+
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Create a password"
+            autocomplete="new-password"
+            minlength="8"
+            required>
+
+
+          <div class="password-note">
+
+            Password must contain at least
+            8 characters.
+
+          </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="confirmPassword">
+            Confirm Password
+          </label>
+
+
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="Re-enter your password"
+            autocomplete="new-password"
+            minlength="8"
+            required>
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="create-account-btn"
+          id="createAccountBtn">
+
+          Create Participant Account
+
+        </button>
+
+
+      </form>
+
+
+      <!-- =========================================
+           STATUS MESSAGE
+      ========================================== -->
+
+      <div
+        id="statusMessage"
+        class="status-message">
+      </div>
+
+
+      <!-- =========================================
+           INFORMATION
+      ========================================== -->
+
+      <div class="info-box">
+
+        🔐 <strong>Your account is unique.</strong>
+        <br>
+
+        Your email address will be associated
+        with your Global School of Yoga
+        Participant ID.
+
+        <br>
+
+        You can use the same account for future
+        Global School of Yoga events.
+
+      </div>
+
+
+      <!-- =========================================
+           LOGIN
+      ========================================== -->
+
+      <div class="login-section">
+
+        Already have a participant account?
+
+        <a href="login.html">
+          Login
+        </a>
+
+      </div>
+
+
+      <!-- =========================================
+           BACK TO FESTIVAL
+      ========================================== -->
+
+      <a
+        href="index.html"
+        class="back-link">
+
+        ← Back to National Yoga Festival
+
+      </a>
+
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       FIREBASE AUTHENTICATION
+  ================================================== -->
+
+  <script type="module">
+
+
+    /* =================================================
+       IMPORT FIREBASE
+    ================================================= */
+
+    const APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbyfo75KniotK2fpfh-zBGYeqwOw3sfLJh-gu1T5_j8U48BFxrZSIIBxo7d5wtgNypIN/exec";
+
+    import {
+      initializeApp
+    }
+    from
+      "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
+
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      createUserWithEmailAndPassword,
+      sendEmailVerification
+    }
+    from
+      "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+
+    /* =================================================
+       FIREBASE CONFIGURATION
+    ================================================= */
+
+    const firebaseConfig = {
+
+      apiKey:
+        "AIzaSyCHak_GwY6N5ZF4Aph-6ZJiDNepmeVhNH0",
+
+      authDomain:
+        "global-school-of-yoga-portal.firebaseapp.com",
+
+      projectId:
+        "global-school-of-yoga-portal",
+
+      storageBucket:
+        "global-school-of-yoga-portal.firebasestorage.app",
+
+      messagingSenderId:
+        "273342913555",
+
+      appId:
+        "1:273342913555:web:76cfdd1a5e26f55339f3e6"
+
+    };
+
+
+    /* =================================================
+       INITIALIZE FIREBASE
+    ================================================= */
+
+    const app =
+      initializeApp(firebaseConfig);
+
+
+    /* =================================================
+       INITIALIZE AUTHENTICATION
+    ================================================= */
+
+    const auth =
+      getAuth(app);
+
+
+    /* =================================================
+       GOOGLE PROVIDER
+    ================================================= */
+
+    const googleProvider =
+      new GoogleAuthProvider();
+
+
+    /* =================================================
+       GET PAGE ELEMENTS
+    ================================================= */
+
+    const googleSignUpBtn =
+      document.getElementById(
+        "googleSignUpBtn"
+      );
+
+
+    const emailSignupForm =
+      document.getElementById(
+        "emailSignupForm"
+      );
+
+
+    const emailInput =
+      document.getElementById(
+        "email"
+      );
+
+
+    const passwordInput =
+      document.getElementById(
+        "password"
+      );
+
+
+    const confirmPasswordInput =
+      document.getElementById(
+        "confirmPassword"
+      );
+
+
+    const createAccountBtn =
+      document.getElementById(
+        "createAccountBtn"
+      );
+
+
+    const statusMessage =
+      document.getElementById(
+        "statusMessage"
+      );
+
+
+    /* =================================================
+       STATUS MESSAGE FUNCTION
+    ================================================= */
+
+    function showStatus(
+      message,
+      type
+    ) {
+
+      statusMessage.textContent =
+        message;
+
+      statusMessage.className =
+        "status-message " + type;
+
+    }
+
+
+    /* =================================================
+       BUTTON STATE
+    ================================================= */
+
+    function setButtonsDisabled(
+      disabled
+    ) {
+
+      googleSignUpBtn.disabled =
+        disabled;
+
+      createAccountBtn.disabled =
+        disabled;
+
+    }
+
+
+    /* =================================================
+       FIREBASE ERROR MESSAGE
+    ================================================= */
+
+    function getFriendlyFirebaseError(
+      error
+    ) {
+
+      switch (error.code) {
+
+
+        case "auth/email-already-in-use":
+
+          return (
+            "An account already exists " +
+            "with this email address. " +
+            "Please use the Login page."
+          );
+
+
+        case "auth/invalid-email":
+
+          return (
+            "Please enter a valid email address."
+          );
+
+
+        case "auth/weak-password":
+
+          return (
+            "The password is too weak. " +
+            "Please use a stronger password."
+          );
+
+
+        case "auth/popup-closed-by-user":
+
+          return (
+            "The Google sign-in window was " +
+            "closed before completing sign-up."
+          );
+
+
+        case "auth/popup-blocked":
+
+          return (
+            "Your browser blocked the Google " +
+            "sign-in window. Please allow " +
+            "pop-ups for this website."
+          );
+
+
+        case "auth/cancelled-popup-request":
+
+          return (
+            "Another Google sign-in request " +
+            "is already in progress."
+          );
+
+
+        case "auth/network-request-failed":
+
+          return (
+            "A network error occurred. " +
+            "Please check your internet connection."
+          );
+
+
+        case "auth/operation-not-allowed":
+
+          return (
+            "This sign-in method has not been " +
+            "enabled in Firebase Authentication."
+          );
+
+
+        case "auth/account-exists-with-different-credential":
+
+          return (
+            "An account already exists with " +
+            "this email using another sign-in method."
+          );
+
+
+        default:
+
+          return (
+            "Unable to create the account. " +
+            "Please try again."
+          );
+
+      }
+
+    }
+
+
+    /* =================================================
+       GOOGLE SIGN UP
+    ================================================= */
+
+
+    async function googleSignUp() {
+
+  showStatus(
+    "Opening Google Sign-In...",
+    "info"
+  );
+
+  setButtonsDisabled(true);
+
+
+  try {
+
+    /*
+     * =====================================================
+     * STEP 1
+     * SIGN IN WITH GOOGLE
+     * =====================================================
+     */
+
+    const result =
+      await signInWithPopup(
+        auth,
+        googleProvider
+      );
+
+
+    const user =
+      result.user;
+
+
+    /*
+     * =====================================================
+     * STEP 2
+     * GET FIREBASE ID TOKEN
+     * =====================================================
+     *
+     * This token proves to our Apps Script backend
+     * that Firebase has authenticated this user.
+     */
+
+    const idToken =
+      await user.getIdToken();
+
+
+    console.log(
+      "Firebase authentication successful."
+    );
+    console.log(
+      "Step 2: Preparing to contact Apps Script..."
+    );
+
+console.log(
+  "Apps Script URL:",
+  APPS_SCRIPT_URL
+);
+
+    /*
+     * =====================================================
+     * STEP 3
+     * SEND AUTHENTICATED USER TO APPS SCRIPT
+     * =====================================================
+     */
+
+    showStatus(
+      "Verifying your participant account...",
+      "info"
+    );
+
+    console.log(
+        "Step 3: Sending Firebase ID token to Apps Script..."
+      );
+    const response =
+      await fetch(
+        APPS_SCRIPT_URL,
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type":
+              "text/plain;charset=utf-8"
+
+          },
+
+          body:
+            JSON.stringify({
+
+              action:
+                "createAuthenticatedParticipant",
+
+              idToken:
+                idToken
+
+            })
+
+        }
+      );
+
+
+    /*
+     * =====================================================
+     * STEP 4
+     * READ APPS SCRIPT RESPONSE
+     * =====================================================
+     */
+    console.log(
+        "Step 4: Apps Script response received."
+      );
+    
+    console.log(
+      "HTTP status:",
+      response.status
+    );
+    const data =
+      await response.json();
+
+
+    console.log(
+        "Apps Script response:",
+        JSON.stringify(data, null, 2)
+      );
+
+    /*
+     * =====================================================
+     * STEP 5
+     * CHECK RESULT
+     * =====================================================
+     */
+
+    if (!data.success) {
+
+      showStatus(
+
+        data.message ||
+        "Unable to create participant account.",
+
+        "error"
+
+      );
+
+
+      setButtonsDisabled(false);
+
+      return;
+
+    }
+
+
+    /*
+     * =====================================================
+     * STEP 6
+     * EXISTING PARTICIPANT
+     * =====================================================
+     */
+
+    if (data.alreadyExists) {
+
+      showStatus(
+
+        "Welcome back, " +
+        (data.fullName || user.displayName || "Participant") +
+        "! " +
+        "Your GSY Participant ID is " +
+        data.participantId +
+        ".",
+
+        "success"
+
+      );
+
+
+      console.log(
+        "Existing participant:",
+        data.participantId
+      );
+
+
+      setButtonsDisabled(false);
+
+      return;
+
+    }
+
+
+    /*
+     * =====================================================
+     * STEP 7
+     * NEW PARTICIPANT
+     * =====================================================
+     */
+
+    showStatus(
+
+      "Welcome to Global School of Yoga, " +
+      (data.fullName || user.displayName || "Participant") +
+      "! " +
+      "Your GSY Participant ID is " +
+      data.participantId +
+      ".",
+
+      "success"
+
+    );
+
+
+    console.log(
+      "NEW GSY Participant created:",
+      data.participantId
+    );
+
+
+    /*
+     * =====================================================
+     * STEP 8
+     * TEMPORARY DEVELOPMENT MESSAGE
+     * =====================================================
+     *
+     * We will replace this with the proper
+     * Participant Profile / Event Registration
+     * screen after the database integration is
+     * completely verified.
+     */
+
+    console.log(
+      "Firebase UID:",
+      data.firebaseUid
+    );
+
+  }
+
+
+  catch (error) {
+
+    console.error(
+      "Google Sign-Up Error:",
+      error
+    );
+
+
+    showStatus(
+
+      "Unable to complete Google Sign-Up. " +
+      "Please try again.",
+
+      "error"
+
+    );
+
+
+    setButtonsDisabled(false);
+
+  }
+
+}
+
+    /* =================================================
+       EMAIL + PASSWORD SIGN UP
+    ================================================= */
+
+    async function emailSignUp(event) {
+
+      event.preventDefault();
+
+      const email =
+        emailInput.value
+          .trim()
+          .toLowerCase();
+
+      const password =
+        passwordInput.value;
+
+      const confirmPassword =
+        confirmPasswordInput.value;
+
+
+      if (password !== confirmPassword) {
+
+        showStatus(
+          "Password and Confirm Password do not match.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      if (password.length < 8) {
+
+        showStatus(
+          "Password must contain at least 8 characters.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      showStatus(
+        "Creating your participant account...",
+        "info"
+      );
+
+      setButtonsDisabled(true);
+
+
+      try {
+
+        /* -----------------------------------------
+           STEP 1 - CREATE FIREBASE ACCOUNT
+        ----------------------------------------- */
+
+        const userCredential =
+          await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+
+        const user =
+          userCredential.user;
+
+
+        console.log(
+          "EMAIL SIGNUP: Firebase account created:",
+          user.email
+        );
+
+
+        /* -----------------------------------------
+           STEP 2 - SEND VERIFICATION EMAIL
+        ----------------------------------------- */
+
+        await sendEmailVerification(user);
+
+
+        console.log(
+          "EMAIL SIGNUP: Verification email sent."
+        );
+
+
+        /* -----------------------------------------
+           STEP 3 - GET FIREBASE ID TOKEN
+        ----------------------------------------- */
+
+        const idToken =
+          await user.getIdToken(true);
+
+
+        /* -----------------------------------------
+           STEP 4 - CREATE/FIND GSY PARTICIPANT
+        ----------------------------------------- */
+
+        showStatus(
+          "Creating your GSY participant profile...",
+          "info"
+        );
+
+
+        const response =
+          await fetch(
+            APPS_SCRIPT_URL,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type":
+                  "text/plain;charset=utf-8"
+              },
+              body: JSON.stringify({
+                action:
+                  "createAuthenticatedParticipant",
+                idToken:
+                  idToken
+              })
+            }
+          );
+
+
+        const responseText =
+          await response.text();
+
+
+        console.log(
+          "EMAIL SIGNUP: Apps Script HTTP status:",
+          response.status
+        );
+
+
+        console.log(
+          "EMAIL SIGNUP: Apps Script raw response:",
+          responseText
+        );
+
+
+        let data;
+
+
+        try {
+
+          data =
+            JSON.parse(responseText);
+
+        } catch (parseError) {
+
+          console.error(
+            "EMAIL SIGNUP: JSON parse error:",
+            parseError
+          );
+
+          throw new Error(
+            "The participant service returned an invalid response."
+          );
+
+        }
+
+
+        if (!data.success) {
+
+          throw new Error(
+            data.message ||
+            "Unable to create your GSY participant profile."
+          );
+
+        }
+
+
+        /* -----------------------------------------
+           STEP 5 - SHOW PARTICIPANT ID
+        ----------------------------------------- */
+
+        const displayName =
+          data.fullName ||
+          user.displayName ||
+          email.split("@")[0];
+
+
+        showStatus(
+          "Welcome to Global School of Yoga, " +
+          displayName +
+          "! Your GSY Participant ID is " +
+          data.participantId +
+          ". A verification email has been sent to " +
+          email +
+          ". Please verify your email before continuing.",
+          "success"
+        );
+
+
+        console.log(
+          "EMAIL SIGNUP: Participant ID:",
+          data.participantId
+        );
+
+
+        /* -----------------------------------------
+           STEP 6 - DASHBOARD LINK
+        ----------------------------------------- */
+
+        const oldLink =
+          document.getElementById(
+            "dashboardLink"
+          );
+
+        if (oldLink) {
+          oldLink.remove();
+        }
+
+
+        const dashboardLink =
+          document.createElement("a");
+
+
+        dashboardLink.id =
+          "dashboardLink";
+
+
+        dashboardLink.href =
+          "profile.html";
+
+
+        dashboardLink.textContent =
+          "🏆 Go to My Dashboard";
+
+
+        dashboardLink.style.display =
+          "block";
+
+
+        dashboardLink.style.marginTop =
+          "16px";
+
+
+        dashboardLink.style.padding =
+          "13px 16px";
+
+
+        dashboardLink.style.borderRadius =
+          "8px";
+
+
+        dashboardLink.style.background =
+          "#2c5f2d";
+
+
+        dashboardLink.style.color =
+          "#ffffff";
+
+
+        dashboardLink.style.textAlign =
+          "center";
+
+
+        dashboardLink.style.fontWeight =
+          "700";
+
+
+        dashboardLink.style.textDecoration =
+          "none";
+
+
+        statusMessage.insertAdjacentElement(
+          "afterend",
+          dashboardLink
+        );
+
+
+        setButtonsDisabled(false);
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "EMAIL SIGNUP: Error:",
+          error
+        );
+
+
+        showStatus(
+          getFriendlyFirebaseError(error),
+          "error"
+        );
+
+
+        setButtonsDisabled(false);
+
+      }
+
+    }
+
+
+    /* =================================================
+       EVENT LISTENERS
+    ================================================= */
+
+    googleSignUpBtn.addEventListener(
+      "click",
+      googleSignUp
+    );
+
+
+    emailSignupForm.addEventListener(
+      "submit",
+      emailSignUp
+    );
+
+
+    /* =================================================
+       FIREBASE INITIALIZATION CONFIRMATION
+    ================================================= */
+
+    console.log(
+      "Global School of Yoga Firebase Authentication initialized successfully."
+    );
+
+
+  </script>
+
+
+</body>
+
+</html>
