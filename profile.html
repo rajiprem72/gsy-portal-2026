@@ -1103,57 +1103,66 @@
     }
 
 
-    function updateSelectionSummary() {
+  function updateSelectionSummary() {
 
-      const selected =
-        Array.from(
-          document.querySelectorAll(
-            ".event-option input[type='checkbox']:checked"
-          )
+  const selected =
+    Array.from(
+      document.querySelectorAll(
+        ".event-option input[type='checkbox']:checked"
+      )
+    );
+
+
+  let total = 0;
+
+
+  selected.forEach(
+    function(checkbox) {
+
+      total +=
+        Number(
+          checkbox.dataset.fee || 0
         );
 
-
-      let total = 0;
-
-
-      selected.forEach(
-        function(checkbox) {
-
-          total +=
-            Number(
-              checkbox.dataset.fee || 0
-            );
-
-        }
-      );
-
-
-      selectionCount.textContent =
-        selected.length === 1
-          ? "1 event selected"
-          : selected.length +
-            " events selected";
-
-
-      selectionTotal.textContent =
-        "Total: " +
-        formatINR(total);
-
-
-      selectionMessage.textContent =
-        currentEventData &&
-        currentEventData.selectionMessage
-          ? currentEventData.selectionMessage
-          : "";
-
-
-      selectionSummary.classList.remove(
-        "hidden"
-      );
-
     }
+  );
 
 
+  selectionCount.textContent =
+    selected.length === 1
+      ? "1 event selected"
+      : selected.length +
+        " events selected";
+
+
+  selectionTotal.textContent =
+    "Total: " +
+    formatINR(total);
+
+
+  selectionMessage.textContent =
+    currentEventData &&
+    currentEventData.selectionMessage
+      ? currentEventData.selectionMessage
+      : "";
+
+
+  selectionSummary.classList.remove(
+    "hidden"
+  );
+
+
+  /*
+   * Enable payment only when at least
+   * one event has been selected.
+   */
+
+  proceedToPaymentBtn.disabled =
+    selected.length === 0;
+
+}
+
+    
     function renderEventCatalogue(
       mode,
       data
