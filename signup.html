@@ -1753,455 +1753,641 @@
     /* =================================================
        EMAIL + PASSWORD SIGN UP
     ================================================= */
+async function emailSignUp(
+  event
+) {
 
-    async function emailSignUp(
-      event
-    ) {
-
-      event.preventDefault();
-
-
-      const email =
-        emailInput.value
-          .trim()
-          .toLowerCase();
+  event.preventDefault();
 
 
-      const password =
-        passwordInput.value;
+  const email =
+    emailInput.value
+      .trim()
+      .toLowerCase();
 
 
-      const confirmPassword =
-        confirmPasswordInput.value;
+  const password =
+    passwordInput.value;
 
 
-      if (
-        password !==
-        confirmPassword
-      ) {
-
-        showStatus(
-          "Password and Confirm Password do not match.",
-          "error"
-        );
-
-        return;
-
-      }
+  const confirmPassword =
+    confirmPasswordInput.value;
 
 
-      if (
-        password.length < 8
-      ) {
+  /*
+   * -------------------------------------------------------
+   * VALIDATE PASSWORD MATCH
+   * -------------------------------------------------------
+   */
 
-        showStatus(
-          "Password must contain at least 8 characters.",
-          "error"
-        );
+  if (
+    password !==
+    confirmPassword
+  ) {
 
-        return;
+    showStatus(
+      "Password and Confirm Password do not match.",
+      "error"
+    );
 
-      }
+    return;
+
+  }
 
 
-      showStatus(
-        "Creating your participant account...",
-        "info"
+  /*
+   * -------------------------------------------------------
+   * VALIDATE PASSWORD LENGTH
+   * -------------------------------------------------------
+   */
+
+  if (
+    password.length < 8
+  ) {
+
+    showStatus(
+      "Password must contain at least 8 characters.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  showStatus(
+    "Creating your participant account...",
+    "info"
+  );
+
+
+  setButtonsDisabled(
+    true
+  );
+
+
+  try {
+
+    /*
+     * =====================================================
+     * STEP 1
+     * Create Firebase Email/Password account
+     * =====================================================
+     */
+
+    const userCredential =
+      await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
       );
 
 
-      setButtonsDisabled(
+    const user =
+      userCredential.user;
+
+
+    console.log(
+      "EMAIL SIGNUP: Firebase account created:",
+      user.email
+    );
+
+
+    /*
+     * =====================================================
+     * STEP 2
+     * Send verification email
+     * =====================================================
+     */
+
+    await sendEmailVerification(
+      user
+    );
+
+
+    console.log(
+      "EMAIL SIGNUP: Verification email sent."
+    );
+
+
+    /*
+     * =====================================================
+     * STEP 3
+     * Get Firebase ID token
+     * =====================================================
+     */
+
+    const idToken =
+      await user.getIdToken(
         true
       );
 
 
-      try {
-
-        /*
-         * STEP 1
-         * Create Firebase Email/Password user.
-         */
-
-        const userCredential =
-          await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
+    console.log(
+      "EMAIL SIGNUP: Firebase ID token obtained."
+    );
 
 
-        const user =
-          userCredential.user;
+    /*
+     * =====================================================
+     * STEP 4
+     * Create/find GSY participant
+     * =====================================================
+     */
+
+    showStatus(
+      "Creating your GSY participant profile...",
+      "info"
+    );
 
 
-        console.log(
-          "EMAIL SIGNUP: Firebase account created:",
-          user.email
-        );
+    const data =
+      await callAppsScript({
+
+        action:
+          "createAuthenticatedParticipant",
+
+        idToken:
+          idToken
+
+      });
 
 
-        /*
-         * STEP 2
-         * Send verification email.
-         */
+    if (
+      !data.success
+    ) {
 
-        await sendEmailVerification(
-          user
-        );
-
-
-        console.log(
-          "EMAIL SIGNUP: Verification email sent."
-        );
-
-
-        /*
-         * STEP 3
-         * Obtain verified Firebase identity token.
-         */
-
-        const idToken =
-          await user.getIdToken(
-            true
-          );
-
-
-        /*
-         * STEP 4
-         * Create/find GSY participant.
-         */
-
-        showStatus(
-          "Creating your GSY participant profile...",
-          "info"
-        );
-
-
-        const data =
-          await callAppsScript({
-
-            action:
-              "createAuthenticatedParticipant",
-
-            idToken:
-              idToken
-
-          });
-
-
-        if (
-          !data.success
-        ) {
-
-          throw new Error(
-            data.message ||
-            "Unable to create your GSY participant profile."
-          );
-
-        }
-
-
-        console.log(
-          "EMAIL SIGNUP: Participant response:",
-          data
-        );
-
-
-        /*
-         * STEP 5
-         * Show personal profile immediately.
-         */
-
-        const profileData = {
-
-          fullName:
-            data.fullName ||
-            user.displayName ||
-            "",
-
-          mobileNumber:
-            data.mobileNumber ||
-            "",
-
-          dateOfBirth:
-            data.dateOfBirth ||
-            "",
-
-          gender:
-            data.gender ||
-            "",
-
-          address:
-            data.address ||
-            "",
-
-          city:
-            data.city ||
-            "",
-
-          district:
-            data.district ||
-            "",
-
-          state:
-            data.state ||
-            "",
-
-          country:
-            data.country ||
-            "",
-
-          pincode:
-            data.pincode ||
-            ""
-
-        };
-
-
-        showStatus(
-
-          "Your account has been created successfully. " +
-          "Your Participant ID is " +
-          data.participantId +
-          ". " +
-          "A verification email has also been sent to " +
-          email +
-          ". Please complete your profile below.",
-
-          "success"
-
-        );
-
-
-        showPersonalProfile(
-          profileData
-        );
-
-
-        /*
-         * The Firebase user remains signed in.
-         * Do not redirect to login here.
-         */
-
-        setButtonsDisabled(
-          false
-        );
-
-      }
-
-      catch (error) {
-
-        console.error(
-          "EMAIL SIGNUP ERROR:",
-          error
-        );
-
-
-        showStatus(
-          getFriendlyFirebaseError(
-            error
-          ),
-          "error"
-        );
-
-
-        setButtonsDisabled(
-          false
-        );
-
-      }
+      throw new Error(
+        data.message ||
+        "Unable to create your GSY participant profile."
+      );
 
     }
+
+
+    console.log(
+      "EMAIL SIGNUP: Participant response:",
+      data
+    );
+
+
+    /*
+     * =====================================================
+     * STEP 5
+     * IMPORTANT
+     *
+     * Fetch the COMPLETE profile from
+     * MASTER_PARTICIPANTS.
+     * =====================================================
+     */
+
+    const profile =
+      await loadCurrentParticipantProfile();
+
+
+    console.log(
+      "EMAIL SIGNUP: Complete participant profile:",
+      profile
+    );
+
+
+    /*
+     * =====================================================
+     * STEP 6
+     * Show the actual saved profile details
+     * =====================================================
+     */
+
+    showPersonalProfile({
+
+      fullName:
+        profile.fullName ||
+        "",
+
+      mobileNumber:
+        profile.mobileNumber ||
+        "",
+
+      dateOfBirth:
+        profile.dateOfBirth ||
+        "",
+
+      gender:
+        profile.gender ||
+        "",
+
+      address:
+        profile.address ||
+        "",
+
+      city:
+        profile.city ||
+        "",
+
+      district:
+        profile.district ||
+        "",
+
+      state:
+        profile.state ||
+        "",
+
+      country:
+        profile.country ||
+        "",
+
+      pincode:
+        profile.pincode ||
+        ""
+
+    });
+
+
+    /*
+     * =====================================================
+     * STEP 7
+     * Welcome message
+     * =====================================================
+     */
+
+    showStatus(
+
+      "Your account has been created successfully. " +
+      "Your Participant ID is " +
+      data.participantId +
+      ". " +
+      "A verification email has also been sent to " +
+      email +
+      ". " +
+      "Please complete your profile below.",
+
+      "success"
+
+    );
+
+
+    /*
+     * The Firebase user remains signed in.
+     * We do NOT redirect to login here.
+     */
+
+
+    setButtonsDisabled(
+      false
+    );
+
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "EMAIL SIGNUP ERROR:",
+      error
+    );
+
+
+    showStatus(
+      getFriendlyFirebaseError(
+        error
+      ),
+      "error"
+    );
+
+
+    setButtonsDisabled(
+      false
+    );
+
+  }
+
+}
 
 
     /* =================================================
        SAVE PERSONAL PROFILE
     ================================================= */
 
-    async function savePersonalProfile() {
+async function savePersonalProfile() {
 
-      const user =
-        auth.currentUser;
-
-
-      if (!user) {
-
-        showProfileStatus(
-          "Your login session is no longer active. Please log in again.",
-          "error"
-        );
-
-        return;
-
-      }
+  const user =
+    auth.currentUser;
 
 
-      const fullName =
-        profileFullName.value
-          .trim();
+  if (!user) {
+
+    showProfileStatus(
+      "Your login session is no longer active. Please log in again.",
+      "error"
+    );
+
+    return;
+
+  }
 
 
-      if (
-        !fullName
-      ) {
-
-        showProfileStatus(
-          "Please enter your full name.",
-          "error"
-        );
-
-        profileFullName.focus();
-
-        return;
-
-      }
+  const fullName =
+    profileFullName.value
+      .trim();
 
 
-      const mobile =
-        profileMobileNumber.value
-          .trim();
+  if (
+    !fullName
+  ) {
+
+    showProfileStatus(
+      "Please enter your full name.",
+      "error"
+    );
+
+    profileFullName.focus();
+
+    return;
+
+  }
 
 
-      const pincode =
-        profilePincode.value
-          .trim();
+  const mobile =
+    profileMobileNumber.value
+      .trim();
 
 
-      setProfileControlsDisabled(
+  const pincode =
+    profilePincode.value
+      .trim();
+
+
+  /*
+   * Disable Save button while the request is running.
+   */
+
+  setProfileControlsDisabled(
+    true
+  );
+
+
+  showProfileStatus(
+    "Saving your personal profile...",
+    "info"
+  );
+
+
+  try {
+
+    /*
+     * =====================================================
+     * STEP 1
+     * Get fresh Firebase ID token
+     * =====================================================
+     */
+
+    const idToken =
+      await user.getIdToken(
         true
       );
 
 
-      showProfileStatus(
-        "Saving your personal profile...",
-        "info"
+    /*
+     * =====================================================
+     * STEP 2
+     * Collect profile details
+     * =====================================================
+     */
+
+    const profileData = {
+
+      fullName:
+        fullName,
+
+      mobileNumber:
+        mobile,
+
+      dateOfBirth:
+        profileDateOfBirth.value ||
+        "",
+
+      gender:
+        profileGender.value ||
+        "",
+
+      address:
+        profileAddress.value
+          .trim(),
+
+      city:
+        profileCity.value
+          .trim(),
+
+      district:
+        profileDistrict.value
+          .trim(),
+
+      state:
+        profileState.value
+          .trim(),
+
+      country:
+        profileCountry.value
+          .trim(),
+
+      pincode:
+        pincode
+
+    };
+
+
+    console.log(
+      "PROFILE SAVE: Sending profile data:",
+      profileData
+    );
+
+
+    /*
+     * =====================================================
+     * STEP 3
+     * Send profile to Apps Script
+     * =====================================================
+     */
+
+    const data =
+      await callAppsScript({
+
+        action:
+          "updateAuthenticatedParticipantProfile",
+
+        idToken:
+          idToken,
+
+        profileData:
+          profileData
+
+      });
+
+
+    console.log(
+      "PROFILE SAVE: Apps Script response:",
+      data
+    );
+
+
+    /*
+     * =====================================================
+     * STEP 4
+     * Check server response
+     * =====================================================
+     */
+
+    if (
+      !data.success
+    ) {
+
+      throw new Error(
+        data.message ||
+        "Unable to save your personal profile."
       );
-
-
-      try {
-
-        const idToken =
-          await user.getIdToken(
-            true
-          );
-
-
-        const profileData = {
-
-          fullName:
-            fullName,
-
-          mobileNumber:
-            mobile,
-
-          dateOfBirth:
-            profileDateOfBirth.value ||
-            "",
-
-          gender:
-            profileGender.value ||
-            "",
-
-          address:
-            profileAddress.value
-              .trim(),
-
-          city:
-            profileCity.value
-              .trim(),
-
-          district:
-            profileDistrict.value
-              .trim(),
-
-          state:
-            profileState.value
-              .trim(),
-
-          country:
-            profileCountry.value
-              .trim(),
-
-          pincode:
-            pincode
-
-        };
-
-
-        const data =
-          await callAppsScript({
-
-            action:
-              "updateAuthenticatedParticipantProfile",
-
-            idToken:
-              idToken,
-
-            profileData:
-              profileData
-
-          });
-
-
-        if (
-          !data.success
-        ) {
-
-          throw new Error(
-            data.message ||
-            "Unable to save your personal profile."
-          );
-
-        }
-
-
-        console.log(
-          "PROFILE SAVE: Response:",
-          data
-        );
-
-
-        showProfileStatus(
-          "✅ Your personal profile has been saved successfully.",
-          "success"
-        );
-
-
-        profileDashboardLink.style.display =
-          "block";
-
-
-        profileDashboardLink.scrollIntoView({
-          behavior: "smooth",
-          block: "center"
-        });
-
-
-      } catch (error) {
-
-        console.error(
-          "PROFILE SAVE ERROR:",
-          error
-        );
-
-
-        showProfileStatus(
-          error.message ||
-          "Unable to save your personal profile.",
-          "error"
-        );
-
-
-      } finally {
-
-        setProfileControlsDisabled(
-          false
-        );
-
-      }
 
     }
 
+
+    /*
+     * =====================================================
+     * STEP 5
+     * IMPORTANT
+     *
+     * Re-read the profile from MASTER_PARTICIPANTS
+     * after saving.
+     * =====================================================
+     */
+
+    showProfileStatus(
+      "Profile saved. Verifying your saved details...",
+      "info"
+    );
+
+
+    const savedProfile =
+      await loadCurrentParticipantProfile();
+
+
+    console.log(
+      "PROFILE SAVE: Confirmed profile from server:",
+      savedProfile
+    );
+
+
+    /*
+     * =====================================================
+     * STEP 6
+     * Refresh the form from the spreadsheet data
+     * =====================================================
+     */
+
+    showPersonalProfile({
+
+      fullName:
+        savedProfile.fullName ||
+        "",
+
+      mobileNumber:
+        savedProfile.mobileNumber ||
+        "",
+
+      dateOfBirth:
+        savedProfile.dateOfBirth ||
+        "",
+
+      gender:
+        savedProfile.gender ||
+        "",
+
+      address:
+        savedProfile.address ||
+        "",
+
+      city:
+        savedProfile.city ||
+        "",
+
+      district:
+        savedProfile.district ||
+        "",
+
+      state:
+        savedProfile.state ||
+        "",
+
+      country:
+        savedProfile.country ||
+        "",
+
+      pincode:
+        savedProfile.pincode ||
+        ""
+
+    });
+
+
+    /*
+     * =====================================================
+     * STEP 7
+     * Final success message
+     * =====================================================
+     */
+
+    showProfileStatus(
+      "✅ Your personal profile has been saved successfully.",
+      "success"
+    );
+
+
+    /*
+     * =====================================================
+     * STEP 8
+     * Show dashboard button
+     * =====================================================
+     */
+
+    profileDashboardLink.style.display =
+      "block";
+
+
+    profileDashboardLink.scrollIntoView({
+      behavior:
+        "smooth",
+
+      block:
+        "center"
+    });
+
+
+  } catch (error) {
+
+    console.error(
+      "PROFILE SAVE ERROR:",
+      error
+    );
+
+
+    showProfileStatus(
+      error.message ||
+      "Unable to save your personal profile.",
+      "error"
+    );
+
+
+  } finally {
+
+    /*
+     * Re-enable the Save button.
+     */
+
+    setProfileControlsDisabled(
+      false
+    );
+
+  }
+
+}
 
     /* =================================================
        EVENT LISTENERS
