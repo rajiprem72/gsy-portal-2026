@@ -1,0 +1,175 @@
+{
+  "mode": "Individual",
+  "currency": "INR",
+  "selectionMessage": "The total amount will be the sum of the fees for the events joined.",
+  "events": [
+    {
+      "eventId": "IND001",
+      "eventName": "Common Category",
+      "fee": 1000,
+      "round": "Common Category",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND002",
+      "eventName": "Yoga World Record",
+      "fee": 1000,
+      "round": "Yoga World Record",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND003",
+      "eventName": "Traditional Yoga",
+      "fee": 1000,
+      "round": "Traditional Yoga",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND004",
+      "eventName": "Forward Bend",
+      "fee": 1000,
+      "round": "Regular",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND005",
+      "eventName": "Back Bend",
+      "fee": 1000,
+      "round": "Regular",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND006",
+      "eventName": "Twisting",
+      "fee": 1000,
+      "round": "Regular",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND007",
+      "eventName": "Leg Balance",
+      "fee": 1000,
+      "round": "Regular",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND008",
+      "eventName": "Hand Balance",
+      "fee": 1000,
+      "round": "Regular",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND009",
+      "eventName": "Inverted",
+      "fee": 1000,
+      "round": "Regular",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND010",
+      "eventName": "Artistic Yogasana",
+      "fee": 1000,
+      "round": "Regular",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND011",
+      "eventName": "Rhythmic Yogasana",
+      "fee": 1000,
+      "round": "Regular",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND012",
+      "eventName": "Forward Bend - Champion Round",
+      "fee": 1500,
+      "round": "Champion Round",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND013",
+      "eventName": "Back Bend - Champion Round",
+      "fee": 1500,
+      "round": "Champion Round",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND014",
+      "eventName": "Twisting - Champion Round",
+      "fee": 1500,
+      "round": "Champion Round",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND015",
+      "eventName": "Leg Balance - Champion Round",
+      "fee": 1500,
+      "round": "Champion Round",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND016",
+      "eventName": "Hand Balance - Champion Round",
+      "fee": 1500,
+      "round": "Champion Round",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND017",
+      "eventName": "Forward Bend - Champion of Champions Round",
+      "fee": 1800,
+      "round": "Champion of Champions Round",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND018",
+      "eventName": "Back Bend - Champion of Champions Round",
+      "fee": 1800,
+      "round": "Champion of Champions Round",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND019",
+      "eventName": "Twisting - Champion of Champions Round",
+      "fee": 1800,
+      "round": "Champion of Champions Round",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND020",
+      "eventName": "Leg Balance - Champion of Champions Round",
+      "fee": 1800,
+      "round": "Champion of Champions Round",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    },
+    {
+      "eventId": "IND021",
+      "eventName": "Hand Balance - Champion of Champions Round",
+      "fee": 1800,
+      "round": "Champion of Champions Round",
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
+    }
+  ]
+}
