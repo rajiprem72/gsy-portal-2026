@@ -1621,18 +1621,59 @@
             safeId;
 
 
-          checkbox.dataset.eventId =
-            event.eventId || "";
+         checkbox.dataset.eventId =
+  event.eventId || "";
 
 
-          checkbox.dataset.fee =
-            event.fee !== undefined
-              ? event.fee
-              : (
-                  event.perPersonFee ||
-                  0
-                );
+/*
+ * -------------------------------------------------------
+ * Check whether this participant has already registered
+ * for this event.
+ * -------------------------------------------------------
+ */
 
+const eventId =
+  String(
+    event.eventId || ""
+  ).trim();
+
+
+const alreadyRegistered =
+  registeredEventIds.has(
+    eventId
+  );
+
+
+/*
+ * -------------------------------------------------------
+ * Already registered events cannot be selected again.
+ * -------------------------------------------------------
+ */
+
+if (
+  alreadyRegistered
+) {
+
+  checkbox.disabled =
+    true;
+
+  checkbox.checked =
+    false;
+
+  row.classList.add(
+    "event-already-registered"
+  );
+
+}
+
+
+checkbox.dataset.fee =
+  event.fee !== undefined
+    ? event.fee
+    : (
+        event.perPersonFee ||
+        0
+      );
 
           const label =
             document.createElement(
