@@ -1451,9 +1451,12 @@
 
 
 
-    let currentMode = "";
-    let currentEventData = null;
+   let currentMode = "";
+let currentEventData = null;
 
+let registeredEventIds =
+  new Set();
+    
 
     function formatINR(amount) {
 
@@ -2555,7 +2558,6 @@ onAuthStateChanged(
   
         const profile =
   await getAuthenticatedParticipantProfile();
-
 
 /*
  * -------------------------------------------------------
