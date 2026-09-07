@@ -1070,8 +1070,7 @@
 
           <div
             id="Pair_PartnerResult_"
-            class="pair-partner-result"
-            style="display:none;">
+            class="pair-partner-result hidden">
 
             <div class="pair-partner-title">
               Partner Found
@@ -1110,7 +1109,7 @@
 
           <div
             id="Pair_EventSection_"
-            style="display:none;">
+            class="hidden">
 
             <div
               class="catalogue-title"
@@ -2152,40 +2151,76 @@ checkbox.dataset.fee =
     );
 
 
-    async function openYogaMode(mode) {
+    document
+      .querySelectorAll(
+        ".mode-card"
+      )
+      .forEach(
+        function(button) {
 
-      currentMode = String(mode || "").trim();
+          button.addEventListener(
+            "click",
+            async function() {
 
-      if (!currentMode) {
-        showStatus("Invalid Yoga Mode.", "error");
-        return;
-      }
+              currentMode =
+                button.dataset.mode ||
+                "";
 
-      joinPanel.classList.add("hidden");
-      cataloguePanel.classList.remove("hidden");
 
-      try {
-        showStatus(
-          "Loading " + currentMode + " event options...",
-          "info"
-        );
+              joinPanel.classList.add(
+                "hidden"
+              );
 
-        await loadEventCatalogue(currentMode);
 
-        showStatus(
-          currentMode + " event options are ready.",
-          "success"
-        );
-      } catch (error) {
-        console.error("Event catalogue error:", error);
-        showStatus(
-          error.message || "Unable to load event options.",
-          "error"
-        );
-      }
-    }
+              cataloguePanel.classList.remove(
+                "hidden"
+              );
 
-    window.GSYOpenYogaMode = openYogaMode;
+
+              try {
+
+                showStatus(
+                  "Loading " +
+                  currentMode +
+                  " event options...",
+                  "info"
+                );
+
+
+                await loadEventCatalogue(
+                  currentMode
+                );
+
+
+                showStatus(
+                  currentMode +
+                  " event options are ready.",
+                  "success"
+                );
+
+
+              } catch (error) {
+
+                console.error(
+                  "Event catalogue error:",
+                  error
+                );
+
+
+                showStatus(
+                  error.message ||
+                  "Unable to load event options.",
+                  "error"
+                );
+
+              }
+
+            }
+          );
+
+        }
+      );
+
 
     backModeBtn.addEventListener(
       "click",
@@ -2854,6 +2889,49 @@ renderRegisteredEvents(
       joinAnotherEventBtn: joinAnotherEventBtn
     };
 
+    /* =========================================================
+       STABLE GLOBAL MODE OPENER
+       Keeps mode opening independent of local module listener
+       registration. Existing Individual payment code is untouched.
+    ========================================================== */
+    window.GSYOpenMode_ = async function(mode) {
+      try {
+        currentMode = String(mode || '').trim();
+
+        joinPanel.classList.add('hidden');
+
+        if (currentMode === 'Pair') {
+          if (typeof window.Pair_Start_ === 'function') {
+            window.Pair_Start_();
+            return;
+          }
+          throw new Error('Pair module is not ready yet.');
+        }
+
+        cataloguePanel.classList.remove('hidden');
+
+        showStatus(
+          'Loading ' + currentMode + ' event options...',
+          'info'
+        );
+
+        await loadEventCatalogue(currentMode);
+
+        showStatus(
+          currentMode + ' event options are ready.',
+          'success'
+        );
+      } catch (error) {
+        console.error('GSY mode open error:', error);
+        showStatus(
+          error && error.message
+            ? error.message
+            : 'Unable to load event options.',
+          'error'
+        );
+      }
+    };
+
   /* =========================================================
    DISPLAY REGISTERED EVENTS
 ========================================================= */
@@ -3111,26 +3189,46 @@ function escapeHtml(
   </script>
 
   <script>
+    /* =========================================================
+       STABLE MODE CLICK FALLBACK
+       Delegated listener for Individual/Pair/Rhythmic/Artistic.
+    ========================================================== */
     (function () {
-      document.addEventListener("click", function (event) {
-        const card = event.target.closest(".mode-card");
-        if (!card) return;
+      function install() {
+        if (window.__GSY_MODE_FALLBACK_INSTALLED__) return;
 
-        const mode = card.dataset.mode || "";
-
-        /* Pair.js handles Pair mode separately. */
-        if (mode === "Pair") return;
-
-        if (typeof window.GSYOpenYogaMode === "function") {
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          window.GSYOpenYogaMode(mode);
-        } else {
-          console.error("GSYOpenYogaMode is not ready.");
+        const cards = document.querySelectorAll('.mode-card');
+        if (!cards.length) {
+          setTimeout(install, 100);
+          return;
         }
-      }, true);
 
-      console.log("GSY mode click fallback listener installed.");
+        document.addEventListener('click', function (event) {
+          const card = event.target.closest('.mode-card');
+          if (!card) return;
+
+          const mode = card.dataset.mode || '';
+
+          /* Pair's capture listener handles Pair itself. */
+          if (mode === 'Pair' && typeof window.Pair_Start_ === 'function') {
+            return;
+          }
+
+          if (typeof window.GSYOpenMode_ === 'function') {
+            event.preventDefault();
+            window.GSYOpenMode_(mode);
+          }
+        });
+
+        window.__GSY_MODE_FALLBACK_INSTALLED__ = true;
+        console.log('GSY mode click fallback listener installed.');
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', install);
+      } else {
+        install();
+      }
     })();
   </script>
 
