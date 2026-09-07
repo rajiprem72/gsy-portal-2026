@@ -2552,38 +2552,70 @@ onAuthStateChanged(
           "info"
         );
 
-
+  
         const profile =
-          await getAuthenticatedParticipantProfile();
+  await getAuthenticatedParticipantProfile();
 
 
-        welcomeTitle.textContent =
-          "Welcome, " +
-          (
-            profile.fullName ||
-            "Participant"
-          );
+/*
+ * -------------------------------------------------------
+ * Build a list of Event IDs already registered
+ * by this participant.
+ *
+ * These Event IDs will later be disabled
+ * in the event catalogue.
+ * -------------------------------------------------------
+ */
+
+registeredEventIds =
+  new Set(
+    (profile.registeredEvents || [])
+      .map(
+        function(event) {
+
+          return String(
+            event.eventId || ""
+          ).trim();
+
+        }
+      )
+      .filter(
+        function(eventId) {
+
+          return eventId !== "";
+
+        }
+      )
+  );
 
 
-        participantId.textContent =
-          profile.participantId ||
-          "—";
+welcomeTitle.textContent =
+  "Welcome, " +
+  (
+    profile.fullName ||
+    "Participant"
+  );
 
 
-        participantName.textContent =
-          profile.fullName ||
-          "—";
+participantId.textContent =
+  profile.participantId ||
+  "—";
 
 
-        loginEmail.textContent =
-          profile.loginEmail ||
-          profile.email ||
-          "—";
+participantName.textContent =
+  profile.fullName ||
+  "—";
 
-        renderRegisteredEvents(
-        profile.registeredEvents || []
-        );
-        
+
+loginEmail.textContent =
+  profile.loginEmail ||
+  profile.email ||
+  "—";
+
+
+renderRegisteredEvents(
+  profile.registeredEvents || []
+);
         populateParticipantProfile(
           profile
         );
