@@ -1070,7 +1070,8 @@
 
           <div
             id="Pair_PartnerResult_"
-            class="pair-partner-result hidden">
+            class="pair-partner-result"
+            style="display:none;">
 
             <div class="pair-partner-title">
               Partner Found
@@ -1109,7 +1110,7 @@
 
           <div
             id="Pair_EventSection_"
-            class="hidden">
+            style="display:none;">
 
             <div
               class="catalogue-title"
@@ -2151,76 +2152,40 @@ checkbox.dataset.fee =
     );
 
 
-    document
-      .querySelectorAll(
-        ".mode-card"
-      )
-      .forEach(
-        function(button) {
+    async function openYogaMode(mode) {
 
-          button.addEventListener(
-            "click",
-            async function() {
+      currentMode = String(mode || "").trim();
 
-              currentMode =
-                button.dataset.mode ||
-                "";
+      if (!currentMode) {
+        showStatus("Invalid Yoga Mode.", "error");
+        return;
+      }
 
+      joinPanel.classList.add("hidden");
+      cataloguePanel.classList.remove("hidden");
 
-              joinPanel.classList.add(
-                "hidden"
-              );
+      try {
+        showStatus(
+          "Loading " + currentMode + " event options...",
+          "info"
+        );
 
+        await loadEventCatalogue(currentMode);
 
-              cataloguePanel.classList.remove(
-                "hidden"
-              );
+        showStatus(
+          currentMode + " event options are ready.",
+          "success"
+        );
+      } catch (error) {
+        console.error("Event catalogue error:", error);
+        showStatus(
+          error.message || "Unable to load event options.",
+          "error"
+        );
+      }
+    }
 
-
-              try {
-
-                showStatus(
-                  "Loading " +
-                  currentMode +
-                  " event options...",
-                  "info"
-                );
-
-
-                await loadEventCatalogue(
-                  currentMode
-                );
-
-
-                showStatus(
-                  currentMode +
-                  " event options are ready.",
-                  "success"
-                );
-
-
-              } catch (error) {
-
-                console.error(
-                  "Event catalogue error:",
-                  error
-                );
-
-
-                showStatus(
-                  error.message ||
-                  "Unable to load event options.",
-                  "error"
-                );
-
-              }
-
-            }
-          );
-
-        }
-      );
-
+    window.GSYOpenYogaMode = openYogaMode;
 
     backModeBtn.addEventListener(
       "click",
@@ -3145,7 +3110,31 @@ function escapeHtml(
   
   </script>
 
-  <script type="module" src="js/pair.js"></script>
+  <script>
+    (function () {
+      document.addEventListener("click", function (event) {
+        const card = event.target.closest(".mode-card");
+        if (!card) return;
+
+        const mode = card.dataset.mode || "";
+
+        /* Pair.js handles Pair mode separately. */
+        if (mode === "Pair") return;
+
+        if (typeof window.GSYOpenYogaMode === "function") {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          window.GSYOpenYogaMode(mode);
+        } else {
+          console.error("GSYOpenYogaMode is not ready.");
+        }
+      }, true);
+
+      console.log("GSY mode click fallback listener installed.");
+    })();
+  </script>
+
+  <script type="module" src="pair.js"></script>
 
 </body>
 </html>
