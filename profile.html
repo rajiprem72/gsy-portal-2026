@@ -816,6 +816,14 @@
               <input type="text" id="profileFullName" autocomplete="name">
             </div>
 
+            <div class="profile-field full-width">
+              <label for="profileFatherName">Father's Name</label>
+              <input
+                type="text"
+                id="profileFatherName"
+                autocomplete="name"
+              >
+            </div>
             <div class="profile-field">
               <label for="profileMobileNumber">Mobile Number</label>
               <input type="tel" id="profileMobileNumber" inputmode="tel" autocomplete="tel">
@@ -1216,6 +1224,7 @@
     const profileParticipantId = document.getElementById("profileParticipantId");
     const profileLoginEmail = document.getElementById("profileLoginEmail");
     const profileFullName = document.getElementById("profileFullName");
+    const profileFatherName =   document.getElementById("profileFatherName");
     const profileMobileNumber = document.getElementById("profileMobileNumber");
     const profileDateOfBirth = document.getElementById("profileDateOfBirth");
     const profileGender = document.getElementById("profileGender");
@@ -2092,6 +2101,8 @@ checkbox.dataset.fee =
                   profileData: {
                     fullName:
                       fullName,
+                    fatherName:
+                      profileFatherName.value.trim(),
                     mobileNumber:
                       profileMobileNumber.value.trim(),
                     dateOfBirth:
