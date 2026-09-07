@@ -673,6 +673,42 @@
 }
 
     
+    /* =========================================================
+       PAIR REGISTRATION
+    ========================================================== */
+
+    .pair-panel {
+      background: #fbfdf9;
+      border-color: #d8e8d2;
+    }
+
+    .pair-partner-result {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid #c8e6c9;
+      border-radius: 12px;
+      background: #f3f8f0;
+    }
+
+    .pair-partner-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #2c5f2d;
+      margin-bottom: 12px;
+    }
+
+    .pair-partner-detail {
+      margin-bottom: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #444;
+    }
+
+    .pair-partner-detail strong {
+      color: #2c5f2d;
+    }
+
+
   </style>
 </head>
 
@@ -993,6 +1029,136 @@
             </button>
 
           </div>
+        </div>
+
+
+        <!-- =================================================
+             PAIR REGISTRATION PANEL
+        ================================================== -->
+
+        <div
+          id="Pair_Panel_"
+          class="catalogue-panel hidden pair-panel">
+
+          <div class="catalogue-title">
+            Pair Registration
+          </div>
+
+          <div class="catalogue-subtitle">
+            Enter the Participant ID of your Pair Partner and verify the participant details before proceeding.
+          </div>
+
+          <div class="profile-field full-width">
+            <label for="Pair_PartnerParticipantId_">
+              Partner Participant ID
+            </label>
+            <input
+              type="text"
+              id="Pair_PartnerParticipantId_"
+              placeholder="Example: GSY000006"
+              autocomplete="off"
+              maxlength="20"
+            >
+          </div>
+
+          <button
+            type="button"
+            id="Pair_FindPartnerBtn_"
+            class="primary-action">
+            🔎 Find Partner
+          </button>
+
+          <div
+            id="Pair_PartnerResult_"
+            class="pair-partner-result hidden">
+
+            <div class="pair-partner-title">
+              Partner Found
+            </div>
+
+            <div class="pair-partner-detail">
+              <strong>Participant ID:</strong>
+              <span id="Pair_PartnerIdDisplay_"></span>
+            </div>
+
+            <div class="pair-partner-detail">
+              <strong>Name:</strong>
+              <span id="Pair_PartnerNameDisplay_"></span>
+            </div>
+
+            <div class="pair-partner-detail">
+              <strong>Father's Name:</strong>
+              <span id="Pair_PartnerFatherNameDisplay_"></span>
+            </div>
+
+            <button
+              type="button"
+              id="Pair_SelectPartnerBtn_"
+              class="primary-action">
+              ✅ Select This Participant as Partner
+            </button>
+
+            <button
+              type="button"
+              id="Pair_ChangePartnerBtn_"
+              class="back-mode-btn">
+              ↔ Change Partner
+            </button>
+
+          </div>
+
+          <div
+            id="Pair_EventSection_"
+            class="hidden">
+
+            <div
+              class="catalogue-title"
+              style="margin-top:24px;">
+              Select Pair Event(s)
+            </div>
+
+            <div
+              class="catalogue-subtitle"
+              id="Pair_EventMessage_">
+            </div>
+
+            <div id="Pair_EventList_"></div>
+
+            <div
+              id="Pair_SelectionSummary_"
+              class="selection-summary hidden">
+
+              <div
+                class="selection-count"
+                id="Pair_SelectionCount_">
+                0 events selected
+              </div>
+
+              <div
+                class="selection-total"
+                id="Pair_SelectionTotal_">
+                Total: ₹0
+              </div>
+
+            </div>
+
+            <button
+              type="button"
+              id="Pair_ProceedToPaymentBtn_"
+              class="primary-action payment-action"
+              disabled>
+              💳 Proceed to Payment
+            </button>
+
+          </div>
+
+          <button
+            type="button"
+            id="Pair_BackToModeBtn_"
+            class="back-mode-btn">
+            ← Back to Yoga Mode
+          </button>
+
         </div>
 
 
@@ -2708,6 +2874,21 @@ renderRegisteredEvents(
       "Global School of Yoga Participant Dashboard initialized successfully."
     );
 
+    /* =========================================================
+       PAIR FRONTEND CONTEXT
+       Pair logic is kept in pair.js.
+       Existing Individual functions remain untouched.
+    ========================================================= */
+
+    window.GSYPairContext = {
+      auth: auth,
+      APPS_SCRIPT_URL: APPS_SCRIPT_URL,
+      showStatus: showStatus,
+      joinPanel: joinPanel,
+      cataloguePanel: cataloguePanel,
+      joinAnotherEventBtn: joinAnotherEventBtn
+    };
+
   /* =========================================================
    DISPLAY REGISTERED EVENTS
 ========================================================= */
@@ -2963,6 +3144,8 @@ function escapeHtml(
 }    
   
   </script>
+
+  <script type="module" src="pair.js"></script>
 
 </body>
 </html>
