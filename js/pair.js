@@ -194,132 +194,391 @@
     }
   }
 
-  async function Pair_FindPartner_() {
-    const partnerInput =
-      document.getElementById("Pair_PartnerParticipantId_");
 
-    const partnerId =
-      partnerInput
-        ? partnerInput.value.trim().toUpperCase()
-        : "";
+async function Pair_FindPartner_() {
 
-    if (!partnerId) {
-      Pair_ShowStatus_("Please enter the Partner Participant ID.");
-      return;
-    }
+  const partnerInput =
+    document.getElementById(
+      "Pair_PartnerParticipantId_"
+    );
 
-    if (!ctx || !ctx.auth || !ctx.auth.currentUser) {
-      Pair_ShowStatus_("Please sign in again.");
-      return;
-    }
 
-    const findBtn =
-      document.getElementById("Pair_FindPartnerBtn_");
+  const partnerId =
+    partnerInput
+      ? partnerInput.value
+          .trim()
+          .toUpperCase()
+      : "";
 
-    if (findBtn) {
-      findBtn.disabled = true;
-      findBtn.textContent = "Searching...";
-    }
 
-    try {
-      const idToken =
-        await ctx.auth.currentUser.getIdToken(true);
+  console.log(
+    "PAIR: Partner ID entered:",
+    partnerId
+  );
 
-      const response = await fetch(
+
+  if (
+    !partnerId
+  ) {
+
+    Pair_ShowStatus_(
+      "Please enter the Partner Participant ID."
+    );
+
+    return;
+  }
+
+
+  /*
+   * -------------------------------------------------------
+   * Check Firebase session
+   * -------------------------------------------------------
+   */
+
+  if (
+    !ctx ||
+    !ctx.auth ||
+    !ctx.auth.currentUser
+  ) {
+
+    console.error(
+      "PAIR: Firebase user is not available."
+    );
+
+    Pair_ShowStatus_(
+      "Please sign in again."
+    );
+
+    return;
+  }
+
+
+  const findBtn =
+    document.getElementById(
+      "Pair_FindPartnerBtn_"
+    );
+
+
+  if (findBtn) {
+
+    findBtn.disabled =
+      true;
+
+    findBtn.textContent =
+      "Searching...";
+
+  }
+
+
+  try {
+
+    /*
+     * -------------------------------------------------------
+     * Get fresh Firebase ID token
+     * -------------------------------------------------------
+     */
+
+    const idToken =
+      await ctx.auth.currentUser
+        .getIdToken(true);
+
+
+    console.log(
+      "PAIR: Firebase token obtained."
+    );
+
+
+    console.log(
+      "PAIR: Apps Script URL:",
+      ctx.APPS_SCRIPT_URL
+    );
+
+
+    /*
+     * -------------------------------------------------------
+     * Send request to Apps Script
+     * -------------------------------------------------------
+     */
+
+    const response =
+      await fetch(
         ctx.APPS_SCRIPT_URL,
         {
           method: "POST",
+
           headers: {
-            "Content-Type": "text/plain;charset=utf-8"
+            "Content-Type":
+              "text/plain;charset=utf-8"
           },
-          body: JSON.stringify({
-            action: "Pair_FindPartner",
-            idToken: idToken,
-            partnerParticipantId: partnerId
-          })
+
+          body:
+            JSON.stringify({
+              action:
+                "Pair_FindPartner",
+
+              idToken:
+                idToken,
+
+              partnerParticipantId:
+                partnerId
+            })
         }
       );
 
-      const data = await response.json();
 
-      if (!data.success) {
-        throw new Error(
-          data.message || "Partner Participant ID not found."
+    console.log(
+      "PAIR: HTTP status:",
+      response.status
+    );
+
+
+    /*
+     * -------------------------------------------------------
+     * Read response as TEXT first.
+     *
+     * This helps us see the real Apps Script response
+     * if it is not valid JSON.
+     * -------------------------------------------------------
+     */
+
+    const responseText =
+      await response.text();
+
+
+    console.log(
+      "PAIR: Raw response:",
+      responseText
+    );
+
+
+    let data;
+
+
+    try {
+
+      data =
+        JSON.parse(
+          responseText
         );
-      }
 
-      const partner = data.data || data.partner;
+    } catch (jsonError) {
 
-      if (!partner) {
-        throw new Error("Partner details were not returned.");
-      }
-
-      window.GSYPairState.partner = partner;
-
-      const result =
-        document.getElementById("Pair_PartnerResult_");
-
-      const idDisplay =
-        document.getElementById("Pair_PartnerIdDisplay_");
-
-      const nameDisplay =
-        document.getElementById("Pair_PartnerNameDisplay_");
-
-      const fatherDisplay =
-        document.getElementById("Pair_PartnerFatherNameDisplay_");
-
-      if (idDisplay) {
-        idDisplay.textContent =
-          partner.participantId ||
-          partner.Participant_ID ||
-          partner.id ||
-          partnerId;
-      }
-
-      if (nameDisplay) {
-        nameDisplay.textContent =
-          partner.fullName ||
-          partner.Full_Name ||
-          partner.name ||
-          "";
-      }
-
-      if (fatherDisplay) {
-        fatherDisplay.textContent =
-          partner.fatherName ||
-          partner.Father_Name ||
-          "";
-      }
-
-      if (result) {
-        result.style.display = "block";
-      }
-
-      Pair_ShowStatus_("Partner found successfully.");
-
-    } catch (error) {
-      console.error("Pair_FindPartner_:", error);
-
-      const result =
-        document.getElementById("Pair_PartnerResult_");
-
-      if (result) {
-        result.style.display = "none";
-      }
-
-      Pair_ShowStatus_(
-        error.message ||
-        "Unable to find the partner."
+      throw new Error(
+        "Apps Script returned an invalid response: " +
+        responseText
       );
 
-    } finally {
-      if (findBtn) {
-        findBtn.disabled = false;
-        findBtn.textContent = "Find Partner";
-      }
     }
+
+
+    console.log(
+      "PAIR: Parsed response:",
+      data
+    );
+
+
+    /*
+     * -------------------------------------------------------
+     * Check API success
+     * -------------------------------------------------------
+     */
+
+    if (
+      !data.success
+    ) {
+
+      throw new Error(
+        data.message ||
+        "Partner Participant ID not found."
+      );
+
+    }
+
+
+    /*
+     * -------------------------------------------------------
+     * Get partner object
+     * -------------------------------------------------------
+     */
+
+    const partner =
+      data.partner ||
+      data.data;
+
+
+    if (
+      !partner
+    ) {
+
+      throw new Error(
+        "Partner details were not returned by the server."
+      );
+
+    }
+
+
+    console.log(
+      "PAIR: Partner found:",
+      partner
+    );
+
+
+    /*
+     * -------------------------------------------------------
+     * Save partner in Pair state
+     * -------------------------------------------------------
+     */
+
+    window.GSYPairState.partner =
+      partner;
+
+
+    /*
+     * -------------------------------------------------------
+     * Display Partner ID
+     * -------------------------------------------------------
+     */
+
+    const idDisplay =
+      document.getElementById(
+        "Pair_PartnerIdDisplay_"
+      );
+
+
+    if (idDisplay) {
+
+      idDisplay.textContent =
+        partner.participantId ||
+        partner.Participant_ID ||
+        partner.id ||
+        partnerId;
+
+    }
+
+
+    /*
+     * -------------------------------------------------------
+     * Display Partner Name
+     * -------------------------------------------------------
+     */
+
+    const nameDisplay =
+      document.getElementById(
+        "Pair_PartnerNameDisplay_"
+      );
+
+
+    if (nameDisplay) {
+
+      nameDisplay.textContent =
+        partner.fullName ||
+        partner.Full_Name ||
+        partner.name ||
+        "";
+
+    }
+
+
+    /*
+     * -------------------------------------------------------
+     * Display Father's Name
+     * -------------------------------------------------------
+     */
+
+    const fatherDisplay =
+      document.getElementById(
+        "Pair_PartnerFatherNameDisplay_"
+      );
+
+
+    if (fatherDisplay) {
+
+      fatherDisplay.textContent =
+        partner.fatherName ||
+        partner.Father_Name ||
+        "";
+
+    }
+
+
+    /*
+     * -------------------------------------------------------
+     * Show Partner Result panel
+     * -------------------------------------------------------
+     */
+
+    const result =
+      document.getElementById(
+        "Pair_PartnerResult_"
+      );
+
+
+    if (result) {
+
+      result.classList.remove(
+        "hidden"
+      );
+
+      result.style.display =
+        "block";
+
+    }
+
+
+    Pair_ShowStatus_(
+      "Partner found successfully."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "PAIR FIND PARTNER ERROR:",
+      error
+    );
+
+
+    const result =
+      document.getElementById(
+        "Pair_PartnerResult_"
+      );
+
+
+    if (result) {
+
+      result.classList.add(
+        "hidden"
+      );
+
+      result.style.display =
+        "none";
+
+    }
+
+
+    Pair_ShowStatus_(
+      error.message ||
+      "Unable to find the partner."
+    );
+
+
+  } finally {
+
+    if (findBtn) {
+
+      findBtn.disabled =
+        false;
+
+      findBtn.textContent =
+        "Find Partner";
+
+    }
+
   }
 
+}
+
+   
   async function Pair_SelectPartner_() {
     if (!window.GSYPairState ||
         !window.GSYPairState.partner) {
