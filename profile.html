@@ -673,6 +673,7 @@
 }
 
     
+  
     /* =========================================================
        PAIR REGISTRATION
     ========================================================== */
@@ -707,7 +708,6 @@
     .pair-partner-detail strong {
       color: #2c5f2d;
     }
-
 
   </style>
 </head>
@@ -860,6 +860,7 @@
                 autocomplete="name"
               >
             </div>
+
             <div class="profile-field">
               <label for="profileMobileNumber">Mobile Number</label>
               <input type="tel" id="profileMobileNumber" inputmode="tel" autocomplete="tel">
@@ -1162,6 +1163,69 @@
         </div>
 
 
+
+        <!-- =========================================================
+             RHYTHMIC / ARTISTIC GROUP REGISTRATION PANEL
+        ========================================================== -->
+
+        <div
+          id="Group_Panel_"
+          class="catalogue-panel hidden">
+
+          <div class="catalogue-title" id="Group_Title_">
+            Group Registration
+          </div>
+
+          <div class="catalogue-subtitle" id="Group_Subtitle_">
+            Enter the Participant IDs for your group.
+          </div>
+
+          <div id="Group_ModeHelp_" class="selection-message"></div>
+
+          <div id="Group_ParticipantInputs_"></div>
+
+          <div id="Group_VerifiedParticipants_" class="selection-message"></div>
+
+          <button
+            type="button"
+            id="Group_VerifyBtn_"
+            class="primary-action">
+            🔎 Verify Participants
+          </button>
+
+          <div id="Group_EventSection_" class="hidden" style="margin-top:16px;">
+            <div class="catalogue-subtitle" id="Group_EventMessage_"></div>
+            <div id="Group_EventList_"></div>
+
+            <div
+              id="Group_SelectionSummary_"
+              class="selection-summary hidden">
+              <div class="selection-count" id="Group_SelectionCount_">
+                0 events selected
+              </div>
+              <div class="selection-total" id="Group_SelectionTotal_">
+                Total: ₹0
+              </div>
+            </div>
+
+            <button
+              type="button"
+              id="Group_ProceedToPaymentBtn_"
+              class="primary-action payment-action"
+              disabled>
+              💳 Proceed to Payment
+            </button>
+          </div>
+
+          <button
+            type="button"
+            id="Group_BackToModeBtn_"
+            class="back-mode-btn">
+            ← Back to Yoga Mode
+          </button>
+
+        </div>
+
         <div
           id="cataloguePanel"
           class="catalogue-panel hidden">
@@ -1390,7 +1454,7 @@
     const profileParticipantId = document.getElementById("profileParticipantId");
     const profileLoginEmail = document.getElementById("profileLoginEmail");
     const profileFullName = document.getElementById("profileFullName");
-    const profileFatherName =   document.getElementById("profileFatherName");
+    const profileFatherName = document.getElementById("profileFatherName");
     const profileMobileNumber = document.getElementById("profileMobileNumber");
     const profileDateOfBirth = document.getElementById("profileDateOfBirth");
     const profileGender = document.getElementById("profileGender");
@@ -1485,60 +1549,27 @@
 
 
 
-      function normalizeDateForInput(value) {
+    function normalizeDateForInput(value) {
 
-  if (!value) return "";
+      if (!value) return "";
 
-  /*
-   * -------------------------------------------------------
-   * If the value already contains YYYY-MM-DD,
-   * use that date exactly as it is.
-   *
-   * This prevents timezone-related date shifting.
-   * -------------------------------------------------------
-   */
+      const text = String(value).trim();
+      const match = text.match(/(\d{4}-\d{2}-\d{2})/);
 
-  const text =
-    String(value).trim();
+      if (match) return match[1];
 
-  const match =
-    text.match(
-      /(\d{4}-\d{2}-\d{2})/
-    );
+      const parsed = new Date(text);
 
-  if (match) {
-    return match[1];
-  }
+      if (!isNaN(parsed.getTime())) {
+        return (
+          parsed.getFullYear() +
+          "-" +
+          String(parsed.getMonth() + 1).padStart(2, "0") +
+          "-" +
+          String(parsed.getDate()).padStart(2, "0")
+        );
+      }
 
-
-  /*
-   * -------------------------------------------------------
-   * Fallback for genuine Date values.
-   * -------------------------------------------------------
-   */
-
-  const parsed =
-    new Date(value);
-
-  if (
-    !isNaN(
-      parsed.getTime()
-    )
-  ) {
-
-    return (
-      parsed.getFullYear() +
-      "-" +
-      String(
-        parsed.getMonth() + 1
-      ).padStart(2, "0") +
-      "-" +
-      String(
-        parsed.getDate()
-      ).padStart(2, "0")
-    );
-
-  }
       return "";
     }
 
@@ -1660,12 +1691,9 @@
 
 
 
-   let currentMode = "";
-let currentEventData = null;
+    let currentMode = "";
+    let currentEventData = null;
 
-let registeredEventIds =
-  new Set();
-    
 
     function formatINR(amount) {
 
@@ -1740,355 +1768,234 @@ let registeredEventIds =
 
 }
 
+    
+    function renderEventCatalogue(
+      mode,
+      data
+    ) {
 
-function renderEventCatalogue(
-  mode,
-  data
-) {
-
-  currentEventData =
-    data;
-
-
-  catalogueTitle.textContent =
-    mode +
-    " Events";
+      currentEventData =
+        data;
 
 
-  catalogueSubtitle.textContent =
-    data.selectionMessage ||
-    "Select the event or events you would like to join.";
+      catalogueTitle.textContent =
+        mode +
+        " Events";
 
 
-  catalogueList.innerHTML =
-    "";
+      catalogueSubtitle.textContent =
+        data.selectionMessage ||
+        "Select the event or events you would like to join.";
 
 
-  const events =
-    Array.isArray(data.events)
-      ? data.events
-      : [];
+      catalogueList.innerHTML =
+        "";
 
 
-  if (
-    events.length === 0
-  ) {
+      const events =
+        Array.isArray(data.events)
+          ? data.events
+          : [];
 
-    selectionSummary.classList.add(
-      "hidden"
-    );
-
-
-    catalogueSubtitle.textContent =
-      "No events are currently available for this mode.";
-
-
-    return;
-
-  }
-
-
-  events.forEach(
-    function(event, index) {
-
-      const row =
-        document.createElement(
-          "div"
-        );
-
-
-      row.className =
-        "event-option";
-
-
-      const checkbox =
-        document.createElement(
-          "input"
-        );
-
-
-      checkbox.type =
-        "checkbox";
-
-
-      const rawId =
-        event.eventId ||
-        (
-          mode +
-          "_" +
-          index
-        );
-
-
-      const safeId =
-        String(rawId)
-          .replace(
-            /[^a-zA-Z0-9_-]/g,
-            "_"
-          );
-
-
-      checkbox.id =
-        "event_" +
-        safeId;
-
-
-      /*
-       * -------------------------------------------------------
-       * Get the Event ID safely.
-       *
-       * IMPORTANT:
-       * Use a different variable name here so that there is
-       * no conflict with any other eventId variable.
-       * -------------------------------------------------------
-       */
-
-      const currentEventId =
-        String(
-          event.eventId ||
-          event.Event_ID ||
-          event.eventID ||
-          ""
-        )
-          .trim()
-          .toUpperCase();
-
-
-      /*
-       * -------------------------------------------------------
-       * Store the Event ID on the checkbox.
-       * -------------------------------------------------------
-       */
-
-      checkbox.dataset.eventId =
-        currentEventId;
-
-
-      /*
-       * -------------------------------------------------------
-       * Check whether this participant has already registered
-       * for this event.
-       *
-       * IMPORTANT:
-       * This restriction applies ONLY to Individual events.
-       *
-       * Pair events are handled separately by pair.js.
-       * Therefore Pair events are NOT disabled here.
-       * -------------------------------------------------------
-       */
-
-      const alreadyRegistered =
-        mode === "Individual" &&
-        registeredEventIds.has(
-          currentEventId
-        );
-
-
-      /*
-       * -------------------------------------------------------
-       * Already registered Individual events cannot be selected
-       * again.
-       * -------------------------------------------------------
-       */
 
       if (
-        alreadyRegistered
+        events.length === 0
       ) {
 
-        checkbox.disabled =
-          true;
-
-        checkbox.checked =
-          false;
-
-        row.classList.add(
-          "event-already-registered"
+        selectionSummary.classList.add(
+          "hidden"
         );
+
+
+        catalogueSubtitle.textContent =
+          "No events are currently available for this mode.";
+
+
+        return;
 
       }
 
 
-      /*
-       * -------------------------------------------------------
-       * Store the event fee.
-       * -------------------------------------------------------
-       */
+      events.forEach(
+        function(event, index) {
 
-      checkbox.dataset.fee =
-        event.fee !== undefined
-          ? event.fee
-          : (
-              event.perPersonFee ||
-              0
+          const row =
+            document.createElement(
+              "div"
             );
 
 
-      /*
-       * -------------------------------------------------------
-       * Event label
-       * -------------------------------------------------------
-       */
-
-      const label =
-        document.createElement(
-          "label"
-        );
+          row.className =
+            "event-option";
 
 
-      label.className =
-        "event-option-label";
+          const checkbox =
+            document.createElement(
+              "input"
+            );
 
 
-      label.htmlFor =
-        checkbox.id;
+          checkbox.type =
+            "checkbox";
 
 
-      /*
-       * -------------------------------------------------------
-       * Event name
-       * -------------------------------------------------------
-       */
-
-      const name =
-        document.createElement(
-          "div"
-        );
+          const rawId =
+            event.eventId ||
+            (
+              mode +
+              "_" +
+              index
+            );
 
 
-      name.className =
-        "event-name";
+          const safeId =
+            String(rawId)
+              .replace(
+                /[^a-zA-Z0-9_-]/g,
+                "_"
+              );
 
 
-      name.textContent =
-        event.eventName ||
-        "Event";
+          checkbox.id =
+            "event_" +
+            safeId;
 
 
-      label.appendChild(
-        name
-      );
+          checkbox.dataset.eventId =
+            event.eventId || "";
 
 
-      /*
-       * -------------------------------------------------------
-       * Event round
-       * -------------------------------------------------------
-       */
+          checkbox.dataset.fee =
+            event.fee !== undefined
+              ? event.fee
+              : (
+                  event.perPersonFee ||
+                  0
+                );
 
-      if (
-        event.round
-      ) {
 
-        const round =
-          document.createElement(
-            "div"
+          const label =
+            document.createElement(
+              "label"
+            );
+
+
+          label.className =
+            "event-option-label";
+
+
+          label.htmlFor =
+            checkbox.id;
+
+
+          const name =
+            document.createElement(
+              "div"
+            );
+
+
+          name.className =
+            "event-name";
+
+
+          name.textContent =
+            event.eventName ||
+            "Event";
+
+
+          label.appendChild(
+            name
           );
 
 
-        round.className =
-          "event-round";
+          if (event.round) {
+
+            const round =
+              document.createElement(
+                "div"
+              );
 
 
-        round.textContent =
-          event.round;
+            round.className =
+              "event-round";
 
 
-        label.appendChild(
-          round
-        );
-
-      }
+            round.textContent =
+              event.round;
 
 
-      /*
-       * -------------------------------------------------------
-       * Event fee
-       * -------------------------------------------------------
-       */
+            label.appendChild(
+              round
+            );
 
-      const fee =
-        document.createElement(
-          "div"
-        );
+          }
 
 
-      fee.className =
-        "event-fee";
+          const fee =
+            document.createElement(
+              "div"
+            );
 
 
-      if (
-        event.fee !== undefined
-      ) {
+          fee.className =
+            "event-fee";
 
-        fee.textContent =
-          formatINR(
-            event.fee
+
+          if (
+            event.fee !== undefined
+          ) {
+
+            fee.textContent =
+              formatINR(
+                event.fee
+              );
+
+          } else if (
+            event.perPersonFee !== undefined
+          ) {
+
+            fee.textContent =
+              formatINR(
+                event.perPersonFee
+              ) +
+              " / person";
+
+          }
+
+
+          checkbox.addEventListener(
+            "change",
+            updateSelectionSummary
           );
 
-      } else if (
-        event.perPersonFee !== undefined
-      ) {
 
-        fee.textContent =
-          formatINR(
-            event.perPersonFee
-          ) +
-          " / person";
-
-      }
+          row.appendChild(
+            checkbox
+          );
 
 
-      /*
-       * -------------------------------------------------------
-       * Checkbox change handler
-       * -------------------------------------------------------
-       */
+          row.appendChild(
+            label
+          );
 
-      checkbox.addEventListener(
-        "change",
-        updateSelectionSummary
+
+          row.appendChild(
+            fee
+          );
+
+
+          catalogueList.appendChild(
+            row
+          );
+
+        }
       );
 
 
-      /*
-       * -------------------------------------------------------
-       * Add elements to event row
-       * -------------------------------------------------------
-       */
-
-      row.appendChild(
-        checkbox
-      );
-
-
-      row.appendChild(
-        label
-      );
-
-
-      row.appendChild(
-        fee
-      );
-
-
-      catalogueList.appendChild(
-        row
-      );
+      updateSelectionSummary();
 
     }
-  );
 
-
-  /*
-   * -------------------------------------------------------
-   * Update selection summary after all events are rendered.
-   * -------------------------------------------------------
-   */
-
-  updateSelectionSummary();
-
-}
-    
 
     async function loadEventCatalogue(
       mode
@@ -2245,6 +2152,18 @@ function renderEventCatalogue(
               currentMode =
                 button.dataset.mode ||
                 "";
+
+              /*
+               * Group modes are owned by their dedicated modules.
+               * Individual remains on the original catalogue/payment flow.
+               */
+              if (
+                currentMode === "Pair" ||
+                currentMode === "Rhythmic" ||
+                currentMode === "Artistic"
+              ) {
+                return;
+              }
 
 
               joinPanel.classList.add(
@@ -2846,72 +2765,38 @@ onAuthStateChanged(
           "info"
         );
 
-  
+
         const profile =
-  await getAuthenticatedParticipantProfile();
-
-/*
- * -------------------------------------------------------
- * Build a list of Event IDs already registered
- * by this participant.
- *
- * These Event IDs will later be disabled
- * in the event catalogue.
- * -------------------------------------------------------
- */
-
-registeredEventIds =
-  new Set(
-    (profile.registeredEvents || [])
-      .map(
-        function(event) {
-
-          return String(
-            event.eventId ||
-            event.Event_ID ||
-            event.eventID ||
-            ""
-          ).trim().toUpperCase();
-
-        }
-      )
-      .filter(
-        function(eventId) {
-
-          return eventId !== "";
-
-        }
-      )
-  );
+          await getAuthenticatedParticipantProfile();
 
 
-welcomeTitle.textContent =
-  "Welcome, " +
-  (
-    profile.fullName ||
-    "Participant"
-  );
+        welcomeTitle.textContent =
+          "Welcome, " +
+          (
+            profile.fullName ||
+            "Participant"
+          );
 
 
-participantId.textContent =
-  profile.participantId ||
-  "—";
+        participantId.textContent =
+          profile.participantId ||
+          "—";
 
 
-participantName.textContent =
-  profile.fullName ||
-  "—";
+        participantName.textContent =
+          profile.fullName ||
+          "—";
 
 
-loginEmail.textContent =
-  profile.loginEmail ||
-  profile.email ||
-  "—";
+        loginEmail.textContent =
+          profile.loginEmail ||
+          profile.email ||
+          "—";
 
-
-renderRegisteredEvents(
-  profile.registeredEvents || []
-);
+        renderRegisteredEvents(
+        profile.registeredEvents || []
+        );
+        
         populateParticipantProfile(
           profile
         );
@@ -2957,13 +2842,27 @@ renderRegisteredEvents(
       "Global School of Yoga Participant Dashboard initialized successfully."
     );
 
+
+    console.log(
+      "Global School of Yoga Participant Dashboard initialized successfully."
+    );
+
     /* =========================================================
        PAIR FRONTEND CONTEXT
-       Pair logic is kept in pair.js.
+       Pair logic is kept in js/pair.js.
        Existing Individual functions remain untouched.
     ========================================================= */
 
     window.GSYPairContext = {
+      auth: auth,
+      APPS_SCRIPT_URL: APPS_SCRIPT_URL,
+      showStatus: showStatus,
+      joinPanel: joinPanel,
+      cataloguePanel: cataloguePanel,
+      joinAnotherEventBtn: joinAnotherEventBtn
+    };
+
+    window.GSYGroupContext = {
       auth: auth,
       APPS_SCRIPT_URL: APPS_SCRIPT_URL,
       showStatus: showStatus,
@@ -2980,217 +2879,96 @@ function renderRegisteredEvents(
   registeredEvents
 ) {
 
-  const box =
-    document.getElementById(
-      "registeredEventsBox"
-    );
+  const box = document.getElementById("registeredEventsBox");
+  if (!box) return;
 
-
-  if (!box) {
-    return;
-  }
-
-
-  /*
-   * No registrations
-   */
-
-  if (
-    !registeredEvents ||
-    registeredEvents.length === 0
-  ) {
-
+  if (!registeredEvents || registeredEvents.length === 0) {
     box.innerHTML = `
-
       <div class="empty-events">
-
-        <div class="empty-icon">
-          🏆
-        </div>
-
-        <div class="empty-title">
-          No registered events yet
-        </div>
-
+        <div class="empty-icon">🏆</div>
+        <div class="empty-title">No registered events yet</div>
         <div class="empty-message">
-          Once you successfully complete payment
-          for an event, your registration will
-          appear here.
+          Once you successfully complete payment for an event,
+          your registration will appear here.
         </div>
-
-      </div>
-
-    `;
-
+      </div>`;
     return;
   }
 
+  const grouped = {};
+  registeredEvents.forEach(function (event) {
+    const mode = String(event.category || event.mode || "Individual").trim() || "Individual";
+    if (!grouped[mode]) grouped[mode] = [];
+    grouped[mode].push(event);
+  });
 
-  /*
-   * Registered events exist
-   */
+  const modeOrder = ["Individual", "Pair", "Rhythmic", "Artistic"];
+  let html = "";
 
-  let html = '';
+  modeOrder.concat(Object.keys(grouped).filter(m => modeOrder.indexOf(m) === -1)).forEach(function (mode) {
+    if (!grouped[mode]) return;
 
+    html += `
+      <div class="registered-mode-group" style="margin-bottom:18px;">
+        <div style="font-size:1.05rem;font-weight:700;margin:0 0 10px 0;">
+          ${escapeHtml(mode === "Rhythmic" ? "Rhythmic Group" : mode === "Artistic" ? "Artistic Group" : mode)}
+        </div>`;
 
-  registeredEvents.forEach(
-    function(event) {
+    const groups = {};
+    grouped[mode].forEach(function (event) {
+      const key = event.groupId || event.registrationId || (event.eventId + "_" + event.participantId);
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(event);
+    });
+
+    Object.keys(groups).forEach(function (groupKey) {
+      const events = groups[groupKey];
+      const first = events[0] || {};
+      const participantNames = events
+        .map(e => e.participantName || e.fullName || e.participantId)
+        .filter(Boolean);
+      const uniqueNames = Array.from(new Set(participantNames));
 
       html += `
-
-        <div class="registered-event">
-
+        <div class="registered-event" style="margin-bottom:10px;">
           <div class="registered-event-header">
-
             <div>
-
-              <div class="registered-event-name">
-                ${escapeHtml(
-                  event.eventName || 'Event'
-                )}
-              </div>
-
-              <div class="registered-event-id">
-                Registration ID:
-                ${escapeHtml(
-                  event.registrationId || '—'
-                )}
-              </div>
-
+              <div class="registered-event-name">${escapeHtml(first.eventName || "Event")}</div>
+              <div class="registered-event-id">Group ID: ${escapeHtml(first.groupId || "—")}</div>
             </div>
-
-            <div class="registered-event-status">
-              ✓ Confirmed
-            </div>
-
+            <div class="registered-event-status">✓ Confirmed</div>
           </div>
-
-
           <div class="registered-event-details">
-
             <div class="registered-detail">
-
-              <div class="registered-detail-label">
-                Event ID
-              </div>
-
-              <div class="registered-detail-value">
-                ${escapeHtml(
-                  event.eventId || '—'
-                )}
-              </div>
-
+              <div class="registered-detail-label">Event ID</div>
+              <div class="registered-detail-value">${escapeHtml(first.eventId || "—")}</div>
             </div>
-
-
             <div class="registered-detail">
-
-              <div class="registered-detail-label">
-                Category
-              </div>
-
-              <div class="registered-detail-value">
-                ${escapeHtml(
-                  event.category || '—'
-                )}
-              </div>
-
+              <div class="registered-detail-label">Participants</div>
+              <div class="registered-detail-value">${escapeHtml(String(uniqueNames.length || events.length))}</div>
             </div>
-
-
             <div class="registered-detail">
-
-              <div class="registered-detail-label">
-                Age Group
-              </div>
-
-              <div class="registered-detail-value">
-                ${escapeHtml(
-                  event.ageGroup || '—'
-                )}
-              </div>
-
+              <div class="registered-detail-label">Participant IDs</div>
+              <div class="registered-detail-value">${escapeHtml(Array.from(new Set(events.map(e => e.participantId).filter(Boolean))).join(", ") || "—")}</div>
             </div>
-
-
             <div class="registered-detail">
-
-              <div class="registered-detail-label">
-                Event Location
-              </div>
-
-              <div class="registered-detail-value">
-                ${escapeHtml(
-                  event.eventLocation || '—'
-                )}
-              </div>
-
+              <div class="registered-detail-label">Amount</div>
+              <div class="registered-detail-value">₹${Number(first.entryFee || first.fee || (events[0] && events[0].perPersonFee) || 0).toLocaleString("en-IN")}</div>
             </div>
-
-
             <div class="registered-detail">
-
-              <div class="registered-detail-label">
-                Event Date
-              </div>
-
-              <div class="registered-detail-value">
-                ${escapeHtml(
-                  event.eventDate || '—'
-                )}
-              </div>
-
+              <div class="registered-detail-label">Event Date</div>
+              <div class="registered-detail-value">${escapeHtml(first.eventDate || "—")}</div>
             </div>
-
-
-            <div class="registered-detail">
-
-              <div class="registered-detail-label">
-                Entry Fee
-              </div>
-
-              <div class="registered-detail-value">
-                ₹${Number(
-                  event.entryFee || 0
-                ).toLocaleString('en-IN')}
-              </div>
-
-            </div>
-
           </div>
+        </div>`;
+    });
 
+    html += `</div>`;
+  });
 
-          <div class="registered-event-payment">
-
-            Payment Status:
-            <strong>
-              ${escapeHtml(
-                event.paymentStatus || '—'
-              )}
-            </strong>
-
-            &nbsp; | &nbsp;
-
-            Payment ID:
-            <strong>
-              ${escapeHtml(
-                event.paymentId || '—'
-              )}
-            </strong>
-
-          </div>
-
-        </div>
-
-      `;
-
-    }
-  );
-
-
-  box.innerHTML =
-    html;
+  box.innerHTML = html;
 }
+
 
 /* =========================================================
    ESCAPE HTML
@@ -3228,7 +3006,9 @@ function escapeHtml(
   
   </script>
 
+  <!-- Pair registration logic -->
   <script src="js/pair.js"></script>
+  <script src="js/group.js"></script>
 
 </body>
 </html>
