@@ -673,7 +673,6 @@
 }
 
     
-  
     /* =========================================================
        PAIR REGISTRATION
     ========================================================== */
@@ -709,6 +708,7 @@
       color: #2c5f2d;
     }
 
+
   </style>
 </head>
 
@@ -734,7 +734,7 @@
             </div>
 
             <div class="festival-name">
-              Indian Yoga Festival – 2026
+              National Level Yoga Festival – 2026
             </div>
           </div>
 
@@ -860,7 +860,6 @@
                 autocomplete="name"
               >
             </div>
-
             <div class="profile-field">
               <label for="profileMobileNumber">Mobile Number</label>
               <input type="tel" id="profileMobileNumber" inputmode="tel" autocomplete="tel">
@@ -992,7 +991,7 @@
 
           <div class="join-panel-subtitle">
             Select how you would like to participate in the
-            Indian Yoga Festival – 2026.
+            National Level Yoga Festival – 2026.
           </div>
 
           <div class="mode-grid">
@@ -1163,7 +1162,6 @@
         </div>
 
 
-
         <div
           id="cataloguePanel"
           class="catalogue-panel hidden">
@@ -1297,7 +1295,7 @@
       <div class="footer">
 
         Global School of Yoga<br>
-        Indian Yoga Festival – 2026
+        National Level Yoga Festival – 2026
 
       </div>
 
@@ -1392,7 +1390,7 @@
     const profileParticipantId = document.getElementById("profileParticipantId");
     const profileLoginEmail = document.getElementById("profileLoginEmail");
     const profileFullName = document.getElementById("profileFullName");
-    const profileFatherName = document.getElementById("profileFatherName");
+    const profileFatherName =   document.getElementById("profileFatherName");
     const profileMobileNumber = document.getElementById("profileMobileNumber");
     const profileDateOfBirth = document.getElementById("profileDateOfBirth");
     const profileGender = document.getElementById("profileGender");
@@ -1487,27 +1485,60 @@
 
 
 
-    function normalizeDateForInput(value) {
+      function normalizeDateForInput(value) {
 
-      if (!value) return "";
+  if (!value) return "";
 
-      const text = String(value).trim();
-      const match = text.match(/(\d{4}-\d{2}-\d{2})/);
+  /*
+   * -------------------------------------------------------
+   * If the value already contains YYYY-MM-DD,
+   * use that date exactly as it is.
+   *
+   * This prevents timezone-related date shifting.
+   * -------------------------------------------------------
+   */
 
-      if (match) return match[1];
+  const text =
+    String(value).trim();
 
-      const parsed = new Date(text);
+  const match =
+    text.match(
+      /(\d{4}-\d{2}-\d{2})/
+    );
 
-      if (!isNaN(parsed.getTime())) {
-        return (
-          parsed.getFullYear() +
-          "-" +
-          String(parsed.getMonth() + 1).padStart(2, "0") +
-          "-" +
-          String(parsed.getDate()).padStart(2, "0")
-        );
-      }
+  if (match) {
+    return match[1];
+  }
 
+
+  /*
+   * -------------------------------------------------------
+   * Fallback for genuine Date values.
+   * -------------------------------------------------------
+   */
+
+  const parsed =
+    new Date(value);
+
+  if (
+    !isNaN(
+      parsed.getTime()
+    )
+  ) {
+
+    return (
+      parsed.getFullYear() +
+      "-" +
+      String(
+        parsed.getMonth() + 1
+      ).padStart(2, "0") +
+      "-" +
+      String(
+        parsed.getDate()
+      ).padStart(2, "0")
+    );
+
+  }
       return "";
     }
 
@@ -1629,9 +1660,12 @@
 
 
 
-    let currentMode = "";
-    let currentEventData = null;
+   let currentMode = "";
+let currentEventData = null;
 
+let registeredEventIds =
+  new Set();
+    
 
     function formatINR(amount) {
 
@@ -1799,18 +1833,63 @@
             safeId;
 
 
-          checkbox.dataset.eventId =
-            event.eventId || "";
+         checkbox.dataset.eventId =
+  eventId;
 
 
-          checkbox.dataset.fee =
-            event.fee !== undefined
-              ? event.fee
-              : (
-                  event.perPersonFee ||
-                  0
-                );
+/*
+ * -------------------------------------------------------
+ * Check whether this participant has already registered
+ * for this event.
+ * -------------------------------------------------------
+ */
 
+const eventId =
+  String(
+    event.eventId ||
+    event.Event_ID ||
+    event.eventID ||
+    ""
+  ).trim().toUpperCase();
+
+
+const alreadyRegistered =
+  mode === "Individual" &&
+  registeredEventIds.has(
+    eventId
+  );
+
+
+/*
+ * -------------------------------------------------------
+ * Already registered events cannot be selected again.
+ * -------------------------------------------------------
+ */
+
+if (
+  alreadyRegistered
+) {
+
+  checkbox.disabled =
+    true;
+
+  checkbox.checked =
+    false;
+
+  row.classList.add(
+    "event-already-registered"
+  );
+
+}
+
+
+checkbox.dataset.fee =
+  event.fee !== undefined
+    ? event.fee
+    : (
+        event.perPersonFee ||
+        0
+      );
 
           const label =
             document.createElement(
@@ -2090,15 +2169,6 @@
               currentMode =
                 button.dataset.mode ||
                 "";
-
-              /*
-               * Pair mode is owned exclusively by pair.js.
-               * Skipping it here preserves the original, proven
-               * click flow for Individual / Rhythmic / Artistic.
-               */
-              if (currentMode === "Pair") {
-                return;
-              }
 
 
               joinPanel.classList.add(
@@ -2700,38 +2770,72 @@ onAuthStateChanged(
           "info"
         );
 
-
+  
         const profile =
-          await getAuthenticatedParticipantProfile();
+  await getAuthenticatedParticipantProfile();
+
+/*
+ * -------------------------------------------------------
+ * Build a list of Event IDs already registered
+ * by this participant.
+ *
+ * These Event IDs will later be disabled
+ * in the event catalogue.
+ * -------------------------------------------------------
+ */
+
+registeredEventIds =
+  new Set(
+    (profile.registeredEvents || [])
+      .map(
+        function(event) {
+
+          return String(
+            event.eventId ||
+            event.Event_ID ||
+            event.eventID ||
+            ""
+          ).trim().toUpperCase();
+
+        }
+      )
+      .filter(
+        function(eventId) {
+
+          return eventId !== "";
+
+        }
+      )
+  );
 
 
-        welcomeTitle.textContent =
-          "Welcome, " +
-          (
-            profile.fullName ||
-            "Participant"
-          );
+welcomeTitle.textContent =
+  "Welcome, " +
+  (
+    profile.fullName ||
+    "Participant"
+  );
 
 
-        participantId.textContent =
-          profile.participantId ||
-          "—";
+participantId.textContent =
+  profile.participantId ||
+  "—";
 
 
-        participantName.textContent =
-          profile.fullName ||
-          "—";
+participantName.textContent =
+  profile.fullName ||
+  "—";
 
 
-        loginEmail.textContent =
-          profile.loginEmail ||
-          profile.email ||
-          "—";
+loginEmail.textContent =
+  profile.loginEmail ||
+  profile.email ||
+  "—";
 
-        renderRegisteredEvents(
-        profile.registeredEvents || []
-        );
-        
+
+renderRegisteredEvents(
+  profile.registeredEvents || []
+);
         populateParticipantProfile(
           profile
         );
@@ -2777,14 +2881,9 @@ onAuthStateChanged(
       "Global School of Yoga Participant Dashboard initialized successfully."
     );
 
-
-    console.log(
-      "Global School of Yoga Participant Dashboard initialized successfully."
-    );
-
     /* =========================================================
        PAIR FRONTEND CONTEXT
-       Pair logic is kept in js/pair.js.
+       Pair logic is kept in pair.js.
        Existing Individual functions remain untouched.
     ========================================================= */
 
@@ -3053,8 +3152,7 @@ function escapeHtml(
   
   </script>
 
-  <!-- Pair registration logic -->
-  <script src="js/pair.js"></script>
+  <script src="pair.js"></script>
 
 </body>
 </html>
