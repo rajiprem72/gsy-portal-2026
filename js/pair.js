@@ -27,15 +27,12 @@
       document.getElementById("Pair_PartnerParticipantId_");
 
     if (partnerInput) {
-      partnerInput.addEventListener(
-        "keydown",
-        function (event) {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            Pair_FindPartner_();
-          }
+      partnerInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          Pair_FindPartner_();
         }
-      );
+      });
     }
 
     /*
@@ -57,111 +54,74 @@
       );
     }
 
-    console.log(
-      "GSY Pair module initialized successfully."
-    );
-
+    console.log("GSY Pair module initialized successfully.");
     Pair_Reset_();
   }
 
   /*
     Robust button handling:
-    Use document-level delegation so Pair buttons continue to work
-    even if the panel is shown/hidden or its contents are refreshed.
+    Use document-level delegation so Pair buttons continue to work even
+    if the panel is shown/hidden or its contents are refreshed.
   */
-  document.addEventListener(
-    "click",
-    function (event) {
+  document.addEventListener("click", function (event) {
+    const button = event.target.closest(
+      "#Pair_FindPartnerBtn_, #Pair_SelectPartnerBtn_, #Pair_ChangePartnerBtn_, #Pair_ProceedToPaymentBtn_, #Pair_BackToModeBtn_"
+    );
 
-      const target = event.target;
+    if (!button) return;
 
-      if (!target) return;
+    event.preventDefault();
 
-      const button =
-        target.closest(
-          "#Pair_FindPartnerBtn_, " +
-          "#Pair_SelectPartnerBtn_, " +
-          "#Pair_ChangePartnerBtn_, " +
-          "#Pair_ProceedToPaymentBtn_, " +
-          "#Pair_BackToModeBtn_"
-        );
-
-      if (!button) return;
-
-      event.preventDefault();
-
-      if (button.id === "Pair_FindPartnerBtn_") {
-        Pair_FindPartner_();
-        return;
-      }
-
-      if (button.id === "Pair_SelectPartnerBtn_") {
-        Pair_SelectPartner_();
-        return;
-      }
-
-      if (button.id === "Pair_ChangePartnerBtn_") {
-        Pair_ChangePartner_();
-        return;
-      }
-
-      if (button.id === "Pair_ProceedToPaymentBtn_") {
-        Pair_CreatePaymentLink_();
-        return;
-      }
-
-      if (button.id === "Pair_BackToModeBtn_") {
-        Pair_BackToMode_();
-      }
+    if (button.id === "Pair_FindPartnerBtn_") {
+      Pair_FindPartner_();
+      return;
     }
-  );
+
+    if (button.id === "Pair_SelectPartnerBtn_") {
+      Pair_SelectPartner_();
+      return;
+    }
+
+    if (button.id === "Pair_ChangePartnerBtn_") {
+      Pair_ChangePartner_();
+      return;
+    }
+
+    if (button.id === "Pair_ProceedToPaymentBtn_") {
+      Pair_CreatePaymentLink_();
+      return;
+    }
+
+    if (button.id === "Pair_BackToModeBtn_") {
+      Pair_BackToMode_();
+    }
+  });
 
   function Pair_Reset_() {
-
-    const panel =
-      document.getElementById(
-        "Pair_Panel_"
-      );
-
+    const panel = document.getElementById("Pair_Panel_");
     const partnerInput =
-      document.getElementById(
-        "Pair_PartnerParticipantId_"
-      );
+      document.getElementById("Pair_PartnerParticipantId_");
 
     const partnerResult =
-      document.getElementById(
-        "Pair_PartnerResult_"
-      );
+      document.getElementById("Pair_PartnerResult_");
 
     const eventSection =
-      document.getElementById(
-        "Pair_EventSection_"
-      );
+      document.getElementById("Pair_EventSection_");
 
     const eventList =
-      document.getElementById(
-        "Pair_EventList_"
-      );
+      document.getElementById("Pair_EventList_");
 
     const eventMessage =
-      document.getElementById(
-        "Pair_EventMessage_"
-      );
+      document.getElementById("Pair_EventMessage_");
 
     const summary =
-      document.getElementById(
-        "Pair_SelectionSummary_"
-      );
+      document.getElementById("Pair_SelectionSummary_");
 
     const count =
-      document.getElementById(
-        "Pair_SelectionCount_"
-      );
+      document.getElementById("Pair_SelectionCount_");
 
     const total =
-      document.getElementById(
-        "Pair_SelectionTotal_"
-      );
+      document.getElementById("Pair_SelectionTotal_");
 
     if (partnerInput) {
       partnerInput.value = "";
@@ -195,41 +155,22 @@
       total.textContent = "₹0";
     }
 
-    /*
-      IMPORTANT:
-      profile.html contains:
-
-      .hidden {
-        display: none !important;
-      }
-
-      Therefore we use the hidden class to control
-      Pair panel visibility.
-    */
     if (panel) {
       panel.classList.add("hidden");
       panel.style.display = "";
     }
 
     window.GSYPairState = {
-        partner: null,
-        events: [],
-        selectedEventIds: [],
-        registeredEventIds: []
-      };
+      partner: null,
+      events: [],
+      selectedEventIds: [],
+      blockedEventIds: []
+    };
   }
 
   async function Pair_Start_() {
-
-    const panel =
-      document.getElementById(
-        "Pair_Panel_"
-      );
-
-    const cataloguePanel =
-      ctx
-        ? ctx.cataloguePanel
-        : null;
+    const panel = document.getElementById("Pair_Panel_");
+    const cataloguePanel = ctx.cataloguePanel;
 
     Pair_Reset_();
 
@@ -244,283 +185,170 @@
     }
 
     const partnerInput =
-      document.getElementById(
-        "Pair_PartnerParticipantId_"
-      );
+      document.getElementById("Pair_PartnerParticipantId_");
 
     if (partnerInput) {
-      setTimeout(
-        function () {
-          partnerInput.focus();
-        },
-        100
-      );
+      setTimeout(function () {
+        partnerInput.focus();
+      }, 100);
     }
   }
 
-   async function Pair_FindPartner_() {
+  async function Pair_FindPartner_() {
+    const partnerInput =
+      document.getElementById("Pair_PartnerParticipantId_");
 
-  const partnerInput =
-    document.getElementById(
-      "Pair_PartnerParticipantId_"
-    );
+    const partnerId =
+      partnerInput
+        ? partnerInput.value.trim().toUpperCase()
+        : "";
 
-  const partnerId =
-    partnerInput
-      ? partnerInput.value
-          .trim()
-          .toUpperCase()
-      : "";
+    if (!partnerId) {
+      Pair_ShowStatus_("Please enter the Partner Participant ID.");
+      return;
+    }
 
-  if (!partnerId) {
-    Pair_ShowStatus_(
-      "Please enter the Partner Participant ID."
-    );
-    return;
-  }
+    if (!ctx || !ctx.auth || !ctx.auth.currentUser) {
+      Pair_ShowStatus_("Please sign in again.");
+      return;
+    }
 
-  if (
-    !ctx ||
-    !ctx.auth ||
-    !ctx.auth.currentUser
-  ) {
-    Pair_ShowStatus_(
-      "Please sign in again."
-    );
-    return;
-  }
+    const findBtn =
+      document.getElementById("Pair_FindPartnerBtn_");
 
-  const findBtn =
-    document.getElementById(
-      "Pair_FindPartnerBtn_"
-    );
+    if (findBtn) {
+      findBtn.disabled = true;
+      findBtn.textContent = "Searching...";
+    }
 
-  if (findBtn) {
-    findBtn.disabled = true;
-    findBtn.textContent = "Searching...";
-  }
+    try {
+      const idToken =
+        await ctx.auth.currentUser.getIdToken(true);
 
-  try {
-
-    const idToken =
-      await ctx.auth.currentUser
-        .getIdToken(true);
-
-    console.log(
-      "Pair_FindPartner: sending request for",
-      partnerId
-    );
-
-    const response =
-      await fetch(
+      const response = await fetch(
         ctx.APPS_SCRIPT_URL,
         {
           method: "POST",
-
           headers: {
-            "Content-Type":
-              "text/plain;charset=utf-8"
+            "Content-Type": "text/plain;charset=utf-8"
           },
-
           body: JSON.stringify({
-            action:
-              "Pair_FindPartner",
-
-            idToken:
-              idToken,
-
-            partnerParticipantId:
-              partnerId
+            action: "Pair_FindPartner",
+            idToken: idToken,
+            partnerParticipantId: partnerId
           })
         }
       );
 
-    console.log(
-      "Pair_FindPartner HTTP status:",
-      response.status
-    );
+      const data = await response.json();
 
-    const data =
-      await response.json();
+      if (!data.success) {
+        throw new Error(
+          data.message || "Partner Participant ID not found."
+        );
+      }
 
-    console.log(
-      "Pair_FindPartner response:",
-      data
-    );
+      const partner = data.data || data.partner;
 
-    if (!data.success) {
-      throw new Error(
-        data.message ||
-        "Partner Participant ID not found."
+      if (!partner) {
+        throw new Error("Partner details were not returned.");
+      }
+
+      window.GSYPairState.partner = partner;
+
+      const result =
+        document.getElementById("Pair_PartnerResult_");
+
+      const idDisplay =
+        document.getElementById("Pair_PartnerIdDisplay_");
+
+      const nameDisplay =
+        document.getElementById("Pair_PartnerNameDisplay_");
+
+      const fatherDisplay =
+        document.getElementById("Pair_PartnerFatherNameDisplay_");
+
+      if (idDisplay) {
+        idDisplay.textContent =
+          partner.participantId ||
+          partner.Participant_ID ||
+          partner.id ||
+          partnerId;
+      }
+
+      if (nameDisplay) {
+        nameDisplay.textContent =
+          partner.fullName ||
+          partner.Full_Name ||
+          partner.name ||
+          "";
+      }
+
+      if (fatherDisplay) {
+        fatherDisplay.textContent =
+          partner.fatherName ||
+          partner.Father_Name ||
+          "";
+      }
+
+      if (result) {
+        result.style.display = "block";
+      }
+
+      Pair_ShowStatus_("Partner found successfully.");
+
+    } catch (error) {
+      console.error("Pair_FindPartner_:", error);
+
+      const result =
+        document.getElementById("Pair_PartnerResult_");
+
+      if (result) {
+        result.style.display = "none";
+      }
+
+      Pair_ShowStatus_(
+        error.message ||
+        "Unable to find the partner."
       );
+
+    } finally {
+      if (findBtn) {
+        findBtn.disabled = false;
+        findBtn.textContent = "Find Partner";
+      }
+    }
+  }
+
+  async function Pair_SelectPartner_() {
+    if (!window.GSYPairState ||
+        !window.GSYPairState.partner) {
+      Pair_ShowStatus_("Please search for a partner first.");
+      return;
     }
 
     const partner =
-      data.data ||
-      data.partner;
-
-    if (!partner) {
-      throw new Error(
-        "Partner details were not returned."
-      );
-    }
-
-    window.GSYPairState.partner =
-      partner;
-
-     window.GSYPairState.registeredEventIds =
-  Array.isArray(
-    data.registeredEventIds
-  )
-    ? data.registeredEventIds.map(
-        function(eventId) {
-          return String(
-            eventId || ''
-          ).trim();
-        }
-      )
-    : [];
-
-console.log(
-  "Pair already registered events:",
-  window.GSYPairState.registeredEventIds
-);
-
-    const result =
-      document.getElementById(
-        "Pair_PartnerResult_"
-      );
-
-    const idDisplay =
-      document.getElementById(
-        "Pair_PartnerIdDisplay_"
-      );
-
-    const nameDisplay =
-      document.getElementById(
-        "Pair_PartnerNameDisplay_"
-      );
-
-    const fatherDisplay =
-      document.getElementById(
-        "Pair_PartnerFatherNameDisplay_"
-      );
-
-    /*
-      IMPORTANT FIX:
-      Remove the hidden class because .hidden uses
-      display:none !important.
-    */
-
-    if (idDisplay) {
-      idDisplay.textContent =
-        partner.participantId ||
-        partner.Participant_ID ||
-        partner.id ||
-        partnerId;
-    }
-
-    if (nameDisplay) {
-      nameDisplay.textContent =
-        partner.fullName ||
-        partner.Full_Name ||
-        partner.name ||
-        "";
-    }
-
-    if (fatherDisplay) {
-      fatherDisplay.textContent =
-        partner.fatherName ||
-        partner.Father_Name ||
-        "";
-    }
-
-    if (result) {
-      result.classList.remove("hidden");
-      result.style.display = "block";
-    }
-
-    Pair_ShowStatus_(
-      "Partner found successfully."
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Pair_FindPartner_:",
-      error
-    );
-
-    const result =
-      document.getElementById(
-        "Pair_PartnerResult_"
-      );
-
-    if (result) {
-      result.classList.add("hidden");
-      result.style.display = "";
-    }
-
-    Pair_ShowStatus_(
-      error.message ||
-      "Unable to find the partner."
-    );
-
-  } finally {
-
-    if (findBtn) {
-      findBtn.disabled = false;
-      findBtn.textContent =
-        "Find Partner";
-    }
-  }
-}
-
-
-   
- async function Pair_SelectPartner_() {
-
-  if (
-    !window.GSYPairState ||
-    !window.GSYPairState.partner
-  ) {
-    Pair_ShowStatus_(
-      "Please search for a partner first."
-    );
-    return;
-  }
-
-  const eventSection =
-    document.getElementById(
-      "Pair_EventSection_"
-    );
-
-  if (eventSection) {
-    eventSection.classList.remove("hidden");
-    eventSection.style.display = "block";
-  }
-
-  await Pair_LoadEvents_();
-}  
-
-
-   
-  function Pair_ChangePartner_() {
+      window.GSYPairState.partner;
 
     const eventSection =
-      document.getElementById(
-        "Pair_EventSection_"
-      );
+      document.getElementById("Pair_EventSection_");
+
+    if (eventSection) {
+      eventSection.style.display = "block";
+    }
+
+    await Pair_LoadEvents_();
+  }
+
+  function Pair_ChangePartner_() {
+    const eventSection =
+      document.getElementById("Pair_EventSection_");
 
     const partnerResult =
-      document.getElementById(
-        "Pair_PartnerResult_"
-      );
+      document.getElementById("Pair_PartnerResult_");
 
     const partnerInput =
-      document.getElementById(
-        "Pair_PartnerParticipantId_"
-      );
+      document.getElementById("Pair_PartnerParticipantId_");
 
     if (eventSection) {
       eventSection.style.display = "none";
@@ -534,33 +362,24 @@ console.log(
       partnerInput.focus();
     }
 
-    window.GSYPairState.partner =
-      null;
-
-    window.GSYPairState.events =
-      [];
-
-    window.GSYPairState.selectedEventIds =
-      [];
+    window.GSYPairState.partner = null;
+    window.GSYPairState.events = [];
+    window.GSYPairState.selectedEventIds = [];
+    window.GSYPairState.blockedEventIds = [];
 
     Pair_UpdateSelection_();
   }
 
   async function Pair_LoadEvents_() {
-
     const eventMessage =
-      document.getElementById(
-        "Pair_EventMessage_"
-      );
+      document.getElementById("Pair_EventMessage_");
 
     const eventList =
-      document.getElementById(
-        "Pair_EventList_"
-      );
+      document.getElementById("Pair_EventList_");
 
     if (eventMessage) {
       eventMessage.textContent =
-        "Loading Pair events...";
+        "Checking Pair event availability...";
     }
 
     if (eventList) {
@@ -568,14 +387,10 @@ console.log(
     }
 
     try {
-
-      const response =
-        await fetch(
-          "data/pair.json",
-          {
-            cache: "no-store"
-          }
-        );
+      const response = await fetch(
+        "data/pair.json",
+        { cache: "no-store" }
+      );
 
       if (!response.ok) {
         throw new Error(
@@ -583,189 +398,187 @@ console.log(
         );
       }
 
-      const catalogue =
-        await response.json();
+      const catalogue = await response.json();
 
-      if (
-        !catalogue ||
-        catalogue.mode !== "Pair" ||
-        !Array.isArray(
-          catalogue.events
-        )
-      ) {
+      if (!catalogue ||
+          catalogue.mode !== "Pair" ||
+          !Array.isArray(catalogue.events)) {
         throw new Error(
           "Invalid Pair event catalogue."
         );
       }
 
-      if (
-        catalogue.events.length !== 2
-      ) {
+      if (catalogue.events.length !== 2) {
         throw new Error(
           "Pair catalogue must contain exactly 2 events."
         );
       }
 
-      for (
-        const event of catalogue.events
-      ) {
-
-        if (
-          !event.eventId ||
-          !event.eventName ||
-          Number(event.fee) !== 2000
-        ) {
+      for (const event of catalogue.events) {
+        if (!event.eventId ||
+            !event.eventName ||
+            Number(event.fee) !== 2000) {
           throw new Error(
             "Invalid Pair event configuration."
           );
         }
 
-        if (
-          Number(event.participants) !== 2
-        ) {
+        if (Number(event.participants) !== 2) {
           throw new Error(
             "Pair event must contain exactly 2 participants."
           );
         }
       }
 
+      if (!ctx ||
+          !ctx.auth ||
+          !ctx.auth.currentUser) {
+        throw new Error("Please sign in again.");
+      }
+
+      const partner =
+        window.GSYPairState &&
+        window.GSYPairState.partner
+          ? window.GSYPairState.partner
+          : null;
+
+      if (!partner) {
+        throw new Error("Please select a partner first.");
+      }
+
+      const idToken =
+        await ctx.auth.currentUser.getIdToken(true);
+
+      const availabilityResponse =
+        await fetch(
+          ctx.APPS_SCRIPT_URL,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify({
+              action:
+                "Pair_GetEventAvailability",
+              idToken: idToken,
+              partnerParticipantId:
+                partner.participantId ||
+                partner.Participant_ID ||
+                ""
+            })
+          }
+        );
+
+      const availability =
+        await availabilityResponse.json();
+
+      if (!availability.success) {
+        throw new Error(
+          availability.message ||
+          "Unable to verify Pair event availability."
+        );
+      }
+
       window.GSYPairState.events =
         catalogue.events;
 
+      window.GSYPairState.blockedEventIds =
+        Array.isArray(availability.blockedEventIds)
+          ? availability.blockedEventIds
+          : [];
+
       Pair_RenderEvents_();
 
+      const blockedCount =
+        window.GSYPairState.blockedEventIds.length;
+
       if (eventMessage) {
-        eventMessage.textContent =
-          catalogue.selectionMessage ||
-          "Select one or both Pair events.";
+        if (blockedCount === catalogue.events.length) {
+          eventMessage.textContent =
+            "Both Pair events are already registered or reserved for this pair.";
+        } else if (blockedCount > 0) {
+          eventMessage.textContent =
+            "An event already enrolled by this pair is disabled. Please select an available Pair event.";
+        } else {
+          eventMessage.textContent =
+            catalogue.selectionMessage ||
+            "Select one or both Pair events.";
+        }
       }
 
     } catch (error) {
+      console.error("Pair_LoadEvents_:", error);
 
-      console.error(
-        "Pair_LoadEvents_:",
-        error
-      );
+      window.GSYPairState.events = [];
+      window.GSYPairState.blockedEventIds = [];
+
+      if (eventList) {
+        eventList.innerHTML = "";
+      }
 
       if (eventMessage) {
         eventMessage.textContent =
           error.message ||
-          "Unable to load Pair events.";
+          "Unable to verify Pair event availability.";
       }
 
       Pair_ShowStatus_(
         error.message ||
-        "Unable to load Pair events."
+        "Unable to verify Pair event availability."
       );
     }
   }
 
 
-function Pair_RenderEvents_() {
+  function Pair_RenderEvents_() {
+    const eventList =
+      document.getElementById("Pair_EventList_");
 
-  const eventList =
-    document.getElementById(
-      "Pair_EventList_"
-    );
+    if (!eventList) return;
 
-  if (!eventList) return;
+    eventList.innerHTML = "";
 
-  eventList.innerHTML = "";
+    const events =
+      window.GSYPairState.events || [];
 
-  const events =
-    window.GSYPairState.events || [];
+    const blockedEventIds =
+      new Set(
+        (window.GSYPairState.blockedEventIds || [])
+          .map(function(id) {
+            return String(id).trim();
+          })
+      );
 
-  const registeredEventIds =
-    new Set(
-      (
-        window.GSYPairState
-          .registeredEventIds || []
-      ).map(
-        function(eventId) {
-          return String(
-            eventId || ''
-          ).trim();
-        }
-      )
-    );
-
-  events.forEach(
-    function(event) {
-
-      const eventId =
-        String(
-          event.eventId || ''
-        ).trim();
-
-      const alreadyRegistered =
-        registeredEventIds.has(
-          eventId
+    events.forEach(function (event) {
+      const blocked =
+        blockedEventIds.has(
+          String(event.eventId).trim()
         );
 
       const wrapper =
-        document.createElement(
-          "label"
-        );
+        document.createElement("label");
 
-      wrapper.style.display =
-        "block";
-
-      wrapper.style.marginBottom =
-        "12px";
-
-      wrapper.style.padding =
-        "12px";
-
-      wrapper.style.border =
-        alreadyRegistered
-          ? "1px solid #ccc"
-          : "1px solid #ddd";
-
-      wrapper.style.borderRadius =
-        "8px";
-
+      wrapper.style.display = "block";
+      wrapper.style.marginBottom = "12px";
+      wrapper.style.padding = "12px";
+      wrapper.style.border = "1px solid #ddd";
+      wrapper.style.borderRadius = "8px";
       wrapper.style.cursor =
-        alreadyRegistered
-          ? "not-allowed"
-          : "pointer";
-
-      if (alreadyRegistered) {
-        wrapper.style.opacity =
-          "0.65";
-      }
+        blocked ? "not-allowed" : "pointer";
+      wrapper.style.opacity =
+        blocked ? "0.65" : "1";
 
       const checkbox =
-        document.createElement(
-          "input"
-        );
+        document.createElement("input");
 
-      checkbox.type =
-        "checkbox";
-
+      checkbox.type = "checkbox";
       checkbox.dataset.eventId =
-        eventId;
+        event.eventId;
+      checkbox.disabled = blocked;
+      checkbox.style.marginRight = "10px";
 
-      checkbox.dataset.fee =
-        event.fee !== undefined
-          ? event.fee
-          : (
-              event.perPersonFee ||
-              0
-            );
-
-      checkbox.style.marginRight =
-        "10px";
-
-      /*
-       * Already registered events
-       * cannot be selected again.
-       */
-      if (alreadyRegistered) {
-        checkbox.disabled = true;
-        checkbox.checked = false;
-      }
-
-      if (!alreadyRegistered) {
+      if (!blocked) {
         checkbox.addEventListener(
           "change",
           Pair_UpdateSelection_
@@ -773,155 +586,60 @@ function Pair_RenderEvents_() {
       }
 
       const title =
-        document.createElement(
-          "strong"
-        );
+        document.createElement("strong");
 
       title.textContent =
         event.eventName;
 
       const fee =
-        document.createElement(
-          "span"
-        );
+        document.createElement("span");
 
       fee.textContent =
         " — ₹" +
-        Number(
-          event.fee || 0
-        ).toLocaleString(
-          "en-IN"
-        ) +
+        Number(event.fee).toLocaleString("en-IN") +
         " total (₹" +
         Number(
           event.perPersonFee || 1000
-        ).toLocaleString(
-          "en-IN"
-        ) +
+        ).toLocaleString("en-IN") +
         " per person)";
 
-      wrapper.appendChild(
-        checkbox
-      );
+      wrapper.appendChild(checkbox);
+      wrapper.appendChild(title);
+      wrapper.appendChild(fee);
 
-      wrapper.appendChild(
-        title
-      );
+      if (blocked) {
+        const note =
+          document.createElement("div");
 
-      wrapper.appendChild(
-        fee
-      );
+        note.textContent =
+          "Already enrolled for this pair";
 
-      /*
-       * Show location and date.
-       */
-      const location =
-        document.createElement(
-          "div"
-        );
+        note.style.marginTop = "6px";
+        note.style.fontSize = "12px";
+        note.style.fontWeight = "600";
 
-      location.style.fontSize =
-        "13px";
-
-      location.style.marginTop =
-        "6px";
-
-      location.textContent =
-        "Location: " +
-        (
-          event.eventLocation ||
-          event.location ||
-          "Bengaluru"
-        );
-
-      wrapper.appendChild(
-        location
-      );
-
-      const date =
-        document.createElement(
-          "div"
-        );
-
-      date.style.fontSize =
-        "13px";
-
-      date.style.marginTop =
-        "3px";
-
-      date.textContent =
-        "Date: " +
-        (
-          event.eventDate ||
-          event.date ||
-          "22 Nov 2026"
-        );
-
-      wrapper.appendChild(
-        date
-      );
-
-      if (alreadyRegistered) {
-
-        const already =
-          document.createElement(
-            "div"
-          );
-
-        already.style.marginTop =
-          "8px";
-
-        already.style.fontWeight =
-          "600";
-
-        already.textContent =
-          "✓ Already Registered";
-
-        wrapper.appendChild(
-          already
-        );
+        wrapper.appendChild(note);
       }
 
-      eventList.appendChild(
-        wrapper
-      );
-    }
-  );
+      eventList.appendChild(wrapper);
+    });
 
-  Pair_UpdateSelection_();
-}
+    Pair_UpdateSelection_();
+  }
 
-   
+
   function Pair_UpdateSelection_() {
-
     const eventList =
-      document.getElementById(
-        "Pair_EventList_"
-      );
+      document.getElementById("Pair_EventList_");
 
     const summary =
-      document.getElementById(
-        "Pair_SelectionSummary_"
-      );
+      document.getElementById("Pair_SelectionSummary_");
 
     const count =
-      document.getElementById(
-        "Pair_SelectionCount_"
-      );
+      document.getElementById("Pair_SelectionCount_");
 
     const total =
-      document.getElementById(
-        "Pair_SelectionTotal_"
-      );
-
-    /*
-      IMPORTANT FIX:
-      This variable was missing in the previous version.
-    */
-    const proceedBtn =
-      document.getElementById(
-        "Pair_ProceedToPaymentBtn_"
-      );
+      document.getElementById("Pair_SelectionTotal_");
 
     if (!eventList) return;
 
@@ -933,55 +651,37 @@ function Pair_RenderEvents_() {
       );
 
     const selectedIds =
-      checked.map(
-        function (checkbox) {
-          return checkbox.dataset.eventId;
-        }
-      );
+      checked.map(function (checkbox) {
+        return checkbox.dataset.eventId;
+      });
 
     window.GSYPairState.selectedEventIds =
       selectedIds;
 
     let selectedTotal = 0;
 
-    selectedIds.forEach(
-      function (eventId) {
+    selectedIds.forEach(function (eventId) {
+      const event =
+        (window.GSYPairState.events || [])
+          .find(function (item) {
+            return item.eventId === eventId;
+          });
 
-        const event =
-          (
-            window.GSYPairState.events ||
-            []
-          ).find(
-            function (item) {
-              return (
-                item.eventId ===
-                eventId
-              );
-            }
-          );
-
-        if (event) {
-          selectedTotal +=
-            Number(
-              event.fee || 0
-            );
-        }
+      if (event) {
+        selectedTotal +=
+          Number(event.fee || 0);
       }
-    );
+    });
 
     if (count) {
       count.textContent =
-        String(
-          selectedIds.length
-        );
+        String(selectedIds.length);
     }
 
     if (total) {
       total.textContent =
         "₹" +
-        selectedTotal.toLocaleString(
-          "en-IN"
-        );
+        selectedTotal.toLocaleString("en-IN");
     }
 
     if (summary) {
@@ -998,41 +698,30 @@ function Pair_RenderEvents_() {
   }
 
   async function Pair_CreatePaymentLink_() {
-
     const state =
       window.GSYPairState;
 
-    if (
-      !state ||
-      !state.partner
-    ) {
+    if (!state ||
+        !state.partner) {
       Pair_ShowStatus_(
         "Please select a partner first."
       );
       return;
     }
 
-    if (
-      !Array.isArray(
-        state.selectedEventIds
-      ) ||
-      state.selectedEventIds.length < 1 ||
-      state.selectedEventIds.length > 2
-    ) {
+    if (!Array.isArray(state.selectedEventIds) ||
+        state.selectedEventIds.length < 1 ||
+        state.selectedEventIds.length > 2) {
       Pair_ShowStatus_(
         "Please select one or two Pair events."
       );
       return;
     }
 
-    if (
-      !ctx ||
-      !ctx.auth ||
-      !ctx.auth.currentUser
-    ) {
-      Pair_ShowStatus_(
-        "Please sign in again."
-      );
+    if (!ctx ||
+        !ctx.auth ||
+        !ctx.auth.currentUser) {
+      Pair_ShowStatus_("Please sign in again.");
       return;
     }
 
@@ -1043,57 +732,35 @@ function Pair_RenderEvents_() {
 
     if (proceedBtn) {
       proceedBtn.disabled = true;
-
       proceedBtn.textContent =
         "Creating Payment Link...";
     }
 
     try {
-
       const idToken =
-        await ctx.auth.currentUser
-          .getIdToken(true);
+        await ctx.auth.currentUser.getIdToken(true);
 
-      console.log(
-        "Pair_CreatePaymentLink: sending request"
+      const response = await fetch(
+        ctx.APPS_SCRIPT_URL,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            action: "Pair_CreatePaymentLink",
+            idToken: idToken,
+            partnerParticipantId:
+              state.partner.participantId ||
+              state.partner.Participant_ID,
+            eventIds:
+              state.selectedEventIds
+          })
+        }
       );
-
-      const response =
-        await fetch(
-          ctx.APPS_SCRIPT_URL,
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "text/plain;charset=utf-8"
-            },
-
-            body: JSON.stringify({
-
-              action:
-                "Pair_CreatePaymentLink",
-
-              idToken:
-                idToken,
-
-              partnerParticipantId:
-                state.partner.participantId ||
-                state.partner.Participant_ID,
-
-              eventIds:
-                state.selectedEventIds
-            })
-          }
-        );
 
       const data =
         await response.json();
-
-      console.log(
-        "Pair_CreatePaymentLink response:",
-        data
-      );
 
       if (!data.success) {
         throw new Error(
@@ -1104,10 +771,7 @@ function Pair_RenderEvents_() {
 
       const paymentUrl =
         data.paymentUrl ||
-        (
-          data.data &&
-          data.data.paymentUrl
-        );
+        (data.data && data.data.paymentUrl);
 
       if (!paymentUrl) {
         throw new Error(
@@ -1119,7 +783,6 @@ function Pair_RenderEvents_() {
         paymentUrl;
 
     } catch (error) {
-
       console.error(
         "Pair_CreatePaymentLink_:",
         error
@@ -1132,7 +795,6 @@ function Pair_RenderEvents_() {
 
       if (proceedBtn) {
         proceedBtn.disabled = false;
-
         proceedBtn.textContent =
           "Proceed to Payment";
       }
@@ -1140,52 +802,30 @@ function Pair_RenderEvents_() {
   }
 
   function Pair_BackToMode_() {
-
     const panel =
-      document.getElementById(
-        "Pair_Panel_"
-      );
+      document.getElementById("Pair_Panel_");
 
     if (panel) {
       panel.classList.add("hidden");
       panel.style.display = "";
     }
 
-    if (
-      ctx &&
-      ctx.joinPanel
-    ) {
-      ctx.joinPanel.classList.remove(
-        "hidden"
-      );
-
-      ctx.joinPanel.style.display =
-        "";
+    if (ctx && ctx.joinPanel) {
+      ctx.joinPanel.classList.remove("hidden");
+      ctx.joinPanel.style.display = "";
     }
 
     Pair_Reset_();
   }
 
   function Pair_ShowStatus_(message) {
-
     try {
-
-      if (
-        ctx &&
-        typeof ctx.showStatus ===
-          "function"
-      ) {
-        ctx.showStatus(
-          message
-        );
+      if (ctx && typeof ctx.showStatus === "function") {
+        ctx.showStatus(message);
       } else {
-        console.log(
-          message
-        );
+        console.log(message);
       }
-
     } catch (error) {
-
       console.error(
         "Pair_ShowStatus_:",
         error
@@ -1193,35 +833,17 @@ function Pair_RenderEvents_() {
     }
   }
 
-  window.Pair_Reset_ =
-    Pair_Reset_;
-
-  window.Pair_Start_ =
-    Pair_Start_;
-
-  window.Pair_FindPartner_ =
-    Pair_FindPartner_;
-
-  window.Pair_SelectPartner_ =
-    Pair_SelectPartner_;
-
-  window.Pair_ChangePartner_ =
-    Pair_ChangePartner_;
-
-  window.Pair_LoadEvents_ =
-    Pair_LoadEvents_;
-
-  window.Pair_RenderEvents_ =
-    Pair_RenderEvents_;
-
-  window.Pair_UpdateSelection_ =
-    Pair_UpdateSelection_;
-
+  window.Pair_Reset_ = Pair_Reset_;
+  window.Pair_Start_ = Pair_Start_;
+  window.Pair_FindPartner_ = Pair_FindPartner_;
+  window.Pair_SelectPartner_ = Pair_SelectPartner_;
+  window.Pair_ChangePartner_ = Pair_ChangePartner_;
+  window.Pair_LoadEvents_ = Pair_LoadEvents_;
+  window.Pair_RenderEvents_ = Pair_RenderEvents_;
+  window.Pair_UpdateSelection_ = Pair_UpdateSelection_;
   window.Pair_CreatePaymentLink_ =
     Pair_CreatePaymentLink_;
-
-  window.Pair_BackToMode_ =
-    Pair_BackToMode_;
+  window.Pair_BackToMode_ = Pair_BackToMode_;
 
   Pair_WaitForContext_();
 
