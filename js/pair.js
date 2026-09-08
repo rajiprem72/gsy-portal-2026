@@ -579,56 +579,107 @@ async function Pair_FindPartner_() {
 }
 
    
-  async function Pair_SelectPartner_() {
-    if (!window.GSYPairState ||
-        !window.GSYPairState.partner) {
-      Pair_ShowStatus_("Please search for a partner first.");
-      return;
-    }
 
-    const partner =
-      window.GSYPairState.partner;
 
-    const eventSection =
-      document.getElementById("Pair_EventSection_");
+async function Pair_SelectPartner_() {
 
-    if (eventSection) {
-      eventSection.style.display = "block";
-    }
+  /*
+   * -------------------------------------------------------
+   * Make sure a partner has been found first.
+   * -------------------------------------------------------
+   */
+
+  if (
+    !window.GSYPairState ||
+    !window.GSYPairState.partner
+  ) {
+
+    Pair_ShowStatus_(
+      "Please search for a partner first."
+    );
+
+    return;
+  }
+
+
+  const partner =
+    window.GSYPairState.partner;
+
+
+  console.log(
+    "PAIR: Selecting partner:",
+    partner
+  );
+
+
+  /*
+   * -------------------------------------------------------
+   * Get the Pair Event Section
+   * -------------------------------------------------------
+   */
+
+  const eventSection =
+    document.getElementById(
+      "Pair_EventSection_"
+    );
+
+
+  /*
+   * -------------------------------------------------------
+   * IMPORTANT:
+   * Remove the hidden class.
+   *
+   * The .hidden CSS rule uses !important, so setting
+   * style.display = "block" alone is not sufficient.
+   * -------------------------------------------------------
+   */
+
+  if (eventSection) {
+
+    eventSection.classList.remove(
+      "hidden"
+    );
+
+    eventSection.style.display =
+      "block";
+
+  }
+
+
+  /*
+   * -------------------------------------------------------
+   * Load the Pair events.
+   * -------------------------------------------------------
+   */
+
+  try {
 
     await Pair_LoadEvents_();
+
+
+    console.log(
+      "PAIR: Partner selected and Pair events loaded."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "PAIR: Error loading events after partner selection:",
+      error
+    );
+
+
+    Pair_ShowStatus_(
+      error.message ||
+      "Unable to load Pair events."
+    );
+
   }
 
-  function Pair_ChangePartner_() {
-    const eventSection =
-      document.getElementById("Pair_EventSection_");
+}
 
-    const partnerResult =
-      document.getElementById("Pair_PartnerResult_");
-
-    const partnerInput =
-      document.getElementById("Pair_PartnerParticipantId_");
-
-    if (eventSection) {
-      eventSection.style.display = "none";
-    }
-
-    if (partnerResult) {
-      partnerResult.style.display = "none";
-    }
-
-    if (partnerInput) {
-      partnerInput.focus();
-    }
-
-    window.GSYPairState.partner = null;
-    window.GSYPairState.events = [];
-    window.GSYPairState.selectedEventIds = [];
-    window.GSYPairState.blockedEventIds = [];
-
-    Pair_UpdateSelection_();
-  }
-
+   
   async function Pair_LoadEvents_() {
     const eventMessage =
       document.getElementById("Pair_EventMessage_");
