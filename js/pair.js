@@ -212,10 +212,11 @@
     }
 
     window.GSYPairState = {
-      partner: null,
-      events: [],
-      selectedEventIds: []
-    };
+        partner: null,
+        events: [],
+        selectedEventIds: [],
+        registeredEventIds: []
+      };
   }
 
   async function Pair_Start_() {
@@ -366,6 +367,24 @@
 
     window.GSYPairState.partner =
       partner;
+
+     window.GSYPairState.registeredEventIds =
+  Array.isArray(
+    data.registeredEventIds
+  )
+    ? data.registeredEventIds.map(
+        function(eventId) {
+          return String(
+            eventId || ''
+          ).trim();
+        }
+      )
+    : [];
+
+console.log(
+  "Pair already registered events:",
+  window.GSYPairState.registeredEventIds
+);
 
     const result =
       document.getElementById(
@@ -641,115 +660,238 @@
     }
   }
 
-  function Pair_RenderEvents_() {
 
-    const eventList =
-      document.getElementById(
-        "Pair_EventList_"
-      );
+function Pair_RenderEvents_() {
 
-    if (!eventList) return;
+  const eventList =
+    document.getElementById(
+      "Pair_EventList_"
+    );
 
-    eventList.innerHTML = "";
+  if (!eventList) return;
 
-    const events =
-      window.GSYPairState.events ||
-      [];
+  eventList.innerHTML = "";
 
-    events.forEach(
-      function (event) {
+  const events =
+    window.GSYPairState.events || [];
 
-        const wrapper =
-          document.createElement(
-            "label"
-          );
+  const registeredEventIds =
+    new Set(
+      (
+        window.GSYPairState
+          .registeredEventIds || []
+      ).map(
+        function(eventId) {
+          return String(
+            eventId || ''
+          ).trim();
+        }
+      )
+    );
 
-        wrapper.style.display =
-          "block";
+  events.forEach(
+    function(event) {
 
-        wrapper.style.marginBottom =
-          "12px";
+      const eventId =
+        String(
+          event.eventId || ''
+        ).trim();
 
-        wrapper.style.padding =
-          "12px";
+      const alreadyRegistered =
+        registeredEventIds.has(
+          eventId
+        );
 
-        wrapper.style.border =
-          "1px solid #ddd";
+      const wrapper =
+        document.createElement(
+          "label"
+        );
 
-        wrapper.style.borderRadius =
-          "8px";
+      wrapper.style.display =
+        "block";
 
-        wrapper.style.cursor =
-          "pointer";
+      wrapper.style.marginBottom =
+        "12px";
 
-        const checkbox =
-          document.createElement(
-            "input"
-          );
+      wrapper.style.padding =
+        "12px";
 
-        checkbox.type =
-          "checkbox";
+      wrapper.style.border =
+        alreadyRegistered
+          ? "1px solid #ccc"
+          : "1px solid #ddd";
 
-        checkbox.dataset.eventId =
-          event.eventId;
+      wrapper.style.borderRadius =
+        "8px";
 
-        checkbox.style.marginRight =
-          "10px";
+      wrapper.style.cursor =
+        alreadyRegistered
+          ? "not-allowed"
+          : "pointer";
 
+      if (alreadyRegistered) {
+        wrapper.style.opacity =
+          "0.65";
+      }
+
+      const checkbox =
+        document.createElement(
+          "input"
+        );
+
+      checkbox.type =
+        "checkbox";
+
+      checkbox.dataset.eventId =
+        eventId;
+
+      checkbox.dataset.fee =
+        event.fee !== undefined
+          ? event.fee
+          : (
+              event.perPersonFee ||
+              0
+            );
+
+      checkbox.style.marginRight =
+        "10px";
+
+      /*
+       * Already registered events
+       * cannot be selected again.
+       */
+      if (alreadyRegistered) {
+        checkbox.disabled = true;
+        checkbox.checked = false;
+      }
+
+      if (!alreadyRegistered) {
         checkbox.addEventListener(
           "change",
           Pair_UpdateSelection_
         );
+      }
 
-        const title =
+      const title =
+        document.createElement(
+          "strong"
+        );
+
+      title.textContent =
+        event.eventName;
+
+      const fee =
+        document.createElement(
+          "span"
+        );
+
+      fee.textContent =
+        " — ₹" +
+        Number(
+          event.fee || 0
+        ).toLocaleString(
+          "en-IN"
+        ) +
+        " total (₹" +
+        Number(
+          event.perPersonFee || 1000
+        ).toLocaleString(
+          "en-IN"
+        ) +
+        " per person)";
+
+      wrapper.appendChild(
+        checkbox
+      );
+
+      wrapper.appendChild(
+        title
+      );
+
+      wrapper.appendChild(
+        fee
+      );
+
+      /*
+       * Show location and date.
+       */
+      const location =
+        document.createElement(
+          "div"
+        );
+
+      location.style.fontSize =
+        "13px";
+
+      location.style.marginTop =
+        "6px";
+
+      location.textContent =
+        "Location: " +
+        (
+          event.eventLocation ||
+          event.location ||
+          "Bengaluru"
+        );
+
+      wrapper.appendChild(
+        location
+      );
+
+      const date =
+        document.createElement(
+          "div"
+        );
+
+      date.style.fontSize =
+        "13px";
+
+      date.style.marginTop =
+        "3px";
+
+      date.textContent =
+        "Date: " +
+        (
+          event.eventDate ||
+          event.date ||
+          "22 Nov 2026"
+        );
+
+      wrapper.appendChild(
+        date
+      );
+
+      if (alreadyRegistered) {
+
+        const already =
           document.createElement(
-            "strong"
+            "div"
           );
 
-        title.textContent =
-          event.eventName;
+        already.style.marginTop =
+          "8px";
 
-        const fee =
-          document.createElement(
-            "span"
-          );
+        already.style.fontWeight =
+          "600";
 
-        fee.textContent =
-          " — ₹" +
-          Number(
-            event.fee
-          ).toLocaleString(
-            "en-IN"
-          ) +
-          " total (₹" +
-          Number(
-            event.perPersonFee || 1000
-          ).toLocaleString(
-            "en-IN"
-          ) +
-          " per person)";
+        already.textContent =
+          "✓ Already Registered";
 
         wrapper.appendChild(
-          checkbox
-        );
-
-        wrapper.appendChild(
-          title
-        );
-
-        wrapper.appendChild(
-          fee
-        );
-
-        eventList.appendChild(
-          wrapper
+          already
         );
       }
-    );
 
-    Pair_UpdateSelection_();
-  }
+      eventList.appendChild(
+        wrapper
+      );
+    }
+  );
 
+  Pair_UpdateSelection_();
+}
+
+   
   function Pair_UpdateSelection_() {
 
     const eventList =
