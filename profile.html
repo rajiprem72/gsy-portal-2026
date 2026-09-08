@@ -1740,279 +1740,355 @@ let registeredEventIds =
 
 }
 
-    
-    function renderEventCatalogue(
-      mode,
-      data
-    ) {
 
-      currentEventData =
-        data;
+function renderEventCatalogue(
+  mode,
+  data
+) {
 
-
-      catalogueTitle.textContent =
-        mode +
-        " Events";
+  currentEventData =
+    data;
 
 
-      catalogueSubtitle.textContent =
-        data.selectionMessage ||
-        "Select the event or events you would like to join.";
+  catalogueTitle.textContent =
+    mode +
+    " Events";
 
 
-      catalogueList.innerHTML =
-        "";
+  catalogueSubtitle.textContent =
+    data.selectionMessage ||
+    "Select the event or events you would like to join.";
 
 
-      const events =
-        Array.isArray(data.events)
-          ? data.events
-          : [];
+  catalogueList.innerHTML =
+    "";
 
 
-      if (
-        events.length === 0
-      ) {
+  const events =
+    Array.isArray(data.events)
+      ? data.events
+      : [];
 
-        selectionSummary.classList.add(
-          "hidden"
+
+  if (
+    events.length === 0
+  ) {
+
+    selectionSummary.classList.add(
+      "hidden"
+    );
+
+
+    catalogueSubtitle.textContent =
+      "No events are currently available for this mode.";
+
+
+    return;
+
+  }
+
+
+  events.forEach(
+    function(event, index) {
+
+      const row =
+        document.createElement(
+          "div"
         );
 
 
-        catalogueSubtitle.textContent =
-          "No events are currently available for this mode.";
+      row.className =
+        "event-option";
 
 
-        return;
+      const checkbox =
+        document.createElement(
+          "input"
+        );
+
+
+      checkbox.type =
+        "checkbox";
+
+
+      const rawId =
+        event.eventId ||
+        (
+          mode +
+          "_" +
+          index
+        );
+
+
+      const safeId =
+        String(rawId)
+          .replace(
+            /[^a-zA-Z0-9_-]/g,
+            "_"
+          );
+
+
+      checkbox.id =
+        "event_" +
+        safeId;
+
+
+      /*
+       * -------------------------------------------------------
+       * Get the Event ID safely.
+       *
+       * IMPORTANT:
+       * Use a different variable name here so that there is
+       * no conflict with any other eventId variable.
+       * -------------------------------------------------------
+       */
+
+      const currentEventId =
+        String(
+          event.eventId ||
+          event.Event_ID ||
+          event.eventID ||
+          ""
+        )
+          .trim()
+          .toUpperCase();
+
+
+      /*
+       * -------------------------------------------------------
+       * Store the Event ID on the checkbox.
+       * -------------------------------------------------------
+       */
+
+      checkbox.dataset.eventId =
+        currentEventId;
+
+
+      /*
+       * -------------------------------------------------------
+       * Check whether this participant has already registered
+       * for this event.
+       *
+       * IMPORTANT:
+       * This restriction applies ONLY to Individual events.
+       *
+       * Pair events are handled separately by pair.js.
+       * Therefore Pair events are NOT disabled here.
+       * -------------------------------------------------------
+       */
+
+      const alreadyRegistered =
+        mode === "Individual" &&
+        registeredEventIds.has(
+          currentEventId
+        );
+
+
+      /*
+       * -------------------------------------------------------
+       * Already registered Individual events cannot be selected
+       * again.
+       * -------------------------------------------------------
+       */
+
+      if (
+        alreadyRegistered
+      ) {
+
+        checkbox.disabled =
+          true;
+
+        checkbox.checked =
+          false;
+
+        row.classList.add(
+          "event-already-registered"
+        );
 
       }
 
 
-      events.forEach(
-        function(event, index) {
+      /*
+       * -------------------------------------------------------
+       * Store the event fee.
+       * -------------------------------------------------------
+       */
 
-          const row =
-            document.createElement(
-              "div"
+      checkbox.dataset.fee =
+        event.fee !== undefined
+          ? event.fee
+          : (
+              event.perPersonFee ||
+              0
             );
 
 
-          row.className =
-            "event-option";
+      /*
+       * -------------------------------------------------------
+       * Event label
+       * -------------------------------------------------------
+       */
 
+      const label =
+        document.createElement(
+          "label"
+        );
 
-          const checkbox =
-            document.createElement(
-              "input"
-            );
 
+      label.className =
+        "event-option-label";
 
-          checkbox.type =
-            "checkbox";
 
+      label.htmlFor =
+        checkbox.id;
 
-          const rawId =
-            event.eventId ||
-            (
-              mode +
-              "_" +
-              index
-            );
 
+      /*
+       * -------------------------------------------------------
+       * Event name
+       * -------------------------------------------------------
+       */
 
-          const safeId =
-            String(rawId)
-              .replace(
-                /[^a-zA-Z0-9_-]/g,
-                "_"
-              );
+      const name =
+        document.createElement(
+          "div"
+        );
 
 
-          checkbox.id =
-            "event_" +
-            safeId;
+      name.className =
+        "event-name";
 
 
-         checkbox.dataset.eventId =
-  eventId;
+      name.textContent =
+        event.eventName ||
+        "Event";
 
 
-/*
- * -------------------------------------------------------
- * Check whether this participant has already registered
- * for this event.
- * -------------------------------------------------------
- */
-
-const eventId =
-  String(
-    event.eventId ||
-    event.Event_ID ||
-    event.eventID ||
-    ""
-  ).trim().toUpperCase();
-
-
-const alreadyRegistered =
-  mode === "Individual" &&
-  registeredEventIds.has(
-    eventId
-  );
-
-
-/*
- * -------------------------------------------------------
- * Already registered events cannot be selected again.
- * -------------------------------------------------------
- */
-
-if (
-  alreadyRegistered
-) {
-
-  checkbox.disabled =
-    true;
-
-  checkbox.checked =
-    false;
-
-  row.classList.add(
-    "event-already-registered"
-  );
-
-}
-
-
-checkbox.dataset.fee =
-  event.fee !== undefined
-    ? event.fee
-    : (
-        event.perPersonFee ||
-        0
-      );
-
-          const label =
-            document.createElement(
-              "label"
-            );
-
-
-          label.className =
-            "event-option-label";
-
-
-          label.htmlFor =
-            checkbox.id;
-
-
-          const name =
-            document.createElement(
-              "div"
-            );
-
-
-          name.className =
-            "event-name";
-
-
-          name.textContent =
-            event.eventName ||
-            "Event";
-
-
-          label.appendChild(
-            name
-          );
-
-
-          if (event.round) {
-
-            const round =
-              document.createElement(
-                "div"
-              );
-
-
-            round.className =
-              "event-round";
-
-
-            round.textContent =
-              event.round;
-
-
-            label.appendChild(
-              round
-            );
-
-          }
-
-
-          const fee =
-            document.createElement(
-              "div"
-            );
-
-
-          fee.className =
-            "event-fee";
-
-
-          if (
-            event.fee !== undefined
-          ) {
-
-            fee.textContent =
-              formatINR(
-                event.fee
-              );
-
-          } else if (
-            event.perPersonFee !== undefined
-          ) {
-
-            fee.textContent =
-              formatINR(
-                event.perPersonFee
-              ) +
-              " / person";
-
-          }
-
-
-          checkbox.addEventListener(
-            "change",
-            updateSelectionSummary
-          );
-
-
-          row.appendChild(
-            checkbox
-          );
-
-
-          row.appendChild(
-            label
-          );
-
-
-          row.appendChild(
-            fee
-          );
-
-
-          catalogueList.appendChild(
-            row
-          );
-
-        }
+      label.appendChild(
+        name
       );
 
 
-      updateSelectionSummary();
+      /*
+       * -------------------------------------------------------
+       * Event round
+       * -------------------------------------------------------
+       */
+
+      if (
+        event.round
+      ) {
+
+        const round =
+          document.createElement(
+            "div"
+          );
+
+
+        round.className =
+          "event-round";
+
+
+        round.textContent =
+          event.round;
+
+
+        label.appendChild(
+          round
+        );
+
+      }
+
+
+      /*
+       * -------------------------------------------------------
+       * Event fee
+       * -------------------------------------------------------
+       */
+
+      const fee =
+        document.createElement(
+          "div"
+        );
+
+
+      fee.className =
+        "event-fee";
+
+
+      if (
+        event.fee !== undefined
+      ) {
+
+        fee.textContent =
+          formatINR(
+            event.fee
+          );
+
+      } else if (
+        event.perPersonFee !== undefined
+      ) {
+
+        fee.textContent =
+          formatINR(
+            event.perPersonFee
+          ) +
+          " / person";
+
+      }
+
+
+      /*
+       * -------------------------------------------------------
+       * Checkbox change handler
+       * -------------------------------------------------------
+       */
+
+      checkbox.addEventListener(
+        "change",
+        updateSelectionSummary
+      );
+
+
+      /*
+       * -------------------------------------------------------
+       * Add elements to event row
+       * -------------------------------------------------------
+       */
+
+      row.appendChild(
+        checkbox
+      );
+
+
+      row.appendChild(
+        label
+      );
+
+
+      row.appendChild(
+        fee
+      );
+
+
+      catalogueList.appendChild(
+        row
+      );
 
     }
+  );
 
+
+  /*
+   * -------------------------------------------------------
+   * Update selection summary after all events are rendered.
+   * -------------------------------------------------------
+   */
+
+  updateSelectionSummary();
+
+}
+    
 
     async function loadEventCatalogue(
       mode
