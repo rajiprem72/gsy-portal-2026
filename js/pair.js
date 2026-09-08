@@ -26,56 +26,6 @@
     const partnerInput =
       document.getElementById("Pair_PartnerParticipantId_");
 
-    const findPartnerBtn =
-      document.getElementById("Pair_FindPartnerBtn_");
-
-    const selectPartnerBtn =
-      document.getElementById("Pair_SelectPartnerBtn_");
-
-    const changePartnerBtn =
-      document.getElementById("Pair_ChangePartnerBtn_");
-
-    const proceedBtn =
-      document.getElementById("Pair_ProceedToPaymentBtn_");
-
-    const backBtn =
-      document.getElementById("Pair_BackToModeBtn_");
-
-    if (findPartnerBtn) {
-      findPartnerBtn.addEventListener(
-        "click",
-        Pair_FindPartner_
-      );
-    }
-
-    if (selectPartnerBtn) {
-      selectPartnerBtn.addEventListener(
-        "click",
-        Pair_SelectPartner_
-      );
-    }
-
-    if (changePartnerBtn) {
-      changePartnerBtn.addEventListener(
-        "click",
-        Pair_ChangePartner_
-      );
-    }
-
-    if (proceedBtn) {
-      proceedBtn.addEventListener(
-        "click",
-        Pair_CreatePaymentLink_
-      );
-    }
-
-    if (backBtn) {
-      backBtn.addEventListener(
-        "click",
-        Pair_BackToMode_
-      );
-    }
-
     if (partnerInput) {
       partnerInput.addEventListener(
         "keydown",
@@ -89,14 +39,11 @@
     }
 
     /*
-      Pair mode click is handled by this module because profile.html
+      Pair mode click is handled here because profile.html
       intentionally skips Pair in its generic mode handler.
     */
-
     const pairModeCard =
-      document.querySelector(
-        '.mode-card[data-mode="Pair"]'
-      );
+      document.querySelector('.mode-card[data-mode="Pair"]');
 
     if (pairModeCard) {
       pairModeCard.addEventListener(
@@ -110,13 +57,71 @@
       );
     }
 
+    console.log(
+      "GSY Pair module initialized successfully."
+    );
+
     Pair_Reset_();
   }
+
+  /*
+    Robust button handling:
+    Use document-level delegation so Pair buttons continue to work
+    even if the panel is shown/hidden or its contents are refreshed.
+  */
+  document.addEventListener(
+    "click",
+    function (event) {
+
+      const target = event.target;
+
+      if (!target) return;
+
+      const button =
+        target.closest(
+          "#Pair_FindPartnerBtn_, " +
+          "#Pair_SelectPartnerBtn_, " +
+          "#Pair_ChangePartnerBtn_, " +
+          "#Pair_ProceedToPaymentBtn_, " +
+          "#Pair_BackToModeBtn_"
+        );
+
+      if (!button) return;
+
+      event.preventDefault();
+
+      if (button.id === "Pair_FindPartnerBtn_") {
+        Pair_FindPartner_();
+        return;
+      }
+
+      if (button.id === "Pair_SelectPartnerBtn_") {
+        Pair_SelectPartner_();
+        return;
+      }
+
+      if (button.id === "Pair_ChangePartnerBtn_") {
+        Pair_ChangePartner_();
+        return;
+      }
+
+      if (button.id === "Pair_ProceedToPaymentBtn_") {
+        Pair_CreatePaymentLink_();
+        return;
+      }
+
+      if (button.id === "Pair_BackToModeBtn_") {
+        Pair_BackToMode_();
+      }
+    }
+  );
 
   function Pair_Reset_() {
 
     const panel =
-      document.getElementById("Pair_Panel_");
+      document.getElementById(
+        "Pair_Panel_"
+      );
 
     const partnerInput =
       document.getElementById(
@@ -192,12 +197,15 @@
 
     /*
       IMPORTANT:
-      The site's CSS uses:
-      .hidden { display:none !important; }
+      profile.html contains:
 
-      Therefore Pair panel visibility must use the hidden class.
+      .hidden {
+        display: none !important;
+      }
+
+      Therefore we use the hidden class to control
+      Pair panel visibility.
     */
-
     if (panel) {
       panel.classList.add("hidden");
       panel.style.display = "";
@@ -218,7 +226,9 @@
       );
 
     const cataloguePanel =
-      ctx.cataloguePanel;
+      ctx
+        ? ctx.cataloguePanel
+        : null;
 
     Pair_Reset_();
 
@@ -295,6 +305,11 @@
         await ctx.auth.currentUser
           .getIdToken(true);
 
+      console.log(
+        "Pair_FindPartner: sending request for",
+        partnerId
+      );
+
       const response =
         await fetch(
           ctx.APPS_SCRIPT_URL,
@@ -319,8 +334,18 @@
           }
         );
 
+      console.log(
+        "Pair_FindPartner HTTP status:",
+        response.status
+      );
+
       const data =
         await response.json();
+
+      console.log(
+        "Pair_FindPartner response:",
+        data
+      );
 
       if (!data.success) {
         throw new Error(
@@ -435,9 +460,6 @@
       );
       return;
     }
-
-    const partner =
-      window.GSYPairState.partner;
 
     const eventSection =
       document.getElementById(
@@ -737,6 +759,10 @@
         "Pair_SelectionTotal_"
       );
 
+    /*
+      IMPORTANT FIX:
+      This variable was missing in the previous version.
+    */
     const proceedBtn =
       document.getElementById(
         "Pair_ProceedToPaymentBtn_"
@@ -862,6 +888,7 @@
 
     if (proceedBtn) {
       proceedBtn.disabled = true;
+
       proceedBtn.textContent =
         "Creating Payment Link...";
     }
@@ -871,6 +898,10 @@
       const idToken =
         await ctx.auth.currentUser
           .getIdToken(true);
+
+      console.log(
+        "Pair_CreatePaymentLink: sending request"
+      );
 
       const response =
         await fetch(
@@ -903,6 +934,11 @@
 
       const data =
         await response.json();
+
+      console.log(
+        "Pair_CreatePaymentLink response:",
+        data
+      );
 
       if (!data.success) {
         throw new Error(
@@ -941,6 +977,7 @@
 
       if (proceedBtn) {
         proceedBtn.disabled = false;
+
         proceedBtn.textContent =
           "Proceed to Payment";
       }
