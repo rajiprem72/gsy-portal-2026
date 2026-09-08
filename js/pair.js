@@ -257,222 +257,235 @@
     }
   }
 
-  async function Pair_FindPartner_() {
+   async function Pair_FindPartner_() {
 
-    const partnerInput =
-      document.getElementById(
-        "Pair_PartnerParticipantId_"
+  const partnerInput =
+    document.getElementById(
+      "Pair_PartnerParticipantId_"
+    );
+
+  const partnerId =
+    partnerInput
+      ? partnerInput.value
+          .trim()
+          .toUpperCase()
+      : "";
+
+  if (!partnerId) {
+    Pair_ShowStatus_(
+      "Please enter the Partner Participant ID."
+    );
+    return;
+  }
+
+  if (
+    !ctx ||
+    !ctx.auth ||
+    !ctx.auth.currentUser
+  ) {
+    Pair_ShowStatus_(
+      "Please sign in again."
+    );
+    return;
+  }
+
+  const findBtn =
+    document.getElementById(
+      "Pair_FindPartnerBtn_"
+    );
+
+  if (findBtn) {
+    findBtn.disabled = true;
+    findBtn.textContent = "Searching...";
+  }
+
+  try {
+
+    const idToken =
+      await ctx.auth.currentUser
+        .getIdToken(true);
+
+    console.log(
+      "Pair_FindPartner: sending request for",
+      partnerId
+    );
+
+    const response =
+      await fetch(
+        ctx.APPS_SCRIPT_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "text/plain;charset=utf-8"
+          },
+
+          body: JSON.stringify({
+            action:
+              "Pair_FindPartner",
+
+            idToken:
+              idToken,
+
+            partnerParticipantId:
+              partnerId
+          })
+        }
       );
 
-    const partnerId =
-      partnerInput
-        ? partnerInput.value
-            .trim()
-            .toUpperCase()
-        : "";
+    console.log(
+      "Pair_FindPartner HTTP status:",
+      response.status
+    );
 
-    if (!partnerId) {
-      Pair_ShowStatus_(
-        "Please enter the Partner Participant ID."
+    const data =
+      await response.json();
+
+    console.log(
+      "Pair_FindPartner response:",
+      data
+    );
+
+    if (!data.success) {
+      throw new Error(
+        data.message ||
+        "Partner Participant ID not found."
       );
-      return;
     }
 
-    if (
-      !ctx ||
-      !ctx.auth ||
-      !ctx.auth.currentUser
-    ) {
-      Pair_ShowStatus_(
-        "Please sign in again."
+    const partner =
+      data.data ||
+      data.partner;
+
+    if (!partner) {
+      throw new Error(
+        "Partner details were not returned."
       );
-      return;
     }
 
-    const findBtn =
+    window.GSYPairState.partner =
+      partner;
+
+    const result =
       document.getElementById(
-        "Pair_FindPartnerBtn_"
+        "Pair_PartnerResult_"
       );
+
+    const idDisplay =
+      document.getElementById(
+        "Pair_PartnerIdDisplay_"
+      );
+
+    const nameDisplay =
+      document.getElementById(
+        "Pair_PartnerNameDisplay_"
+      );
+
+    const fatherDisplay =
+      document.getElementById(
+        "Pair_PartnerFatherNameDisplay_"
+      );
+
+    /*
+      IMPORTANT FIX:
+      Remove the hidden class because .hidden uses
+      display:none !important.
+    */
+
+    if (idDisplay) {
+      idDisplay.textContent =
+        partner.participantId ||
+        partner.Participant_ID ||
+        partner.id ||
+        partnerId;
+    }
+
+    if (nameDisplay) {
+      nameDisplay.textContent =
+        partner.fullName ||
+        partner.Full_Name ||
+        partner.name ||
+        "";
+    }
+
+    if (fatherDisplay) {
+      fatherDisplay.textContent =
+        partner.fatherName ||
+        partner.Father_Name ||
+        "";
+    }
+
+    if (result) {
+      result.classList.remove("hidden");
+      result.style.display = "block";
+    }
+
+    Pair_ShowStatus_(
+      "Partner found successfully."
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Pair_FindPartner_:",
+      error
+    );
+
+    const result =
+      document.getElementById(
+        "Pair_PartnerResult_"
+      );
+
+    if (result) {
+      result.classList.add("hidden");
+      result.style.display = "";
+    }
+
+    Pair_ShowStatus_(
+      error.message ||
+      "Unable to find the partner."
+    );
+
+  } finally {
 
     if (findBtn) {
-      findBtn.disabled = true;
-      findBtn.textContent = "Searching...";
-    }
-
-    try {
-
-      const idToken =
-        await ctx.auth.currentUser
-          .getIdToken(true);
-
-      console.log(
-        "Pair_FindPartner: sending request for",
-        partnerId
-      );
-
-      const response =
-        await fetch(
-          ctx.APPS_SCRIPT_URL,
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "text/plain;charset=utf-8"
-            },
-
-            body: JSON.stringify({
-              action:
-                "Pair_FindPartner",
-
-              idToken:
-                idToken,
-
-              partnerParticipantId:
-                partnerId
-            })
-          }
-        );
-
-      console.log(
-        "Pair_FindPartner HTTP status:",
-        response.status
-      );
-
-      const data =
-        await response.json();
-
-      console.log(
-        "Pair_FindPartner response:",
-        data
-      );
-
-      if (!data.success) {
-        throw new Error(
-          data.message ||
-          "Partner Participant ID not found."
-        );
-      }
-
-      const partner =
-        data.data ||
-        data.partner;
-
-      if (!partner) {
-        throw new Error(
-          "Partner details were not returned."
-        );
-      }
-
-      window.GSYPairState.partner =
-        partner;
-
-      const result =
-        document.getElementById(
-          "Pair_PartnerResult_"
-        );
-
-      const idDisplay =
-        document.getElementById(
-          "Pair_PartnerIdDisplay_"
-        );
-
-      const nameDisplay =
-        document.getElementById(
-          "Pair_PartnerNameDisplay_"
-        );
-
-      const fatherDisplay =
-        document.getElementById(
-          "Pair_PartnerFatherNameDisplay_"
-        );
-
-      if (idDisplay) {
-        idDisplay.textContent =
-          partner.participantId ||
-          partner.Participant_ID ||
-          partner.id ||
-          partnerId;
-      }
-
-      if (nameDisplay) {
-        nameDisplay.textContent =
-          partner.fullName ||
-          partner.Full_Name ||
-          partner.name ||
-          "";
-      }
-
-      if (fatherDisplay) {
-        fatherDisplay.textContent =
-          partner.fatherName ||
-          partner.Father_Name ||
-          "";
-      }
-
-      if (result) {
-        result.style.display = "block";
-      }
-
-      Pair_ShowStatus_(
-        "Partner found successfully."
-      );
-
-    } catch (error) {
-
-      console.error(
-        "Pair_FindPartner_:",
-        error
-      );
-
-      const result =
-        document.getElementById(
-          "Pair_PartnerResult_"
-        );
-
-      if (result) {
-        result.style.display = "none";
-      }
-
-      Pair_ShowStatus_(
-        error.message ||
-        "Unable to find the partner."
-      );
-
-    } finally {
-
-      if (findBtn) {
-        findBtn.disabled = false;
-        findBtn.textContent =
-          "Find Partner";
-      }
+      findBtn.disabled = false;
+      findBtn.textContent =
+        "Find Partner";
     }
   }
+}
 
-  async function Pair_SelectPartner_() {
 
-    if (
-      !window.GSYPairState ||
-      !window.GSYPairState.partner
-    ) {
-      Pair_ShowStatus_(
-        "Please search for a partner first."
-      );
-      return;
-    }
+   
+ async function Pair_SelectPartner_() {
 
-    const eventSection =
-      document.getElementById(
-        "Pair_EventSection_"
-      );
-
-    if (eventSection) {
-      eventSection.style.display = "block";
-    }
-
-    await Pair_LoadEvents_();
+  if (
+    !window.GSYPairState ||
+    !window.GSYPairState.partner
+  ) {
+    Pair_ShowStatus_(
+      "Please search for a partner first."
+    );
+    return;
   }
 
+  const eventSection =
+    document.getElementById(
+      "Pair_EventSection_"
+    );
+
+  if (eventSection) {
+    eventSection.classList.remove("hidden");
+    eventSection.style.display = "block";
+  }
+
+  await Pair_LoadEvents_();
+}  
+
+
+   
   function Pair_ChangePartner_() {
 
     const eventSection =
