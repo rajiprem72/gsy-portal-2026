@@ -887,75 +887,200 @@ async function Pair_FindPartner_() {
   }
 
 
-  function Pair_UpdateSelection_() {
-    const eventList =
-      document.getElementById("Pair_EventList_");
 
-    const summary =
-      document.getElementById("Pair_SelectionSummary_");
 
-    const count =
-      document.getElementById("Pair_SelectionCount_");
+function Pair_UpdateSelection_() {
 
-    const total =
-      document.getElementById("Pair_SelectionTotal_");
+  const eventList =
+    document.getElementById(
+      "Pair_EventList_"
+    );
 
-    if (!eventList) return;
 
-    const checked =
-      Array.from(
-        eventList.querySelectorAll(
-          'input[type="checkbox"]:checked'
-        )
-      );
+  const summary =
+    document.getElementById(
+      "Pair_SelectionSummary_"
+    );
 
-    const selectedIds =
-      checked.map(function (checkbox) {
-        return checkbox.dataset.eventId;
-      });
 
-    window.GSYPairState.selectedEventIds =
-      selectedIds;
+  const count =
+    document.getElementById(
+      "Pair_SelectionCount_"
+    );
 
-    let selectedTotal = 0;
 
-    selectedIds.forEach(function (eventId) {
-      const event =
-        (window.GSYPairState.events || [])
-          .find(function (item) {
-            return item.eventId === eventId;
-          });
+  const total =
+    document.getElementById(
+      "Pair_SelectionTotal_"
+    );
 
-      if (event) {
-        selectedTotal +=
-          Number(event.fee || 0);
-      }
-    });
 
-    if (count) {
-      count.textContent =
-        String(selectedIds.length);
-    }
+  const proceedBtn =
+    document.getElementById(
+      "Pair_ProceedToPaymentBtn_"
+    );
 
-    if (total) {
-      total.textContent =
-        "₹" +
-        selectedTotal.toLocaleString("en-IN");
-    }
 
-    if (summary) {
-      summary.style.display =
-        selectedIds.length > 0
-          ? "block"
-          : "none";
-    }
-
-    if (proceedBtn) {
-      proceedBtn.disabled =
-        selectedIds.length === 0;
-    }
+  if (!eventList) {
+    return;
   }
 
+
+  /*
+   * -------------------------------------------------------
+   * Get all selected Pair events
+   * -------------------------------------------------------
+   */
+
+  const checked =
+    Array.from(
+      eventList.querySelectorAll(
+        'input[type="checkbox"]:checked'
+      )
+    );
+
+
+  const selectedIds =
+    checked.map(
+      function (checkbox) {
+        return checkbox.dataset.eventId;
+      }
+    );
+
+
+  /*
+   * -------------------------------------------------------
+   * Save selected event IDs
+   * -------------------------------------------------------
+   */
+
+  if (
+    !window.GSYPairState
+  ) {
+
+    window.GSYPairState = {
+      partner: null,
+      events: [],
+      selectedEventIds: []
+    };
+
+  }
+
+
+  window.GSYPairState.selectedEventIds =
+    selectedIds;
+
+
+  /*
+   * -------------------------------------------------------
+   * Calculate total amount
+   * -------------------------------------------------------
+   */
+
+  let selectedTotal =
+    0;
+
+
+  selectedIds.forEach(
+    function (eventId) {
+
+      const event =
+        (window.GSYPairState.events || [])
+          .find(
+            function (item) {
+
+              return (
+                String(
+                  item.eventId || ""
+                ).trim() ===
+                String(
+                  eventId || ""
+                ).trim()
+              );
+
+            }
+          );
+
+
+      if (event) {
+
+        selectedTotal +=
+          Number(
+            event.fee || 0
+          );
+
+      }
+
+    }
+  );
+
+
+  /*
+   * -------------------------------------------------------
+   * Update count
+   * -------------------------------------------------------
+   */
+
+  if (count) {
+
+    count.textContent =
+      String(
+        selectedIds.length
+      );
+
+  }
+
+
+  /*
+   * -------------------------------------------------------
+   * Update total
+   * -------------------------------------------------------
+   */
+
+  if (total) {
+
+    total.textContent =
+      "₹" +
+      selectedTotal.toLocaleString(
+        "en-IN"
+      );
+
+  }
+
+
+  /*
+   * -------------------------------------------------------
+   * Show / hide selection summary
+   * -------------------------------------------------------
+   */
+
+  if (summary) {
+
+    summary.style.display =
+      selectedIds.length > 0
+        ? "block"
+        : "none";
+
+  }
+
+
+  /*
+   * -------------------------------------------------------
+   * Enable payment button only when at least
+   * one Pair event is selected.
+   * -------------------------------------------------------
+   */
+
+  if (proceedBtn) {
+
+    proceedBtn.disabled =
+      selectedIds.length === 0;
+
+  }
+
+}
+
+   
   async function Pair_CreatePaymentLink_() {
     const state =
       window.GSYPairState;
