@@ -25,6 +25,36 @@
 
     const partnerInput =
       document.getElementById("Pair_PartnerParticipantId_");
+    const findPartnerBtn =
+      document.getElementById("Pair_FindPartnerBtn_");
+    const selectPartnerBtn =
+      document.getElementById("Pair_SelectPartnerBtn_");
+    const changePartnerBtn =
+      document.getElementById("Pair_ChangePartnerBtn_");
+    const proceedBtn =
+      document.getElementById("Pair_ProceedToPaymentBtn_");
+    const backBtn =
+      document.getElementById("Pair_BackToModeBtn_");
+
+    if (findPartnerBtn) {
+      findPartnerBtn.addEventListener("click", Pair_FindPartner_);
+    }
+
+    if (selectPartnerBtn) {
+      selectPartnerBtn.addEventListener("click", Pair_SelectPartner_);
+    }
+
+    if (changePartnerBtn) {
+      changePartnerBtn.addEventListener("click", Pair_ChangePartner_);
+    }
+
+    if (proceedBtn) {
+      proceedBtn.addEventListener("click", Pair_CreatePaymentLink_);
+    }
+
+    if (backBtn) {
+      backBtn.addEventListener("click", Pair_BackToMode_);
+    }
 
     if (partnerInput) {
       partnerInput.addEventListener("keydown", function (event) {
@@ -36,7 +66,7 @@
     }
 
     /*
-      Pair mode click is handled here because profile.html
+      Pair mode click is handled by this module because profile.html
       intentionally skips Pair in its generic mode handler.
     */
     const pairModeCard =
@@ -54,48 +84,8 @@
       );
     }
 
-    console.log("GSY Pair module initialized successfully.");
     Pair_Reset_();
   }
-
-  /*
-    Robust button handling:
-    Use document-level delegation so Pair buttons continue to work even
-    if the panel is shown/hidden or its contents are refreshed.
-  */
-  document.addEventListener("click", function (event) {
-    const button = event.target.closest(
-      "#Pair_FindPartnerBtn_, #Pair_SelectPartnerBtn_, #Pair_ChangePartnerBtn_, #Pair_ProceedToPaymentBtn_, #Pair_BackToModeBtn_"
-    );
-
-    if (!button) return;
-
-    event.preventDefault();
-
-    if (button.id === "Pair_FindPartnerBtn_") {
-      Pair_FindPartner_();
-      return;
-    }
-
-    if (button.id === "Pair_SelectPartnerBtn_") {
-      Pair_SelectPartner_();
-      return;
-    }
-
-    if (button.id === "Pair_ChangePartnerBtn_") {
-      Pair_ChangePartner_();
-      return;
-    }
-
-    if (button.id === "Pair_ProceedToPaymentBtn_") {
-      Pair_CreatePaymentLink_();
-      return;
-    }
-
-    if (button.id === "Pair_BackToModeBtn_") {
-      Pair_BackToMode_();
-    }
-  });
 
   function Pair_Reset_() {
     const panel = document.getElementById("Pair_Panel_");
@@ -132,6 +122,7 @@
     }
 
     if (eventSection) {
+      eventSection.classList.add("hidden");
       eventSection.style.display = "none";
     }
 
@@ -163,8 +154,7 @@
     window.GSYPairState = {
       partner: null,
       events: [],
-      selectedEventIds: [],
-      blockedEventIds: []
+      selectedEventIds: []
     };
   }
 
@@ -194,492 +184,182 @@
     }
   }
 
+  async function Pair_FindPartner_() {
+    const partnerInput =
+      document.getElementById("Pair_PartnerParticipantId_");
 
-async function Pair_FindPartner_() {
+    const partnerId =
+      partnerInput
+        ? partnerInput.value.trim().toUpperCase()
+        : "";
 
-  const partnerInput =
-    document.getElementById(
-      "Pair_PartnerParticipantId_"
-    );
+    if (!partnerId) {
+      Pair_ShowStatus_("Please enter the Partner Participant ID.");
+      return;
+    }
 
+    if (!ctx || !ctx.auth || !ctx.auth.currentUser) {
+      Pair_ShowStatus_("Please sign in again.");
+      return;
+    }
 
-  const partnerId =
-    partnerInput
-      ? partnerInput.value
-          .trim()
-          .toUpperCase()
-      : "";
+    const findBtn =
+      document.getElementById("Pair_FindPartnerBtn_");
 
+    if (findBtn) {
+      findBtn.disabled = true;
+      findBtn.textContent = "Searching...";
+    }
 
-  console.log(
-    "PAIR: Partner ID entered:",
-    partnerId
-  );
+    try {
+      const idToken =
+        await ctx.auth.currentUser.getIdToken(true);
 
-
-  if (
-    !partnerId
-  ) {
-
-    Pair_ShowStatus_(
-      "Please enter the Partner Participant ID."
-    );
-
-    return;
-  }
-
-
-  /*
-   * -------------------------------------------------------
-   * Check Firebase session
-   * -------------------------------------------------------
-   */
-
-  if (
-    !ctx ||
-    !ctx.auth ||
-    !ctx.auth.currentUser
-  ) {
-
-    console.error(
-      "PAIR: Firebase user is not available."
-    );
-
-    Pair_ShowStatus_(
-      "Please sign in again."
-    );
-
-    return;
-  }
-
-
-  const findBtn =
-    document.getElementById(
-      "Pair_FindPartnerBtn_"
-    );
-
-
-  if (findBtn) {
-
-    findBtn.disabled =
-      true;
-
-    findBtn.textContent =
-      "Searching...";
-
-  }
-
-
-  try {
-
-    /*
-     * -------------------------------------------------------
-     * Get fresh Firebase ID token
-     * -------------------------------------------------------
-     */
-
-    const idToken =
-      await ctx.auth.currentUser
-        .getIdToken(true);
-
-
-    console.log(
-      "PAIR: Firebase token obtained."
-    );
-
-
-    console.log(
-      "PAIR: Apps Script URL:",
-      ctx.APPS_SCRIPT_URL
-    );
-
-
-    /*
-     * -------------------------------------------------------
-     * Send request to Apps Script
-     * -------------------------------------------------------
-     */
-
-    const response =
-      await fetch(
+      const response = await fetch(
         ctx.APPS_SCRIPT_URL,
         {
           method: "POST",
-
           headers: {
-            "Content-Type":
-              "text/plain;charset=utf-8"
+            "Content-Type": "text/plain;charset=utf-8"
           },
-
-          body:
-            JSON.stringify({
-              action:
-                "Pair_FindPartner",
-
-              idToken:
-                idToken,
-
-              partnerParticipantId:
-                partnerId
-            })
+          body: JSON.stringify({
+            action: "Pair_FindPartner",
+            idToken: idToken,
+            partnerParticipantId: partnerId
+          })
         }
       );
 
+      const data = await response.json();
 
-    console.log(
-      "PAIR: HTTP status:",
-      response.status
-    );
-
-
-    /*
-     * -------------------------------------------------------
-     * Read response as TEXT first.
-     *
-     * This helps us see the real Apps Script response
-     * if it is not valid JSON.
-     * -------------------------------------------------------
-     */
-
-    const responseText =
-      await response.text();
-
-
-    console.log(
-      "PAIR: Raw response:",
-      responseText
-    );
-
-
-    let data;
-
-
-    try {
-
-      data =
-        JSON.parse(
-          responseText
+      if (!data.success) {
+        throw new Error(
+          data.message || "Partner Participant ID not found."
         );
+      }
 
-    } catch (jsonError) {
+      const partner = data.data || data.partner;
 
-      throw new Error(
-        "Apps Script returned an invalid response: " +
-        responseText
+      if (!partner) {
+        throw new Error("Partner details were not returned.");
+      }
+
+      window.GSYPairState.partner = partner;
+
+      const result =
+        document.getElementById("Pair_PartnerResult_");
+
+      const idDisplay =
+        document.getElementById("Pair_PartnerIdDisplay_");
+
+      const nameDisplay =
+        document.getElementById("Pair_PartnerNameDisplay_");
+
+      const fatherDisplay =
+        document.getElementById("Pair_PartnerFatherNameDisplay_");
+
+      if (idDisplay) {
+        idDisplay.textContent =
+          partner.participantId ||
+          partner.Participant_ID ||
+          partner.id ||
+          partnerId;
+      }
+
+      if (nameDisplay) {
+        nameDisplay.textContent =
+          partner.fullName ||
+          partner.Full_Name ||
+          partner.name ||
+          "";
+      }
+
+      if (fatherDisplay) {
+        fatherDisplay.textContent =
+          partner.fatherName ||
+          partner.Father_Name ||
+          "";
+      }
+
+      if (result) {
+        result.style.display = "block";
+      }
+
+      Pair_ShowStatus_("Partner found successfully.");
+
+    } catch (error) {
+      console.error("Pair_FindPartner_:", error);
+
+      const result =
+        document.getElementById("Pair_PartnerResult_");
+
+      if (result) {
+        result.style.display = "none";
+      }
+
+      Pair_ShowStatus_(
+        error.message ||
+        "Unable to find the partner."
       );
 
+    } finally {
+      if (findBtn) {
+        findBtn.disabled = false;
+        findBtn.textContent = "Find Partner";
+      }
     }
+  }
 
-
-    console.log(
-      "PAIR: Parsed response:",
-      data
-    );
-
-
-    /*
-     * -------------------------------------------------------
-     * Check API success
-     * -------------------------------------------------------
-     */
-
-    if (
-      !data.success
-    ) {
-
-      throw new Error(
-        data.message ||
-        "Partner Participant ID not found."
-      );
-
+  async function Pair_SelectPartner_() {
+    if (!window.GSYPairState ||
+        !window.GSYPairState.partner) {
+      Pair_ShowStatus_("Please search for a partner first.");
+      return;
     }
-
-
-    /*
-     * -------------------------------------------------------
-     * Get partner object
-     * -------------------------------------------------------
-     */
 
     const partner =
-      data.partner ||
-      data.data;
+      window.GSYPairState.partner;
 
+    const eventSection =
+      document.getElementById("Pair_EventSection_");
 
-    if (
-      !partner
-    ) {
-
-      throw new Error(
-        "Partner details were not returned by the server."
-      );
-
+    if (eventSection) {
+      eventSection.classList.remove("hidden");
+      eventSection.style.display = "block";
     }
-
-
-    console.log(
-      "PAIR: Partner found:",
-      partner
-    );
-
-
-    /*
-     * -------------------------------------------------------
-     * Save partner in Pair state
-     * -------------------------------------------------------
-     */
-
-    window.GSYPairState.partner =
-      partner;
-
-
-    /*
-     * -------------------------------------------------------
-     * Display Partner ID
-     * -------------------------------------------------------
-     */
-
-    const idDisplay =
-      document.getElementById(
-        "Pair_PartnerIdDisplay_"
-      );
-
-
-    if (idDisplay) {
-
-      idDisplay.textContent =
-        partner.participantId ||
-        partner.Participant_ID ||
-        partner.id ||
-        partnerId;
-
-    }
-
-
-    /*
-     * -------------------------------------------------------
-     * Display Partner Name
-     * -------------------------------------------------------
-     */
-
-    const nameDisplay =
-      document.getElementById(
-        "Pair_PartnerNameDisplay_"
-      );
-
-
-    if (nameDisplay) {
-
-      nameDisplay.textContent =
-        partner.fullName ||
-        partner.Full_Name ||
-        partner.name ||
-        "";
-
-    }
-
-
-    /*
-     * -------------------------------------------------------
-     * Display Father's Name
-     * -------------------------------------------------------
-     */
-
-    const fatherDisplay =
-      document.getElementById(
-        "Pair_PartnerFatherNameDisplay_"
-      );
-
-
-    if (fatherDisplay) {
-
-      fatherDisplay.textContent =
-        partner.fatherName ||
-        partner.Father_Name ||
-        "";
-
-    }
-
-
-    /*
-     * -------------------------------------------------------
-     * Show Partner Result panel
-     * -------------------------------------------------------
-     */
-
-    const result =
-      document.getElementById(
-        "Pair_PartnerResult_"
-      );
-
-
-    if (result) {
-
-      result.classList.remove(
-        "hidden"
-      );
-
-      result.style.display =
-        "block";
-
-    }
-
-
-    Pair_ShowStatus_(
-      "Partner found successfully."
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      "PAIR FIND PARTNER ERROR:",
-      error
-    );
-
-
-    const result =
-      document.getElementById(
-        "Pair_PartnerResult_"
-      );
-
-
-    if (result) {
-
-      result.classList.add(
-        "hidden"
-      );
-
-      result.style.display =
-        "none";
-
-    }
-
-
-    Pair_ShowStatus_(
-      error.message ||
-      "Unable to find the partner."
-    );
-
-
-  } finally {
-
-    if (findBtn) {
-
-      findBtn.disabled =
-        false;
-
-      findBtn.textContent =
-        "Find Partner";
-
-    }
-
-  }
-
-}
-
-   
-
-
-async function Pair_SelectPartner_() {
-
-  /*
-   * -------------------------------------------------------
-   * Make sure a partner has been found first.
-   * -------------------------------------------------------
-   */
-
-  if (
-    !window.GSYPairState ||
-    !window.GSYPairState.partner
-  ) {
-
-    Pair_ShowStatus_(
-      "Please search for a partner first."
-    );
-
-    return;
-  }
-
-
-  const partner =
-    window.GSYPairState.partner;
-
-
-  console.log(
-    "PAIR: Selecting partner:",
-    partner
-  );
-
-
-  /*
-   * -------------------------------------------------------
-   * Get the Pair Event Section
-   * -------------------------------------------------------
-   */
-
-  const eventSection =
-    document.getElementById(
-      "Pair_EventSection_"
-    );
-
-
-  /*
-   * -------------------------------------------------------
-   * IMPORTANT:
-   * Remove the hidden class.
-   *
-   * The .hidden CSS rule uses !important, so setting
-   * style.display = "block" alone is not sufficient.
-   * -------------------------------------------------------
-   */
-
-  if (eventSection) {
-
-    eventSection.classList.remove(
-      "hidden"
-    );
-
-    eventSection.style.display =
-      "block";
-
-  }
-
-
-  /*
-   * -------------------------------------------------------
-   * Load the Pair events.
-   * -------------------------------------------------------
-   */
-
-  try {
 
     await Pair_LoadEvents_();
-
-
-    console.log(
-      "PAIR: Partner selected and Pair events loaded."
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      "PAIR: Error loading events after partner selection:",
-      error
-    );
-
-
-    Pair_ShowStatus_(
-      error.message ||
-      "Unable to load Pair events."
-    );
-
   }
 
-}
+  function Pair_ChangePartner_() {
+    const eventSection =
+      document.getElementById("Pair_EventSection_");
 
-   
+    const partnerResult =
+      document.getElementById("Pair_PartnerResult_");
+
+    const partnerInput =
+      document.getElementById("Pair_PartnerParticipantId_");
+
+    if (eventSection) {
+      eventSection.style.display = "none";
+    }
+
+    if (partnerResult) {
+      partnerResult.style.display = "none";
+    }
+
+    if (partnerInput) {
+      partnerInput.focus();
+    }
+
+    window.GSYPairState.partner = null;
+    window.GSYPairState.events = [];
+    window.GSYPairState.selectedEventIds = [];
+
+    Pair_UpdateSelection_();
+  }
+
   async function Pair_LoadEvents_() {
     const eventMessage =
       document.getElementById("Pair_EventMessage_");
@@ -688,8 +368,7 @@ async function Pair_SelectPartner_() {
       document.getElementById("Pair_EventList_");
 
     if (eventMessage) {
-      eventMessage.textContent =
-        "Checking Pair event availability...";
+      eventMessage.textContent = "Loading Pair events...";
     }
 
     if (eventList) {
@@ -699,7 +378,9 @@ async function Pair_SelectPartner_() {
     try {
       const response = await fetch(
         "data/pair.json",
-        { cache: "no-store" }
+        {
+          cache: "no-store"
+        }
       );
 
       if (!response.ok) {
@@ -740,106 +421,32 @@ async function Pair_SelectPartner_() {
         }
       }
 
-      if (!ctx ||
-          !ctx.auth ||
-          !ctx.auth.currentUser) {
-        throw new Error("Please sign in again.");
-      }
-
-      const partner =
-        window.GSYPairState &&
-        window.GSYPairState.partner
-          ? window.GSYPairState.partner
-          : null;
-
-      if (!partner) {
-        throw new Error("Please select a partner first.");
-      }
-
-      const idToken =
-        await ctx.auth.currentUser.getIdToken(true);
-
-      const availabilityResponse =
-        await fetch(
-          ctx.APPS_SCRIPT_URL,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "text/plain;charset=utf-8"
-            },
-            body: JSON.stringify({
-              action:
-                "Pair_GetEventAvailability",
-              idToken: idToken,
-              partnerParticipantId:
-                partner.participantId ||
-                partner.Participant_ID ||
-                ""
-            })
-          }
-        );
-
-      const availability =
-        await availabilityResponse.json();
-
-      if (!availability.success) {
-        throw new Error(
-          availability.message ||
-          "Unable to verify Pair event availability."
-        );
-      }
-
       window.GSYPairState.events =
         catalogue.events;
 
-      window.GSYPairState.blockedEventIds =
-        Array.isArray(availability.blockedEventIds)
-          ? availability.blockedEventIds
-          : [];
-
       Pair_RenderEvents_();
 
-      const blockedCount =
-        window.GSYPairState.blockedEventIds.length;
-
       if (eventMessage) {
-        if (blockedCount === catalogue.events.length) {
-          eventMessage.textContent =
-            "Both Pair events are already registered or reserved for this pair.";
-        } else if (blockedCount > 0) {
-          eventMessage.textContent =
-            "An event already enrolled by this pair is disabled. Please select an available Pair event.";
-        } else {
-          eventMessage.textContent =
-            catalogue.selectionMessage ||
-            "Select one or both Pair events.";
-        }
+        eventMessage.textContent =
+          catalogue.selectionMessage ||
+          "Select one or both Pair events.";
       }
 
     } catch (error) {
       console.error("Pair_LoadEvents_:", error);
 
-      window.GSYPairState.events = [];
-      window.GSYPairState.blockedEventIds = [];
-
-      if (eventList) {
-        eventList.innerHTML = "";
-      }
-
       if (eventMessage) {
         eventMessage.textContent =
           error.message ||
-          "Unable to verify Pair event availability.";
+          "Unable to load Pair events.";
       }
 
       Pair_ShowStatus_(
         error.message ||
-        "Unable to verify Pair event availability."
+        "Unable to load Pair events."
       );
     }
   }
-
 
   function Pair_RenderEvents_() {
     const eventList =
@@ -852,20 +459,7 @@ async function Pair_SelectPartner_() {
     const events =
       window.GSYPairState.events || [];
 
-    const blockedEventIds =
-      new Set(
-        (window.GSYPairState.blockedEventIds || [])
-          .map(function(id) {
-            return String(id).trim();
-          })
-      );
-
     events.forEach(function (event) {
-      const blocked =
-        blockedEventIds.has(
-          String(event.eventId).trim()
-        );
-
       const wrapper =
         document.createElement("label");
 
@@ -874,10 +468,7 @@ async function Pair_SelectPartner_() {
       wrapper.style.padding = "12px";
       wrapper.style.border = "1px solid #ddd";
       wrapper.style.borderRadius = "8px";
-      wrapper.style.cursor =
-        blocked ? "not-allowed" : "pointer";
-      wrapper.style.opacity =
-        blocked ? "0.65" : "1";
+      wrapper.style.cursor = "pointer";
 
       const checkbox =
         document.createElement("input");
@@ -885,15 +476,13 @@ async function Pair_SelectPartner_() {
       checkbox.type = "checkbox";
       checkbox.dataset.eventId =
         event.eventId;
-      checkbox.disabled = blocked;
+
       checkbox.style.marginRight = "10px";
 
-      if (!blocked) {
-        checkbox.addEventListener(
-          "change",
-          Pair_UpdateSelection_
-        );
-      }
+      checkbox.addEventListener(
+        "change",
+        Pair_UpdateSelection_
+      );
 
       const title =
         document.createElement("strong");
@@ -917,221 +506,84 @@ async function Pair_SelectPartner_() {
       wrapper.appendChild(title);
       wrapper.appendChild(fee);
 
-      if (blocked) {
-        const note =
-          document.createElement("div");
-
-        note.textContent =
-          "Already enrolled for this pair";
-
-        note.style.marginTop = "6px";
-        note.style.fontSize = "12px";
-        note.style.fontWeight = "600";
-
-        wrapper.appendChild(note);
-      }
-
       eventList.appendChild(wrapper);
     });
 
     Pair_UpdateSelection_();
   }
 
+  function Pair_UpdateSelection_() {
+    const eventList =
+      document.getElementById("Pair_EventList_");
 
+    const summary =
+      document.getElementById("Pair_SelectionSummary_");
 
+    const count =
+      document.getElementById("Pair_SelectionCount_");
 
-function Pair_UpdateSelection_() {
+    const total =
+      document.getElementById("Pair_SelectionTotal_");
 
-  const eventList =
-    document.getElementById(
-      "Pair_EventList_"
-    );
+    const proceedBtn =
+      document.getElementById("Pair_ProceedToPaymentBtn_");
 
+    if (!eventList) return;
 
-  const summary =
-    document.getElementById(
-      "Pair_SelectionSummary_"
-    );
+    const checked =
+      Array.from(
+        eventList.querySelectorAll(
+          'input[type="checkbox"]:checked'
+        )
+      );
 
-
-  const count =
-    document.getElementById(
-      "Pair_SelectionCount_"
-    );
-
-
-  const total =
-    document.getElementById(
-      "Pair_SelectionTotal_"
-    );
-
-
-  const proceedBtn =
-    document.getElementById(
-      "Pair_ProceedToPaymentBtn_"
-    );
-
-
-  if (!eventList) {
-    return;
-  }
-
-
-  /*
-   * -------------------------------------------------------
-   * Get all selected Pair events
-   * -------------------------------------------------------
-   */
-
-  const checked =
-    Array.from(
-      eventList.querySelectorAll(
-        'input[type="checkbox"]:checked'
-      )
-    );
-
-
-  const selectedIds =
-    checked.map(
-      function (checkbox) {
+    const selectedIds =
+      checked.map(function (checkbox) {
         return checkbox.dataset.eventId;
-      }
-    );
+      });
 
+    window.GSYPairState.selectedEventIds =
+      selectedIds;
 
-  /*
-   * -------------------------------------------------------
-   * Save selected event IDs
-   * -------------------------------------------------------
-   */
+    let selectedTotal = 0;
 
-  if (
-    !window.GSYPairState
-  ) {
-
-    window.GSYPairState = {
-      partner: null,
-      events: [],
-      selectedEventIds: []
-    };
-
-  }
-
-
-  window.GSYPairState.selectedEventIds =
-    selectedIds;
-
-
-  /*
-   * -------------------------------------------------------
-   * Calculate total amount
-   * -------------------------------------------------------
-   */
-
-  let selectedTotal =
-    0;
-
-
-  selectedIds.forEach(
-    function (eventId) {
-
+    selectedIds.forEach(function (eventId) {
       const event =
         (window.GSYPairState.events || [])
-          .find(
-            function (item) {
-
-              return (
-                String(
-                  item.eventId || ""
-                ).trim() ===
-                String(
-                  eventId || ""
-                ).trim()
-              );
-
-            }
-          );
-
+          .find(function (item) {
+            return item.eventId === eventId;
+          });
 
       if (event) {
-
         selectedTotal +=
-          Number(
-            event.fee || 0
-          );
-
+          Number(event.fee || 0);
       }
+    });
 
+    if (count) {
+      count.textContent =
+        String(selectedIds.length);
     }
-  );
 
+    if (total) {
+      total.textContent =
+        "₹" +
+        selectedTotal.toLocaleString("en-IN");
+    }
 
-  /*
-   * -------------------------------------------------------
-   * Update count
-   * -------------------------------------------------------
-   */
+    if (summary) {
+      summary.style.display =
+        selectedIds.length > 0
+          ? "block"
+          : "none";
+    }
 
-  if (count) {
-
-    count.textContent =
-      String(
-        selectedIds.length
-      );
-
+    if (proceedBtn) {
+      proceedBtn.disabled =
+        selectedIds.length === 0;
+    }
   }
 
-
-  /*
-   * -------------------------------------------------------
-   * Update total
-   * -------------------------------------------------------
-   */
-
-  if (total) {
-
-    total.textContent =
-      "₹" +
-      selectedTotal.toLocaleString(
-        "en-IN"
-      );
-
-  }
-
-
-  /*
-   * -------------------------------------------------------
-   * Show / hide selection summary
-   * -------------------------------------------------------
-   */
-
-  if (summary) {
-
-    summary.style.display =
-      selectedIds.length > 0
-        ? "block"
-        : "none";
-
-  }
-
-
-  /*
-   * -------------------------------------------------------
-   * Enable payment button only when at least
-   * one Pair event is selected.
-   * -------------------------------------------------------
-   */
-
-  if (proceedBtn) {
-
-    proceedBtn.disabled =
-      selectedIds.length === 0;
-
-  }
-
-}
-
-   
   async function Pair_CreatePaymentLink_() {
     const state =
       window.GSYPairState;
