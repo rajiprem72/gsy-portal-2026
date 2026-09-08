@@ -673,6 +673,7 @@
 }
 
     
+  
     /* =========================================================
        PAIR REGISTRATION
     ========================================================== */
@@ -707,7 +708,6 @@
     .pair-partner-detail strong {
       color: #2c5f2d;
     }
-
 
   </style>
 </head>
@@ -860,6 +860,7 @@
                 autocomplete="name"
               >
             </div>
+
             <div class="profile-field">
               <label for="profileMobileNumber">Mobile Number</label>
               <input type="tel" id="profileMobileNumber" inputmode="tel" autocomplete="tel">
@@ -1162,6 +1163,7 @@
         </div>
 
 
+
         <div
           id="cataloguePanel"
           class="catalogue-panel hidden">
@@ -1390,7 +1392,7 @@
     const profileParticipantId = document.getElementById("profileParticipantId");
     const profileLoginEmail = document.getElementById("profileLoginEmail");
     const profileFullName = document.getElementById("profileFullName");
-    const profileFatherName =   document.getElementById("profileFatherName");
+    const profileFatherName = document.getElementById("profileFatherName");
     const profileMobileNumber = document.getElementById("profileMobileNumber");
     const profileDateOfBirth = document.getElementById("profileDateOfBirth");
     const profileGender = document.getElementById("profileGender");
@@ -1485,60 +1487,27 @@
 
 
 
-      function normalizeDateForInput(value) {
+    function normalizeDateForInput(value) {
 
-  if (!value) return "";
+      if (!value) return "";
 
-  /*
-   * -------------------------------------------------------
-   * If the value already contains YYYY-MM-DD,
-   * use that date exactly as it is.
-   *
-   * This prevents timezone-related date shifting.
-   * -------------------------------------------------------
-   */
+      const text = String(value).trim();
+      const match = text.match(/(\d{4}-\d{2}-\d{2})/);
 
-  const text =
-    String(value).trim();
+      if (match) return match[1];
 
-  const match =
-    text.match(
-      /(\d{4}-\d{2}-\d{2})/
-    );
+      const parsed = new Date(text);
 
-  if (match) {
-    return match[1];
-  }
+      if (!isNaN(parsed.getTime())) {
+        return (
+          parsed.getFullYear() +
+          "-" +
+          String(parsed.getMonth() + 1).padStart(2, "0") +
+          "-" +
+          String(parsed.getDate()).padStart(2, "0")
+        );
+      }
 
-
-  /*
-   * -------------------------------------------------------
-   * Fallback for genuine Date values.
-   * -------------------------------------------------------
-   */
-
-  const parsed =
-    new Date(value);
-
-  if (
-    !isNaN(
-      parsed.getTime()
-    )
-  ) {
-
-    return (
-      parsed.getFullYear() +
-      "-" +
-      String(
-        parsed.getMonth() + 1
-      ).padStart(2, "0") +
-      "-" +
-      String(
-        parsed.getDate()
-      ).padStart(2, "0")
-    );
-
-  }
       return "";
     }
 
@@ -1660,12 +1629,9 @@
 
 
 
-   let currentMode = "";
-let currentEventData = null;
+    let currentMode = "";
+    let currentEventData = null;
 
-let registeredEventIds =
-  new Set();
-    
 
     function formatINR(amount) {
 
@@ -1833,59 +1799,18 @@ let registeredEventIds =
             safeId;
 
 
-         checkbox.dataset.eventId =
-  event.eventId || "";
+          checkbox.dataset.eventId =
+            event.eventId || "";
 
 
-/*
- * -------------------------------------------------------
- * Check whether this participant has already registered
- * for this event.
- * -------------------------------------------------------
- */
+          checkbox.dataset.fee =
+            event.fee !== undefined
+              ? event.fee
+              : (
+                  event.perPersonFee ||
+                  0
+                );
 
-const eventId =
-  String(
-    event.eventId || ""
-  ).trim();
-
-
-const alreadyRegistered =
-  registeredEventIds.has(
-    eventId
-  );
-
-
-/*
- * -------------------------------------------------------
- * Already registered events cannot be selected again.
- * -------------------------------------------------------
- */
-
-if (
-  alreadyRegistered
-) {
-
-  checkbox.disabled =
-    true;
-
-  checkbox.checked =
-    false;
-
-  row.classList.add(
-    "event-already-registered"
-  );
-
-}
-
-
-checkbox.dataset.fee =
-  event.fee !== undefined
-    ? event.fee
-    : (
-        event.perPersonFee ||
-        0
-      );
 
           const label =
             document.createElement(
@@ -2165,6 +2090,15 @@ checkbox.dataset.fee =
               currentMode =
                 button.dataset.mode ||
                 "";
+
+              /*
+               * Pair mode is owned exclusively by pair.js.
+               * Skipping it here preserves the original, proven
+               * click flow for Individual / Rhythmic / Artistic.
+               */
+              if (currentMode === "Pair") {
+                return;
+              }
 
 
               joinPanel.classList.add(
@@ -2766,69 +2700,38 @@ onAuthStateChanged(
           "info"
         );
 
-  
+
         const profile =
-  await getAuthenticatedParticipantProfile();
-
-/*
- * -------------------------------------------------------
- * Build a list of Event IDs already registered
- * by this participant.
- *
- * These Event IDs will later be disabled
- * in the event catalogue.
- * -------------------------------------------------------
- */
-
-registeredEventIds =
-  new Set(
-    (profile.registeredEvents || [])
-      .map(
-        function(event) {
-
-          return String(
-            event.eventId || ""
-          ).trim();
-
-        }
-      )
-      .filter(
-        function(eventId) {
-
-          return eventId !== "";
-
-        }
-      )
-  );
+          await getAuthenticatedParticipantProfile();
 
 
-welcomeTitle.textContent =
-  "Welcome, " +
-  (
-    profile.fullName ||
-    "Participant"
-  );
+        welcomeTitle.textContent =
+          "Welcome, " +
+          (
+            profile.fullName ||
+            "Participant"
+          );
 
 
-participantId.textContent =
-  profile.participantId ||
-  "—";
+        participantId.textContent =
+          profile.participantId ||
+          "—";
 
 
-participantName.textContent =
-  profile.fullName ||
-  "—";
+        participantName.textContent =
+          profile.fullName ||
+          "—";
 
 
-loginEmail.textContent =
-  profile.loginEmail ||
-  profile.email ||
-  "—";
+        loginEmail.textContent =
+          profile.loginEmail ||
+          profile.email ||
+          "—";
 
-
-renderRegisteredEvents(
-  profile.registeredEvents || []
-);
+        renderRegisteredEvents(
+        profile.registeredEvents || []
+        );
+        
         populateParticipantProfile(
           profile
         );
@@ -2874,9 +2777,14 @@ renderRegisteredEvents(
       "Global School of Yoga Participant Dashboard initialized successfully."
     );
 
+
+    console.log(
+      "Global School of Yoga Participant Dashboard initialized successfully."
+    );
+
     /* =========================================================
        PAIR FRONTEND CONTEXT
-       Pair logic is kept in pair.js.
+       Pair logic is kept in js/pair.js.
        Existing Individual functions remain untouched.
     ========================================================= */
 
@@ -2887,49 +2795,6 @@ renderRegisteredEvents(
       joinPanel: joinPanel,
       cataloguePanel: cataloguePanel,
       joinAnotherEventBtn: joinAnotherEventBtn
-    };
-
-    /* =========================================================
-       STABLE GLOBAL MODE OPENER
-       Keeps mode opening independent of local module listener
-       registration. Existing Individual payment code is untouched.
-    ========================================================== */
-    window.GSYOpenMode_ = async function(mode) {
-      try {
-        currentMode = String(mode || '').trim();
-
-        joinPanel.classList.add('hidden');
-
-        if (currentMode === 'Pair') {
-          if (typeof window.Pair_Start_ === 'function') {
-            window.Pair_Start_();
-            return;
-          }
-          throw new Error('Pair module is not ready yet.');
-        }
-
-        cataloguePanel.classList.remove('hidden');
-
-        showStatus(
-          'Loading ' + currentMode + ' event options...',
-          'info'
-        );
-
-        await loadEventCatalogue(currentMode);
-
-        showStatus(
-          currentMode + ' event options are ready.',
-          'success'
-        );
-      } catch (error) {
-        console.error('GSY mode open error:', error);
-        showStatus(
-          error && error.message
-            ? error.message
-            : 'Unable to load event options.',
-          'error'
-        );
-      }
     };
 
   /* =========================================================
@@ -3188,51 +3053,8 @@ function escapeHtml(
   
   </script>
 
-  <script>
-    /* =========================================================
-       STABLE MODE CLICK FALLBACK
-       Delegated listener for Individual/Pair/Rhythmic/Artistic.
-    ========================================================== */
-    (function () {
-      function install() {
-        if (window.__GSY_MODE_FALLBACK_INSTALLED__) return;
-
-        const cards = document.querySelectorAll('.mode-card');
-        if (!cards.length) {
-          setTimeout(install, 100);
-          return;
-        }
-
-        document.addEventListener('click', function (event) {
-          const card = event.target.closest('.mode-card');
-          if (!card) return;
-
-          const mode = card.dataset.mode || '';
-
-          /* Pair's capture listener handles Pair itself. */
-          if (mode === 'Pair' && typeof window.Pair_Start_ === 'function') {
-            return;
-          }
-
-          if (typeof window.GSYOpenMode_ === 'function') {
-            event.preventDefault();
-            window.GSYOpenMode_(mode);
-          }
-        });
-
-        window.__GSY_MODE_FALLBACK_INSTALLED__ = true;
-        console.log('GSY mode click fallback listener installed.');
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', install);
-      } else {
-        install();
-      }
-    })();
-  </script>
-
-  <script type="module" src="js/pair.js"></script>
+  <!-- Pair registration logic -->
+  <script src="js/pair.js"></script>
 
 </body>
 </html>
