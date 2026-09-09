@@ -1787,6 +1787,11 @@
 
     let currentMode = "";
     let currentEventData = null;
+
+    /* =========================================================
+       INDIVIDUAL - ALREADY REGISTERED EVENT TRACKING
+       Used only by the Individual event catalogue.
+    ========================================================== */
     let registeredEventIds = new Set();
 
 
@@ -1969,8 +1974,13 @@
                 );
 
 
-          const alreadyRegistered =
-            mode === "Individual" &&
+          /*
+           * Prevent re-registration of an Individual event
+           * that this participant has already joined.
+           * Other Yoga Modes are not affected.
+           */
+          const isAlreadyRegisteredIndividualEvent =
+            String(mode).toLowerCase() === "individual" &&
             registeredEventIds.has(
               String(
                 event.eventId ||
@@ -1978,11 +1988,8 @@
               ).trim()
             );
 
-
-          if (alreadyRegistered) {
+          if (isAlreadyRegisteredIndividualEvent) {
             checkbox.disabled = true;
-            row.style.opacity = "0.6";
-            row.style.cursor = "not-allowed";
           }
 
 
@@ -1994,6 +2001,10 @@
 
           label.className =
             "event-option-label";
+
+          if (isAlreadyRegisteredIndividualEvent) {
+            label.style.cursor = "not-allowed";
+          }
 
 
           label.htmlFor =
@@ -2014,11 +2025,10 @@
             event.eventName ||
             "Event";
 
-
-          if (alreadyRegistered) {
+          if (isAlreadyRegisteredIndividualEvent) {
             name.style.textDecoration = "line-through";
             name.style.textDecorationThickness = "2px";
-            name.style.cursor = "not-allowed";
+            name.style.opacity = "0.65";
           }
 
 
@@ -2888,22 +2898,20 @@ onAuthStateChanged(
         const profile =
           await getAuthenticatedParticipantProfile();
 
-        registeredEventIds = new Set(
-          (profile.registeredEvents || []).map(
-            function(event) {
-              return String(
-                event.eventId ||
-                event.Event_ID ||
-                ""
-              ).trim();
-            }
-          ).filter(
-            function(eventId) {
-              return eventId !== "";
-            }
-          )
-        );
-
+        registeredEventIds =
+          new Set(
+            (profile.registeredEvents || [])
+              .map(function(event) {
+                return String(
+                  event.eventId ||
+                  event.Event_ID ||
+                  ""
+                ).trim();
+              })
+              .filter(function(eventId) {
+                return eventId !== "";
+              })
+          );
 
         welcomeTitle.textContent =
           "Welcome, " +
