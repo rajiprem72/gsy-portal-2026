@@ -1177,35 +1177,126 @@
           </div>
 
           <div class="catalogue-subtitle" id="Group_Subtitle_">
-            Enter the Participant IDs for your group.
+            Add your group participants one at a time.
           </div>
 
-          <div id="Group_ModeHelp_" class="selection-message"></div>
+          <div
+            id="Group_ModeHelp_"
+            class="selection-message"
+            style="margin-bottom:14px;">
+          </div>
 
-          <div id="Group_ParticipantInputs_"></div>
-
-          <div id="Group_VerifiedParticipants_" class="selection-message"></div>
+          <div
+            class="profile-field full-width"
+            style="margin-bottom:12px;">
+            <label>
+              Participant ID
+            </label>
+            <input
+              type="text"
+              id="Group_ParticipantInput_"
+              placeholder="Example: GSY000004"
+              autocomplete="off"
+              maxlength="20">
+          </div>
 
           <button
             type="button"
             id="Group_VerifyBtn_"
             class="primary-action">
-            🔎 Verify Participants
+            🔎 Search Participant
           </button>
 
-          <div id="Group_EventSection_" class="hidden" style="margin-top:16px;">
-            <div class="catalogue-subtitle" id="Group_EventMessage_"></div>
+          <div
+            id="Group_SearchResult_"
+            class="pair-partner-result hidden"
+            style="margin-top:14px;">
+
+            <div class="pair-partner-title">
+              Participant Found
+            </div>
+
+            <div class="pair-partner-detail">
+              <strong>Participant ID:</strong>
+              <span id="Group_SearchResultId_"></span>
+            </div>
+
+            <div class="pair-partner-detail">
+              <strong>Name:</strong>
+              <span id="Group_SearchResultName_"></span>
+            </div>
+
+            <div class="pair-partner-detail">
+              <strong>Father's Name:</strong>
+              <span id="Group_SearchResultFather_"></span>
+            </div>
+
+            <button
+              type="button"
+              id="Group_AddParticipantBtn_"
+              class="primary-action">
+              ✅ Add Participant
+            </button>
+
+          </div>
+
+          <div
+            id="Group_ParticipantProgress_"
+            class="selection-message"
+            style="margin-top:16px;">
+          </div>
+
+          <div
+            id="Group_ParticipantList_"
+            style="margin-top:10px;">
+          </div>
+
+          <!-- Kept for backward compatibility with the group module. -->
+          <div
+            id="Group_ParticipantInputs_"
+            style="display:none;">
+          </div>
+
+          <div
+            id="Group_VerifiedParticipants_"
+            class="selection-message"
+            style="margin-top:10px;">
+          </div>
+
+          <div
+            id="Group_EventSection_"
+            class="hidden"
+            style="margin-top:20px;">
+
+            <div
+              class="catalogue-title"
+              style="margin-top:0;">
+              Select Group Event
+            </div>
+
+            <div
+              class="catalogue-subtitle"
+              id="Group_EventMessage_">
+            </div>
+
             <div id="Group_EventList_"></div>
 
             <div
               id="Group_SelectionSummary_"
               class="selection-summary hidden">
-              <div class="selection-count" id="Group_SelectionCount_">
+
+              <div
+                class="selection-count"
+                id="Group_SelectionCount_">
                 0 events selected
               </div>
-              <div class="selection-total" id="Group_SelectionTotal_">
+
+              <div
+                class="selection-total"
+                id="Group_SelectionTotal_">
                 Total: ₹0
               </div>
+
             </div>
 
             <button
@@ -1215,16 +1306,19 @@
               disabled>
               💳 Proceed to Payment
             </button>
+
           </div>
 
           <button
             type="button"
             id="Group_BackToModeBtn_"
-            class="back-mode-btn">
+            class="back-mode-btn"
+            style="margin-top:14px;">
             ← Back to Yoga Mode
           </button>
 
         </div>
+
 
         <div
           id="cataloguePanel"
@@ -2896,79 +2990,173 @@ function renderRegisteredEvents(
   }
 
   const grouped = {};
+
   registeredEvents.forEach(function (event) {
-    const mode = String(event.category || event.mode || "Individual").trim() || "Individual";
+    const mode = String(
+      event.category ||
+      event.mode ||
+      event.Category ||
+      event.Mode ||
+      "Individual"
+    ).trim() || "Individual";
+
     if (!grouped[mode]) grouped[mode] = [];
     grouped[mode].push(event);
   });
 
-  const modeOrder = ["Individual", "Pair", "Rhythmic", "Artistic"];
+  const modeOrder = [
+    "Individual",
+    "Pair",
+    "Rhythmic",
+    "Artistic"
+  ];
+
   let html = "";
 
-  modeOrder.concat(Object.keys(grouped).filter(m => modeOrder.indexOf(m) === -1)).forEach(function (mode) {
-    if (!grouped[mode]) return;
+  modeOrder
+    .concat(
+      Object.keys(grouped).filter(function (mode) {
+        return modeOrder.indexOf(mode) === -1;
+      })
+    )
+    .forEach(function (mode) {
+      if (!grouped[mode]) return;
 
-    html += `
-      <div class="registered-mode-group" style="margin-bottom:18px;">
-        <div style="font-size:1.05rem;font-weight:700;margin:0 0 10px 0;">
-          ${escapeHtml(mode === "Rhythmic" ? "Rhythmic Group" : mode === "Artistic" ? "Artistic Group" : mode)}
-        </div>`;
-
-    const groups = {};
-    grouped[mode].forEach(function (event) {
-      const key = event.groupId || event.registrationId || (event.eventId + "_" + event.participantId);
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(event);
-    });
-
-    Object.keys(groups).forEach(function (groupKey) {
-      const events = groups[groupKey];
-      const first = events[0] || {};
-      const participantNames = events
-        .map(e => e.participantName || e.fullName || e.participantId)
-        .filter(Boolean);
-      const uniqueNames = Array.from(new Set(participantNames));
+      const modeTitle =
+        mode === "Rhythmic"
+          ? "Rhythmic Group"
+          : mode === "Artistic"
+            ? "Artistic Group"
+            : mode;
 
       html += `
-        <div class="registered-event" style="margin-bottom:10px;">
-          <div class="registered-event-header">
-            <div>
-              <div class="registered-event-name">${escapeHtml(first.eventName || "Event")}</div>
-              <div class="registered-event-id">Group ID: ${escapeHtml(first.groupId || "—")}</div>
-            </div>
-            <div class="registered-event-status">✓ Confirmed</div>
-          </div>
-          <div class="registered-event-details">
-            <div class="registered-detail">
-              <div class="registered-detail-label">Event ID</div>
-              <div class="registered-detail-value">${escapeHtml(first.eventId || "—")}</div>
-            </div>
-            <div class="registered-detail">
-              <div class="registered-detail-label">Participants</div>
-              <div class="registered-detail-value">${escapeHtml(String(uniqueNames.length || events.length))}</div>
-            </div>
-            <div class="registered-detail">
-              <div class="registered-detail-label">Participant IDs</div>
-              <div class="registered-detail-value">${escapeHtml(Array.from(new Set(events.map(e => e.participantId).filter(Boolean))).join(", ") || "—")}</div>
-            </div>
-            <div class="registered-detail">
-              <div class="registered-detail-label">Amount</div>
-              <div class="registered-detail-value">₹${Number(first.entryFee || first.fee || (events[0] && events[0].perPersonFee) || 0).toLocaleString("en-IN")}</div>
-            </div>
-            <div class="registered-detail">
-              <div class="registered-detail-label">Event Date</div>
-              <div class="registered-detail-value">${escapeHtml(first.eventDate || "—")}</div>
-            </div>
-          </div>
-        </div>`;
-    });
+        <div class="registered-mode-group" style="margin-bottom:22px;">
+          <div style="font-size:1.05rem;font-weight:700;margin:0 0 10px 0;">
+            ${escapeHtml(modeTitle)}
+          </div>`;
 
-    html += `</div>`;
-  });
+      const groups = {};
+
+      grouped[mode].forEach(function (event) {
+        const groupId =
+          event.groupId ||
+          event.Group_ID ||
+          event.registrationId ||
+          event.Registration_ID ||
+          (event.eventId || "EVENT") + "_" + (event.participantId || "PARTICIPANT");
+
+        if (!groups[groupId]) groups[groupId] = [];
+        groups[groupId].push(event);
+      });
+
+      Object.keys(groups).forEach(function (groupKey) {
+        const rows = groups[groupKey];
+        const first = rows[0] || {};
+
+        const participantIds = Array.from(
+          new Set(
+            rows
+              .map(function (row) {
+                return row.participantId || row.Participant_ID || "";
+              })
+              .filter(Boolean)
+          )
+        );
+
+        const participantNames = Array.from(
+          new Set(
+            rows
+              .map(function (row) {
+                return row.participantName || row.fullName || row.Full_Name || "";
+              })
+              .filter(Boolean)
+          )
+        );
+
+        let totalAmount = 0;
+
+        rows.forEach(function (row) {
+          totalAmount += Number(
+            row.entryFee ||
+            row.Entry_Fee ||
+            row.fee ||
+            row.Fee ||
+            row.perPersonFee ||
+            row.Per_Person_Fee ||
+            0
+          );
+        });
+
+        html += `
+          <div class="registered-event" style="margin-bottom:12px;">
+            <div class="registered-event-header">
+              <div>
+                <div class="registered-event-name">
+                  ${escapeHtml(first.eventName || first.Event_Name || "Event")}
+                </div>
+                <div class="registered-event-id">
+                  ${escapeHtml(
+                    first.groupId ||
+                    first.Group_ID
+                      ? "Group ID: " + (first.groupId || first.Group_ID)
+                      : "Registration"
+                  )}
+                </div>
+              </div>
+              <div class="registered-event-status">✓ Confirmed</div>
+            </div>
+
+            <div class="registered-event-details">
+              <div class="registered-detail">
+                <div class="registered-detail-label">Event ID</div>
+                <div class="registered-detail-value">
+                  ${escapeHtml(first.eventId || first.Event_ID || "—")}
+                </div>
+              </div>
+
+              <div class="registered-detail">
+                <div class="registered-detail-label">Participants</div>
+                <div class="registered-detail-value">
+                  ${escapeHtml(String(participantIds.length || rows.length || 1))}
+                </div>
+              </div>
+
+              <div class="registered-detail">
+                <div class="registered-detail-label">Participant IDs</div>
+                <div class="registered-detail-value">
+                  ${escapeHtml(participantIds.join(", ") || "—")}
+                </div>
+              </div>
+
+              <div class="registered-detail">
+                <div class="registered-detail-label">Participants</div>
+                <div class="registered-detail-value">
+                  ${escapeHtml(participantNames.join(", ") || "—")}
+                </div>
+              </div>
+
+              <div class="registered-detail">
+                <div class="registered-detail-label">Amount Paid</div>
+                <div class="registered-detail-value">
+                  ₹${Number(totalAmount).toLocaleString("en-IN")}
+                </div>
+              </div>
+
+              <div class="registered-detail">
+                <div class="registered-detail-label">Event Date</div>
+                <div class="registered-detail-value">
+                  ${escapeHtml(first.eventDate || first.Event_Date || "22 Nov 2026")}
+                </div>
+              </div>
+            </div>
+          </div>`;
+      });
+
+      html += `</div>`;
+    });
 
   box.innerHTML = html;
 }
-
 
 /* =========================================================
    ESCAPE HTML
