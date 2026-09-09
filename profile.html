@@ -370,11 +370,6 @@
       line-height: 1.4;
     }
 
-    .event-name.already-registered {
-      text-decoration: line-through;
-      opacity: 0.65;
-    }
-
     .event-round {
       display: inline-block;
       margin-top: 3px;
@@ -1974,19 +1969,20 @@
                 );
 
 
-          const eventId =
-            String(
-              event.eventId ||
-              ""
-            ).trim();
-
           const alreadyRegistered =
-            eventId !== "" &&
-            registeredEventIds.has(eventId);
+            mode === "Individual" &&
+            registeredEventIds.has(
+              String(
+                event.eventId ||
+                ""
+              ).trim()
+            );
+
 
           if (alreadyRegistered) {
             checkbox.disabled = true;
-            checkbox.title = "Already registered";
+            row.style.opacity = "0.6";
+            row.style.cursor = "not-allowed";
           }
 
 
@@ -2020,9 +2016,9 @@
 
 
           if (alreadyRegistered) {
-            name.classList.add(
-              "already-registered"
-            );
+            name.style.textDecoration = "line-through";
+            name.style.textDecorationThickness = "2px";
+            name.style.cursor = "not-allowed";
           }
 
 
@@ -2892,20 +2888,21 @@ onAuthStateChanged(
         const profile =
           await getAuthenticatedParticipantProfile();
 
-        registeredEventIds =
-          new Set(
-            (profile.registeredEvents || [])
-              .map(function (event) {
-                return String(
-                  event.eventId ||
-                  event.Event_ID ||
-                  ""
-                ).trim();
-              })
-              .filter(function (eventId) {
-                return eventId !== "";
-              })
-          );
+        registeredEventIds = new Set(
+          (profile.registeredEvents || []).map(
+            function(event) {
+              return String(
+                event.eventId ||
+                event.Event_ID ||
+                ""
+              ).trim();
+            }
+          ).filter(
+            function(eventId) {
+              return eventId !== "";
+            }
+          )
+        );
 
 
         welcomeTitle.textContent =
@@ -3173,9 +3170,44 @@ function renderRegisteredEvents(
               </div>
 
               <div class="registered-detail">
-                <div class="registered-detail-label">Participants</div>
+                <div class="registered-detail-label">Total Participants</div>
                 <div class="registered-detail-value">
-                  ${escapeHtml(participantNames.join(", ") || "—")}
+                  ${escapeHtml(
+                    (function () {
+                      const modeName = String(
+                        first.category ||
+                        first.mode ||
+                        first.Category ||
+                        first.Mode ||
+                        mode ||
+                        "Individual"
+                      ).trim().toLowerCase();
+
+                      if (modeName === "individual") return "1";
+                      if (modeName === "pair") return "2";
+                      if (modeName === "rhythmic") return "5";
+
+                      /*
+                       * Artistic: use an actual count when the backend
+                       * provides one; otherwise retain the valid range.
+                       */
+                      if (modeName === "artistic") {
+                        const actualCount =
+                          first.participantCount ||
+                          first.totalParticipants ||
+                          first.participantsCount ||
+                          first.Participant_Count;
+
+                        if (actualCount) {
+                          return String(actualCount);
+                        }
+
+                        return "6–12";
+                      }
+
+                      return "1";
+                    })()
+                  )}
                 </div>
               </div>
 
