@@ -122,7 +122,6 @@
     }
 
     if (eventSection) {
-      eventSection.classList.add("hidden");
       eventSection.style.display = "none";
     }
 
