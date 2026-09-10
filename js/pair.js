@@ -322,7 +322,7 @@
 
   /* ============================================================
      SEARCH PARTNER
-     Uses the proven Pair_FindPartner backend route.
+     Uses the proven Pair_SearchParticipant_() backend route.
      ============================================================ */
 
   async function Pair_SearchParticipant_() {
