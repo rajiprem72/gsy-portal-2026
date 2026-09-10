@@ -1,7 +1,7 @@
 /* ============================================================
    pair.js
    Global School of Yoga — Pair Event Registration
-   updated 10 Sep 2026 11:36 AM
+   updated 10 Sep 2026 11:57 AM
    ============================================================ */
 
 (function () {
@@ -21,27 +21,72 @@
   }
 
 
-   function Pair_Initialize_() {
+  function Pair_Initialize_() {
   if (initialized || !ctx) return;
   initialized = true;
 
-  const partnerInput =
-    document.getElementById("Pair_PartnerParticipantId_");
+  /*
+   * =========================================================
+   * PAIR MODE BUTTON
+   * Same working pattern as group.js
+   * =========================================================
+   */
+
+  document
+    .querySelectorAll('.mode-card[data-mode="Pair"]')
+    .forEach(function (card) {
+
+      card.addEventListener(
+        "click",
+        function (event) {
+
+          event.preventDefault();
+          event.stopImmediatePropagation();
+
+          Pair_Start_();
+
+        },
+        true
+      );
+
+    });
+
+
+  /*
+   * =========================================================
+   * PAIR CONTROLS
+   * =========================================================
+   */
 
   const findPartnerBtn =
-    document.getElementById("Pair_FindPartnerBtn_");
+    document.getElementById(
+      "Pair_FindPartnerBtn_"
+    );
 
   const selectPartnerBtn =
-    document.getElementById("Pair_SelectPartnerBtn_");
+    document.getElementById(
+      "Pair_SelectPartnerBtn_"
+    );
 
   const changePartnerBtn =
-    document.getElementById("Pair_ChangePartnerBtn_");
+    document.getElementById(
+      "Pair_ChangePartnerBtn_"
+    );
+
+  const partnerInput =
+    document.getElementById(
+      "Pair_PartnerParticipantId_"
+    );
 
   const proceedBtn =
-    document.getElementById("Pair_ProceedToPaymentBtn_");
+    document.getElementById(
+      "Pair_ProceedToPaymentBtn_"
+    );
 
   const backBtn =
-    document.getElementById("Pair_BackToModeBtn_");
+    document.getElementById(
+      "Pair_BackToModeBtn_"
+    );
 
 
   if (findPartnerBtn) {
@@ -79,57 +124,29 @@
     );
   }
 
+
   if (partnerInput) {
+
     partnerInput.addEventListener(
       "keydown",
       function (event) {
+
         if (event.key === "Enter") {
+
           event.preventDefault();
+
           Pair_SearchParticipant_();
+
         }
+
       }
     );
+
   }
-
-
-  /*
-   * ---------------------------------------------------------
-   * PAIR MODE BUTTON
-   *
-   * Use event delegation so this continues to work even when
-   * profile.html creates/rebuilds the catalogue buttons.
-   * ---------------------------------------------------------
-   */
-  document.addEventListener(
-    "click",
-    function (event) {
-
-      const target =
-        event.target.closest(
-          '[data-mode="Pair"], [data-yoga-mode="Pair"], .pair-mode-card, #Pair_EventBtn_'
-        );
-
-      if (!target) {
-        return;
-      }
-
-      /*
-       * Do not allow the normal catalogue handler
-       * to process Pair.
-       */
-      event.preventDefault();
-      event.stopImmediatePropagation();
-
-      Pair_Start_();
-
-    },
-    true
-  );
 
 
   Pair_Reset_();
 }
-
   /* ============================================================
      RESET PAIR STATE
      ============================================================ */
@@ -227,41 +244,81 @@
      START PAIR MODE
      ============================================================ */
 
-  async function Pair_Start_() {
 
-    const panel =
-      document.getElementById(
-        "Pair_Panel_"
-      );
+   function Pair_Start_() {
 
-    const cataloguePanel =
-      ctx.cataloguePanel;
+  Pair_Reset_();
 
-    Pair_Reset_();
 
-    if (panel) {
-      panel.style.display = "block";
-    }
+  const panel =
+    document.getElementById(
+      "Pair_Panel_"
+    );
 
-    if (cataloguePanel) {
-      cataloguePanel.style.display = "none";
-    }
+  const input =
+    document.getElementById(
+      "Pair_PartnerParticipantId_"
+    );
 
-    const partnerInput =
-      document.getElementById(
-        "Pair_PartnerParticipantId_"
-      );
 
-    if (partnerInput) {
-      setTimeout(
-        function () {
-          partnerInput.focus();
-        },
-        100
-      );
-    }
+  /*
+   * Show Pair panel.
+   */
+  if (panel) {
+
+    panel.classList.remove(
+      "hidden"
+    );
+
+    panel.style.display =
+      "block";
   }
 
+
+  /*
+   * Hide the normal catalogue.
+   */
+  if (ctx.cataloguePanel) {
+
+    ctx.cataloguePanel.classList.add(
+      "hidden"
+    );
+
+    ctx.cataloguePanel.style.display =
+      "none";
+  }
+
+
+  /*
+   * Hide Join Another Event panel.
+   */
+  if (ctx.joinPanel) {
+
+    ctx.joinPanel.classList.add(
+      "hidden"
+    );
+
+    ctx.joinPanel.style.display =
+      "none";
+  }
+
+
+  /*
+   * Focus Partner Participant ID.
+   */
+  if (input) {
+
+    setTimeout(
+      function () {
+
+        input.focus();
+
+      },
+      100
+    );
+
+  }
+}
 
   /* ============================================================
      SEARCH PARTNER
