@@ -492,10 +492,14 @@
         result.style.display = "block";
       }
 
-      Pair_ShowStatus_(
-        "Partner found successfully."
-      );
-
+   Pair_ShowStatus_(
+  "PAIR SEARCH SUCCESS — Participant ID: " +
+  (partner.participantId || partner.Participant_ID || partnerId) +
+  " | Name: " +
+  (partner.fullName || partner.Full_Name || partner.name || "Not available") +
+  " | Father's Name: " +
+  (partner.fatherName || partner.Father_Name || "Not available")
+);
     } catch (error) {
 
       console.error(
