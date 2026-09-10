@@ -20,99 +20,115 @@
     setTimeout(Pair_WaitForContext_, 100);
   }
 
-  function Pair_Initialize_() {
-    if (initialized || !ctx) return;
-    initialized = true;
 
-    const partnerInput =
-      document.getElementById("Pair_PartnerParticipantId_");
+   function Pair_Initialize_() {
+  if (initialized || !ctx) return;
+  initialized = true;
 
-    const findPartnerBtn =
-      document.getElementById("Pair_FindPartnerBtn_");
+  const partnerInput =
+    document.getElementById("Pair_PartnerParticipantId_");
 
-    const selectPartnerBtn =
-      document.getElementById("Pair_SelectPartnerBtn_");
+  const findPartnerBtn =
+    document.getElementById("Pair_FindPartnerBtn_");
 
-    const changePartnerBtn =
-      document.getElementById("Pair_ChangePartnerBtn_");
+  const selectPartnerBtn =
+    document.getElementById("Pair_SelectPartnerBtn_");
 
-    const proceedBtn =
-      document.getElementById("Pair_ProceedToPaymentBtn_");
+  const changePartnerBtn =
+    document.getElementById("Pair_ChangePartnerBtn_");
 
-    const backBtn =
-      document.getElementById("Pair_BackToModeBtn_");
+  const proceedBtn =
+    document.getElementById("Pair_ProceedToPaymentBtn_");
 
-    if (findPartnerBtn) {
-      findPartnerBtn.addEventListener(
-        "click",
-        Pair_SearchParticipant_
-      );
-    }
+  const backBtn =
+    document.getElementById("Pair_BackToModeBtn_");
 
-    if (selectPartnerBtn) {
-      selectPartnerBtn.addEventListener(
-        "click",
-        Pair_SelectPartner_
-      );
-    }
 
-    if (changePartnerBtn) {
-      changePartnerBtn.addEventListener(
-        "click",
-        Pair_ChangePartner_
-      );
-    }
-
-    if (proceedBtn) {
-      proceedBtn.addEventListener(
-        "click",
-        Pair_CreatePaymentLink_
-      );
-    }
-
-    if (backBtn) {
-      backBtn.addEventListener(
-        "click",
-        Pair_BackToMode_
-      );
-    }
-
-    if (partnerInput) {
-      partnerInput.addEventListener(
-        "keydown",
-        function (event) {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            Pair_SearchParticipant_();
-          }
-        }
-      );
-    }
-
-    /*
-      Pair mode is intercepted before the generic
-      catalogue handler in profile.html.
-    */
-    const pairModeCard =
-      document.querySelector(
-        '.mode-card[data-mode="Pair"]'
-      );
-
-    if (pairModeCard) {
-      pairModeCard.addEventListener(
-        "click",
-        function (event) {
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          Pair_Start_();
-        },
-        true
-      );
-    }
-
-    Pair_Reset_();
+  if (findPartnerBtn) {
+    findPartnerBtn.addEventListener(
+      "click",
+      Pair_SearchParticipant_
+    );
   }
 
+  if (selectPartnerBtn) {
+    selectPartnerBtn.addEventListener(
+      "click",
+      Pair_SelectPartner_
+    );
+  }
+
+  if (changePartnerBtn) {
+    changePartnerBtn.addEventListener(
+      "click",
+      Pair_ChangePartner_
+    );
+  }
+
+  if (proceedBtn) {
+    proceedBtn.addEventListener(
+      "click",
+      Pair_CreatePaymentLink_
+    );
+  }
+
+  if (backBtn) {
+    backBtn.addEventListener(
+      "click",
+      Pair_BackToMode_
+    );
+  }
+
+  if (partnerInput) {
+    partnerInput.addEventListener(
+      "keydown",
+      function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          Pair_SearchParticipant_();
+        }
+      }
+    );
+  }
+
+
+  /*
+   * ---------------------------------------------------------
+   * PAIR MODE BUTTON
+   *
+   * Use event delegation so this continues to work even when
+   * profile.html creates/rebuilds the catalogue buttons.
+   * ---------------------------------------------------------
+   */
+  document.addEventListener(
+    "click",
+    function (event) {
+
+      const target =
+        event.target.closest(
+          '[data-mode="Pair"], [data-yoga-mode="Pair"], .pair-mode-card, #Pair_EventBtn_'
+        );
+
+      if (!target) {
+        return;
+      }
+
+      /*
+       * Do not allow the normal catalogue handler
+       * to process Pair.
+       */
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      Pair_Start_();
+
+    },
+    true
+  );
+
+
+  Pair_Reset_();
+}
 
   /* ============================================================
      RESET PAIR STATE
