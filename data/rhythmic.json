@@ -10,7 +10,9 @@
       "eventName": "Rhythmic Yogasana Group Event",
       "fee": 5000,
       "perPersonFee": 1000,
-      "participants": 5
+      "participants": 5,
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
     }
   ]
 }
