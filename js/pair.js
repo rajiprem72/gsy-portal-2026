@@ -384,7 +384,7 @@
             body:
               JSON.stringify({
                 action:
-                  "Pair_FindPartner",
+                 "Pair_SearchParticipant",
 
                 idToken:
                   idToken,
