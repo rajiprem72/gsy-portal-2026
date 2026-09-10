@@ -1,7 +1,7 @@
 /* ============================================================
    pair.js
    Global School of Yoga — Pair Event Registration
-   updated 10 Sep 2026 10:43 AM
+   updated 10 Sep 2026 11:36 AM
    ============================================================ */
 
 (function () {
