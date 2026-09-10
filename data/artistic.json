@@ -11,7 +11,9 @@
       "eventName": "Artistic Yogasana",
       "perPersonFee": 1000,
       "minimumParticipants": 6,
-      "maximumParticipants": 12
+      "maximumParticipants": 12,
+      "eventLocation": "Bengaluru",
+      "eventDate": "22 Nov 2026"
     }
   ]
 }
