@@ -246,55 +246,77 @@
   }
 
 
-  async function Pair_Start_() {
 
-    const panel =
-      document.getElementById(
-        "Pair_Panel_"
-      );
+   async function Pair_Start_() {
 
-    const cataloguePanel =
-      ctx.cataloguePanel;
+  const panel =
+    document.getElementById(
+      "Pair_Panel_"
+    );
 
-
-    Pair_Reset_();
+  const cataloguePanel =
+    ctx.cataloguePanel;
 
 
-    if (panel) {
-
-      panel.style.display = "block";
-
-    }
+  Pair_Reset_();
 
 
-    if (cataloguePanel) {
+  /*
+   * IMPORTANT:
+   * Pair_Panel_ contains the "hidden"
+   * class when the page loads.
+   * Remove it before displaying the panel.
+   */
 
-      cataloguePanel.style.display = "none";
+  if (panel) {
 
-    }
+    panel.classList.remove(
+      "hidden"
+    );
 
-
-    const partnerInput =
-      document.getElementById(
-        "Pair_PartnerParticipantId_"
-      );
-
-
-    if (partnerInput) {
-
-      setTimeout(
-        function () {
-
-          partnerInput.focus();
-
-        },
-        100
-      );
-
-    }
+    panel.style.display =
+      "block";
 
   }
 
+
+  /*
+   * Hide the Individual catalogue
+   * while Pair registration is active.
+   */
+
+  if (cataloguePanel) {
+
+    cataloguePanel.classList.add(
+      "hidden"
+    );
+
+    cataloguePanel.style.display =
+      "none";
+
+  }
+
+
+  const partnerInput =
+    document.getElementById(
+      "Pair_PartnerParticipantId_"
+    );
+
+
+  if (partnerInput) {
+
+    setTimeout(
+      function () {
+
+        partnerInput.focus();
+
+      },
+      100
+    );
+
+  }
+
+}
 
   async function Pair_SearchParticipant_() {
 
