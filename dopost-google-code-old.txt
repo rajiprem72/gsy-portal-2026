@@ -1,0 +1,936 @@
+
+/* =========================================================
+   POST API
+   ========================================================= */
+function doPost(e) {
+   const SERVER_VERSION = '58';
+
+  try {
+
+    /*
+     * =====================================================
+     * STEP 1
+     * Validate request body
+     * =====================================================
+     */
+
+    if (
+      !e ||
+      !e.postData ||
+      !e.postData.contents
+    ) {
+
+      return ContentService
+        .createTextOutput(
+          JSON.stringify({
+
+            success: false,
+
+            message:
+              'Request body is missing.'
+
+          })
+        )
+        .setMimeType(
+          ContentService.MimeType.JSON
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * STEP 2
+     * Read the raw request body ONCE
+     * =====================================================
+     */
+
+    const rawBody =
+      e.postData.contents;
+
+
+    console.log(
+      'POST RAW BODY:',
+      rawBody
+    );
+
+
+    /*
+     * =====================================================
+     * STEP 3
+     * Parse JSON ONCE
+     * =====================================================
+     */
+
+    let request;
+
+
+    try {
+
+      request =
+        JSON.parse(
+          rawBody
+        );
+
+    } catch (error) {
+
+      console.error(
+        'JSON parse error:',
+        error
+      );
+
+
+      return ContentService
+        .createTextOutput(
+          JSON.stringify({
+
+            success: false,
+
+            message:
+              'Invalid JSON request.'
+
+          })
+        )
+        .setMimeType(
+          ContentService.MimeType.JSON
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * STEP 4
+     * RAZORPAY WEBHOOK
+     *
+     * Webhook requests have "event"
+     * Normal website API requests have "action"
+     * =====================================================
+     */
+
+    if (
+      request &&
+      request.event &&
+      !request.action
+    ) {
+
+      /*
+       * -----------------------------------------------------
+       * PAIR WEBHOOK ROUTING
+       *
+       * Pair-specific webhook processing lives entirely in
+       * pair.gs. Existing Individual webhook processing is
+       * left intact.
+       * -----------------------------------------------------
+       */
+
+      if (
+        Pair_ShouldHandleWebhook_(
+          request
+        )
+      ) {
+
+        try {
+
+          const pairWebhookResult =
+            Pair_HandlePaymentLinkPaid_(
+              request
+            );
+
+
+          console.log(
+            'PAIR RAZORPAY WEBHOOK RESULT:',
+            JSON.stringify(
+              pairWebhookResult,
+              null,
+              2
+            )
+          );
+
+
+          return ContentService
+            .createTextOutput(
+              JSON.stringify(
+                pairWebhookResult
+              )
+            )
+            .setMimeType(
+              ContentService.MimeType.JSON
+            );
+
+
+        } catch (pairWebhookError) {
+
+          console.error(
+            'PAIR RAZORPAY WEBHOOK ERROR:',
+            pairWebhookError
+          );
+
+
+          return ContentService
+            .createTextOutput(
+              JSON.stringify({
+
+                success: false,
+
+                message:
+                  'Pair Razorpay webhook processing failed.',
+
+                error:
+                  pairWebhookError.message
+
+              })
+            )
+            .setMimeType(
+              ContentService.MimeType.JSON
+            );
+
+        }
+
+      }
+
+
+      /*
+ * -----------------------------------------------------
+ * RHYTHMIC / ARTISTIC GROUP WEBHOOK ROUTING
+ *
+ * Group payment links contain the Yoga Mode in notes.
+ * Route Rhythmic and Artistic payments to the
+ * Group payment processor before Individual processing.
+ * -----------------------------------------------------
+ */
+
+if (
+  request &&
+  request.event &&
+  !request.action &&
+  (
+    request.event === 'payment_link.paid' ||
+    request.event === 'payment.captured' ||
+    request.event === 'payment.authorized'
+  )
+) {
+
+  const paymentLinkEntity =
+    request.payload &&
+    request.payload.payment_link &&
+    request.payload.payment_link.entity
+      ? request.payload.payment_link.entity
+      : null;
+
+  const notes =
+    paymentLinkEntity &&
+    paymentLinkEntity.notes
+      ? paymentLinkEntity.notes
+      : {};
+
+  const groupMode =
+    String(
+      notes.mode ||
+      notes.yoga_mode ||
+      ''
+    ).trim().toLowerCase();
+
+  if (
+    groupMode === 'rhythmic' ||
+    groupMode === 'artistic'
+  ) {
+
+    try {
+
+      const groupWebhookResult =
+        Group_ProcessSuccessfulPayment_(
+          request
+        );
+
+      console.log(
+        'GROUP RAZORPAY WEBHOOK RESULT:',
+        JSON.stringify(
+          groupWebhookResult,
+          null,
+          2
+        )
+      );
+
+      return ContentService
+        .createTextOutput(
+          JSON.stringify(
+            groupWebhookResult
+          )
+        )
+        .setMimeType(
+          ContentService.MimeType.JSON
+        );
+
+    } catch (groupWebhookError) {
+
+      console.error(
+        'GROUP RAZORPAY WEBHOOK ERROR:',
+        groupWebhookError
+      );
+
+      return ContentService
+        .createTextOutput(
+          JSON.stringify({
+            success: false,
+            message:
+              'Group Razorpay webhook processing failed.',
+            error:
+              groupWebhookError.message
+          })
+        )
+        .setMimeType(
+          ContentService.MimeType.JSON
+        );
+    }
+  }
+}
+
+      /*
+       * -----------------------------------------------------
+       * EXISTING INDIVIDUAL / NORMAL WEBHOOK PROCESSOR
+       *
+       * DO NOT CHANGE THIS CALL.
+       * -----------------------------------------------------
+       */
+
+      try {
+
+        const webhookResult =
+          processRazorpayWebhook_(
+            rawBody
+          );
+
+
+        console.log(
+          'RAZORPAY WEBHOOK RESULT:',
+          JSON.stringify(
+            webhookResult,
+            null,
+            2
+          )
+        );
+
+
+        return ContentService
+          .createTextOutput(
+            JSON.stringify(
+              webhookResult
+            )
+          )
+          .setMimeType(
+            ContentService.MimeType.JSON
+          );
+
+
+      } catch (webhookError) {
+
+        console.error(
+          'RAZORPAY WEBHOOK ERROR:',
+          webhookError
+        );
+
+
+        return ContentService
+          .createTextOutput(
+            JSON.stringify({
+
+              success: false,
+
+              message:
+                'Razorpay webhook processing failed.',
+
+              error:
+                webhookError.message
+
+            })
+          )
+          .setMimeType(
+            ContentService.MimeType.JSON
+          );
+
+      }
+
+    }
+
+
+    /*
+     * =====================================================
+     * STEP 5
+     * GET NORMAL API ACTION
+     * =====================================================
+     */
+
+    const action =
+      String(
+        request.action || ''
+      ).trim();
+
+
+    /*
+     * =====================================================
+     * CREATE AUTHENTICATED PARTICIPANT
+     * =====================================================
+     */
+
+    if (
+      action ===
+      'createAuthenticatedParticipant'
+    ) {
+
+      const idToken =
+        request.idToken;
+
+
+      const result =
+        createAuthenticatedParticipant_(
+          idToken
+        );
+
+
+      return ContentService
+        .createTextOutput(
+          JSON.stringify(
+            result
+          )
+        )
+        .setMimeType(
+          ContentService.MimeType.JSON
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * GET PARTICIPANT PROFILE
+     * =====================================================
+     */
+
+    if (
+      action ===
+      'getAuthenticatedParticipantProfile'
+    ) {
+
+      const idToken =
+        request.idToken;
+
+
+      const result =
+        getAuthenticatedParticipantProfile_(
+          idToken
+        );
+
+
+      return ContentService
+        .createTextOutput(
+          JSON.stringify(
+            result
+          )
+        )
+        .setMimeType(
+          ContentService.MimeType.JSON
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * UPDATE PARTICIPANT PROFILE
+     * =====================================================
+     */
+
+    if (
+      action ===
+      'updateAuthenticatedParticipantProfile'
+    ) {
+
+      const idToken =
+        request.idToken;
+
+
+      const profileData =
+        request.profileData;
+
+
+      const result =
+        updateAuthenticatedParticipantProfile_(
+          idToken,
+          profileData
+        );
+
+
+      return ContentService
+        .createTextOutput(
+          JSON.stringify(
+            result
+          )
+        )
+        .setMimeType(
+          ContentService.MimeType.JSON
+        );
+
+    }
+
+
+   
+ /* =====================================================
+ * PAIR - SEARCH PARTICIPANT
+ * =====================================================
+ */
+
+
+    if (
+  action ===
+  'Pair_SearchParticipant'
+) {
+
+  const result =
+  Pair_SearchParticipant_(
+    request.idToken,
+    request.partnerParticipantId
+  );
+
+return ContentService
+  .createTextOutput(
+    JSON.stringify(result)
+  )
+  .setMimeType(
+    ContentService.MimeType.JSON
+  );
+}
+    /*
+     * =====================================================
+     * PAIR - CREATE RAZORPAY PAYMENT LINK
+     * =====================================================
+     */
+
+    if (
+      action ===
+      'Pair_CreatePaymentLink'
+    ) {
+
+      const firebase =
+        verifyFirebaseIdToken_(
+          request.idToken
+        );
+
+
+      if (
+        !firebase.success
+      ) {
+
+              return ContentService
+        .createTextOutput(
+          JSON.stringify({
+            ...result,
+            serverVersion: SERVER_VERSION
+          })
+        )
+        .setMimeType(
+          ContentService.MimeType.JSON
+        );
+
+      }
+
+
+      const participant =
+        findParticipantByEmail(
+          firebase.email
+        );
+
+
+      if (
+        !participant.success ||
+        !participant.found
+      ) {
+
+        return ContentService
+          .createTextOutput(
+            JSON.stringify({
+
+              success: false,
+
+              message:
+                'Participant account was not found.'
+
+            })
+          )
+          .setMimeType(
+            ContentService.MimeType.JSON
+          );
+
+      }
+
+
+      const result =
+        Pair_CreatePaymentLink_(
+          participant,
+          request.partnerParticipantId,
+          request.eventIds
+        );
+
+
+      return ContentService
+        .createTextOutput(
+          JSON.stringify(
+            result
+          )
+        )
+        .setMimeType(
+          ContentService.MimeType.JSON
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * CREATE INDIVIDUAL PAYMENT LINK
+     * =====================================================
+     */
+
+    if (
+      action ===
+      'createIndividualPaymentLink'
+    ) {
+
+      const idToken =
+        request.idToken;
+
+
+      const eventIds =
+        request.eventIds;
+
+
+      /*
+       * Verify Firebase authentication.
+       */
+
+      const firebase =
+        verifyFirebaseIdToken_(
+          idToken
+        );
+
+
+      if (
+        !firebase.success
+      ) {
+
+        return ContentService
+          .createTextOutput(
+            JSON.stringify({
+
+              success: false,
+
+              message:
+                firebase.message,
+
+              diagnostic:
+                firebase.diagnostic ||
+                '',
+
+              diagnosticMessage:
+                firebase.diagnosticMessage ||
+                ''
+
+            })
+          )
+          .setMimeType(
+            ContentService.MimeType.JSON
+          );
+
+      }
+
+
+      /*
+       * Find the participant using
+       * the authenticated email.
+       */
+
+      const participant =
+        findParticipantByEmail(
+          firebase.email
+        );
+
+
+      if (
+        !participant.success ||
+        !participant.found
+      ) {
+
+        return ContentService
+          .createTextOutput(
+            JSON.stringify({
+
+              success: false,
+
+              message:
+                'Participant account was not found.'
+
+            })
+          )
+          .setMimeType(
+            ContentService.MimeType.JSON
+          );
+
+      }
+
+
+      /*
+       * Create Razorpay Payment Link.
+       */
+
+      const result =
+        createRazorpayPaymentLink_(
+          participant,
+          eventIds
+        );
+
+
+      return ContentService
+        .createTextOutput(
+          JSON.stringify(
+            result
+          )
+        )
+        .setMimeType(
+          ContentService.MimeType.JSON
+        );
+
+    }
+
+
+  /* =====================================================
+ * RHYTHMIC GROUP - CREATE RAZORPAY PAYMENT LINK
+ * ===================================================== */
+
+if (
+  action ===
+  'Group_CreatePaymentLink'
+  &&
+  String(
+    request.mode || ''
+  ).trim().toLowerCase() ===
+  'rhythmic'
+) {
+
+  const firebase =
+    verifyFirebaseIdToken_(
+      request.idToken
+    );
+
+
+  if (
+    !firebase.success
+  ) {
+
+    return ContentService
+      .createTextOutput(
+        JSON.stringify({
+          success: false,
+          message:
+            firebase.message,
+          diagnostic:
+            firebase.diagnostic ||
+            '',
+          diagnosticMessage:
+            firebase.diagnosticMessage ||
+            ''
+        })
+      )
+      .setMimeType(
+        ContentService.MimeType.JSON
+      );
+
+  }
+
+
+  const participant =
+    findParticipantByEmail(
+      firebase.email
+    );
+
+
+  if (
+    !participant.success ||
+    !participant.found
+  ) {
+
+    return ContentService
+      .createTextOutput(
+        JSON.stringify({
+          success: false,
+          message:
+            'Participant account was not found.'
+        })
+      )
+      .setMimeType(
+        ContentService.MimeType.JSON
+      );
+
+  }
+
+
+  const result =
+    Group_CreatePaymentLink_(
+      participant,
+      'rhythmic',
+      request.participantIds,
+      request.eventIds
+    );
+
+
+  return ContentService
+    .createTextOutput(
+      JSON.stringify(
+        result
+      )
+    )
+    .setMimeType(
+      ContentService.MimeType.JSON
+    );
+
+}
+
+
+
+/* =====================================================
+ * ARTISTIC GROUP - CREATE RAZORPAY PAYMENT LINK
+ * ===================================================== */
+
+if (
+  action ===
+  'Group_CreatePaymentLink'
+  &&
+  String(
+    request.mode || ''
+  ).trim().toLowerCase() ===
+  'artistic'
+) {
+
+  const firebase =
+    verifyFirebaseIdToken_(
+      request.idToken
+    );
+
+
+  if (
+    !firebase.success
+  ) {
+
+    return ContentService
+      .createTextOutput(
+        JSON.stringify({
+          success: false,
+          message:
+            firebase.message,
+          diagnostic:
+            firebase.diagnostic ||
+            '',
+          diagnosticMessage:
+            firebase.diagnosticMessage ||
+            ''
+        })
+      )
+      .setMimeType(
+        ContentService.MimeType.JSON
+      );
+
+  }
+
+
+  const participant =
+    findParticipantByEmail(
+      firebase.email
+    );
+
+
+  if (
+    !participant.success ||
+    !participant.found
+  ) {
+
+    return ContentService
+      .createTextOutput(
+        JSON.stringify({
+          success: false,
+          message:
+            'Participant account was not found.'
+        })
+      )
+      .setMimeType(
+        ContentService.MimeType.JSON
+      );
+
+  }
+
+
+  const result =
+    Group_CreatePaymentLink_(
+      participant,
+      'artistic',
+      request.participantIds,
+      request.eventIds
+    );
+
+
+  return ContentService
+    .createTextOutput(
+      JSON.stringify(
+        result
+      )
+    )
+    .setMimeType(
+      ContentService.MimeType.JSON
+    );
+
+}
+
+    return ContentService
+      .createTextOutput(
+        JSON.stringify({
+
+          success: false,
+
+          message:
+            'Unknown API action.'
+
+        })
+      )
+      .setMimeType(
+        ContentService.MimeType.JSON
+      );
+
+
+  } catch (error) {
+
+    console.error(
+      'doPost error:',
+      error
+    );
+
+
+    return ContentService
+      .createTextOutput(
+        JSON.stringify({
+
+          success: false,
+
+          message:
+            'Server error occurred.',
+
+          error:
+            error.message
+
+        })
+      )
+      .setMimeType(
+        ContentService.MimeType.JSON
+      );
+
+  }
+
+}
+
