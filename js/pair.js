@@ -1064,7 +1064,15 @@
           JSON.parse(
             responseText
           );
+       console.log(
+  "PAIR SERVER VERSION:",
+  data.serverVersion
+);
 
+console.log(
+  "PAIR SERVER RESPONSE:",
+  data
+);
       } catch (parseError) {
 
         console.error(
