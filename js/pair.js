@@ -540,7 +540,7 @@
   async function Pair_SelectPartner_() {
     console.log("PAIR SELECT BUTTON CLICKED");
 
-    alert("PAIR SELECT BUTTON CLICKED");
+    //alert("PAIR SELECT BUTTON CLICKED");
     if (
       !window.GSYPairState ||
       !window.GSYPairState.partner
