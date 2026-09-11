@@ -489,6 +489,7 @@
       }
 
       if (result) {
+        result.classList.remove("hidden");
         result.style.display = "block";
       }
 
