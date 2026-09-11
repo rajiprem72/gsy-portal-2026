@@ -555,6 +555,7 @@
       );
 
     if (eventSection) {
+      eventSection.classList.remove("hidden");
       eventSection.style.display =
         "block";
     }
