@@ -9,7 +9,7 @@
   "events": [
     {
       "eventId": "PAIR001",
-      "eventName": "Artistic Yogasana",
+      "eventName": "Artistic Yogasana - Pair Event",
       "fee": 2000,
       "perPersonFee": 1000,
       "participants": 2,
@@ -18,7 +18,7 @@
     },
     {
       "eventId": "PAIR002",
-      "eventName": "Rhythmic Yogasana",
+      "eventName": "Rhythmic Yogasana - Pair Event",
       "fee": 2000,
       "perPersonFee": 1000,
       "participants": 2,
