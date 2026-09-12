@@ -1834,12 +1834,15 @@
         );
       }
 
-      if (!data.success) {
-        throw new Error(
-          data.message ||
-          "Unable to create the payment link."
-        );
-      }
+     if (!data.success) {
+  console.error("GROUP PAYMENT SERVER RESPONSE:", data);
+
+  throw new Error(
+    data.error ||
+    data.message ||
+    "Unable to create Razorpay payment link."
+  );
+}
 
       if (!data.paymentUrl) {
         throw new Error(
