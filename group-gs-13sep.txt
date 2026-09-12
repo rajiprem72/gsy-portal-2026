@@ -1,0 +1,2261 @@
+/* =========================================================
+   GLOBAL SCHOOL OF YOGA
+   CONSOLIDATED GROUP BACKEND
+   File: group.gs
+
+   Supports:
+   1. Pair
+      - Exactly 2 participants
+      - 1 partner
+      - 2 events from pair.json
+      - Pair event fee is the total fee for both participants
+
+   2. Rhythmic
+      - Exactly 5 participants
+      - 4 additional participants
+      - 1 event from rhythmic.json
+
+   3. Artistic
+      - 6 to 12 participants
+      - 5 to 11 additional participants
+      - 1 event from artistic.json
+
+   Common flow:
+   Participant search
+   -> event catalogue
+   -> Razorpay Payment Link
+   -> Sheet3 Pending Reconciliation
+   -> Razorpay payment_link.paid webhook
+   -> Sheet2 Registration
+   -> Sheet3 Paid/Reconciled
+   -> Email / WhatsApp
+
+   IMPORTANT:
+   Individual registration remains independent and is not handled here.
+   This file replaces the separate Pair backend and the old Group backend.
+========================================================= */
+
+
+/* =========================================================
+   GROUP - NORMALIZE MODE
+========================================================= */
+function Group_NormalizeMode_(mode) {
+  const value = String(mode || '').trim().toLowerCase();
+
+  if (value === 'pair') return 'pair';
+  if (value === 'rhythmic') return 'rhythmic';
+  if (value === 'artistic') return 'artistic';
+
+  throw new Error('Invalid Group Yoga Mode.');
+}
+
+
+/* =========================================================
+   GROUP - GET MODE RULES
+========================================================= */
+function Group_GetRules_(mode) {
+  const normalized = Group_NormalizeMode_(mode);
+
+  if (normalized === 'pair') {
+    return {
+      mode: 'Pair',
+      fileName: 'pair.json',
+      minTotal: 2,
+      maxTotal: 2,
+      minAdditional: 1,
+      maxAdditional: 1,
+      eventCount: 2,
+      feeType: 'pair'
+    };
+  }
+
+  if (normalized === 'rhythmic') {
+    return {
+      mode: 'Rhythmic',
+      fileName: 'rhythmic.json',
+      minTotal: 5,
+      maxTotal: 5,
+      minAdditional: 4,
+      maxAdditional: 4,
+      eventCount: 1,
+      feeType: 'perPerson'
+    };
+  }
+
+  return {
+    mode: 'Artistic',
+    fileName: 'artistic.json',
+    minTotal: 6,
+    maxTotal: 12,
+    minAdditional: 5,
+    maxAdditional: 11,
+    eventCount: 1,
+    feeType: 'perPerson'
+  };
+}
+
+
+/* =========================================================
+   GROUP - GET EVENT CATALOGUE
+========================================================= */
+function Group_GetEventCatalogue_(mode) {
+  const rules = Group_GetRules_(mode);
+
+  const url =
+    'https://portal.globalschoolofyoga.com/data/' +
+    rules.fileName;
+
+  const response = UrlFetchApp.fetch(
+    url,
+    {
+      method: 'get',
+      muteHttpExceptions: true,
+      cache: false
+    }
+  );
+
+  const status = response.getResponseCode();
+  const text = response.getContentText();
+
+  if (status < 200 || status >= 300) {
+    throw new Error(
+      'Unable to load ' +
+      rules.fileName +
+      '. HTTP status: ' +
+      status
+    );
+  }
+
+  let data;
+
+  try {
+    data = JSON.parse(text);
+  } catch (error) {
+    throw new Error(
+      rules.fileName +
+      ' contains invalid JSON.'
+    );
+  }
+
+  if (!data || !Array.isArray(data.events)) {
+    throw new Error(
+      rules.fileName +
+      ' does not contain a valid events array.'
+    );
+  }
+
+  if (data.events.length !== rules.eventCount) {
+    throw new Error(
+      rules.fileName +
+      ' must contain exactly ' +
+      rules.eventCount +
+      ' event' +
+      (rules.eventCount === 1 ? '' : 's') +
+      '.'
+    );
+  }
+
+  const events = data.events.map(function(event) {
+    if (!event.eventId || !event.eventName) {
+      throw new Error(
+        'An event in ' +
+        rules.fileName +
+        ' is missing Event ID or Event Name.'
+      );
+    }
+
+    const fee =
+      Number(
+        event.fee !== undefined
+          ? event.fee
+          : event.perPersonFee || 0
+      );
+
+    const perPersonFee =
+      Number(
+        event.perPersonFee !== undefined
+          ? event.perPersonFee
+          : (
+              rules.feeType === 'pair'
+                ? fee / 2
+                : fee
+            )
+      );
+
+    if (!isFinite(fee) || fee <= 0) {
+      throw new Error(
+        'Invalid fee in ' +
+        rules.fileName +
+        ' for event ' +
+        event.eventId +
+        '.'
+      );
+    }
+
+    if (!isFinite(perPersonFee) || perPersonFee <= 0) {
+      throw new Error(
+        'Invalid per-person fee in ' +
+        rules.fileName +
+        ' for event ' +
+        event.eventId +
+        '.'
+      );
+    }
+
+    return {
+      eventId: String(event.eventId).trim(),
+      eventName: String(event.eventName).trim(),
+      fee: fee,
+      perPersonFee: perPersonFee,
+      participants: Number(event.participants || 0),
+      eventLocation: String(event.eventLocation || '').trim(),
+      eventDate: String(event.eventDate || '').trim(),
+      round: String(event.round || '').trim()
+    };
+  });
+
+  /*
+   * Pair catalogue is authoritative for exactly two participants.
+   * Existing pair.json uses fee as the total pair fee.
+   */
+  if (rules.feeType === 'pair') {
+    events.forEach(function(event) {
+      if (
+        event.participants &&
+        Number(event.participants) !== 2
+      ) {
+        throw new Error(
+          'A Pair event must specify exactly 2 participants.'
+        );
+      }
+    });
+  }
+
+  return {
+    mode: rules.mode,
+    selectionMessage:
+      String(data.selectionMessage || '').trim(),
+    events: events
+  };
+}
+
+
+/* =========================================================
+   GROUP - VALIDATE PARTICIPANTS
+========================================================= */
+function Group_ValidateParticipants_(participantIds, mode) {
+  const rules = Group_GetRules_(mode);
+
+  if (!Array.isArray(participantIds)) {
+    throw new Error('Participant list is missing.');
+  }
+
+  const ids = participantIds
+    .map(function(id) {
+      return String(id || '').trim().toUpperCase();
+    })
+    .filter(function(id) {
+      return id !== '';
+    });
+
+  const uniqueIds = [];
+
+  ids.forEach(function(id) {
+    if (uniqueIds.indexOf(id) === -1) {
+      uniqueIds.push(id);
+    }
+  });
+
+  if (uniqueIds.length < rules.minTotal) {
+    if (rules.mode === 'Pair') {
+      throw new Error(
+        'Pair registration requires exactly 2 participants.'
+      );
+    }
+
+    if (rules.mode === 'Rhythmic') {
+      throw new Error(
+        'Rhythmic Group requires exactly 5 participants.'
+      );
+    }
+
+    throw new Error(
+      'Artistic Group requires at least 6 participants.'
+    );
+  }
+
+  if (uniqueIds.length > rules.maxTotal) {
+    if (rules.mode === 'Pair') {
+      throw new Error(
+        'Pair registration requires exactly 2 participants.'
+      );
+    }
+
+    if (rules.mode === 'Rhythmic') {
+      throw new Error(
+        'Rhythmic Group allows exactly 5 participants.'
+      );
+    }
+
+    throw new Error(
+      'Artistic Group allows a maximum of 12 participants.'
+    );
+  }
+
+  return uniqueIds;
+}
+
+
+/* =========================================================
+   GROUP - FIND PARTICIPANT BY ID
+========================================================= */
+function Group_GetParticipantById_(participantId) {
+  const id =
+    String(participantId || '').trim().toUpperCase();
+
+  if (!id) {
+    return {
+      success: false,
+      found: false,
+      message: 'Participant ID is required.'
+    };
+  }
+
+  const sheet = getMasterSheet_();
+  const lastRow = sheet.getLastRow();
+
+  if (lastRow < 2) {
+    return {
+      success: true,
+      found: false
+    };
+  }
+
+  const lastColumn = sheet.getLastColumn();
+
+  const values = sheet
+    .getRange(1, 1, lastRow, lastColumn)
+    .getValues();
+
+  const headers = values[0].map(function(header) {
+    return String(header || '').trim();
+  });
+
+  function indexOfHeader(name) {
+    return headers.indexOf(name);
+  }
+
+  const participantIdIndex =
+    indexOfHeader('Participant_ID');
+
+  if (participantIdIndex === -1) {
+    throw new Error(
+      'Participant_ID column was not found in MASTER_PARTICIPANTS.'
+    );
+  }
+
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+
+    const rowParticipantId =
+      String(row[participantIdIndex] || '')
+        .trim()
+        .toUpperCase();
+
+    if (rowParticipantId !== id) continue;
+
+    function valueOf(name) {
+      const index = indexOfHeader(name);
+      return index === -1 ? '' : row[index] || '';
+    }
+
+    return {
+      success: true,
+      found: true,
+      participantId: valueOf('Participant_ID'),
+      email: valueOf('Login_Email'),
+      loginMethod: valueOf('Login_Method'),
+      fullName: valueOf('Full_Name'),
+      fatherName: valueOf('Father_Name'),
+      mobileNumber: valueOf('Mobile_Number'),
+      dateOfBirth: valueOf('Date_of_Birth'),
+      gender: valueOf('Gender'),
+      accountStatus: valueOf('Account_Status') || 'Active'
+    };
+  }
+
+  return {
+    success: true,
+    found: false
+  };
+}
+
+
+/* =========================================================
+   GROUP - FIND PARTICIPANT / PARTNER
+   Used by Pair and by Rhythmic/Artistic search.
+========================================================= */
+function Group_FindParticipant_(
+  idToken,
+  participantId
+) {
+  const firebase =
+    verifyFirebaseIdToken_(idToken);
+
+  if (!firebase.success) {
+    return {
+      success: false,
+      message: firebase.message || 'Authentication failed.'
+    };
+  }
+
+  const initiator =
+    findParticipantByEmail(firebase.email);
+
+  if (!initiator.success || !initiator.found) {
+    return {
+      success: false,
+      message: 'Your participant account was not found.'
+    };
+  }
+
+  const requestedId =
+    String(participantId || '')
+      .trim()
+      .toUpperCase();
+
+  if (!requestedId) {
+    return {
+      success: false,
+      message: 'Please enter a Participant ID.'
+    };
+  }
+
+  if (
+    String(initiator.participantId || '')
+      .trim()
+      .toUpperCase() === requestedId
+  ) {
+    return {
+      success: false,
+      message: 'You cannot add yourself.'
+    };
+  }
+
+  const participant =
+    Group_GetParticipantById_(requestedId);
+
+  if (!participant.success || !participant.found) {
+    return {
+      success: false,
+      message:
+        'The Participant ID was not found. Please check the ID and try again.'
+    };
+  }
+
+  const status =
+    String(
+      participant.accountStatus || 'Active'
+    )
+      .trim()
+      .toLowerCase();
+
+  if (status !== 'active') {
+    return {
+      success: false,
+      message: 'This participant account is not active.'
+    };
+  }
+
+  return {
+    success: true,
+    partner: {
+      participantId: participant.participantId,
+      fullName: participant.fullName || '',
+      fatherName: participant.fatherName || ''
+    }
+  };
+}
+
+
+/* =========================================================
+   GROUP - GENERATE GROUP ID
+========================================================= */
+function Group_GetNextGroupId_(mode) {
+  const normalized = Group_NormalizeMode_(mode);
+
+  const props =
+    PropertiesService.getScriptProperties();
+
+  const propertyName =
+    normalized === 'pair'
+      ? 'PAIR_GROUP_SEQUENCE'
+      : normalized === 'rhythmic'
+        ? 'RHYTHMIC_GROUP_SEQUENCE'
+        : 'ARTISTIC_GROUP_SEQUENCE';
+
+  const prefix =
+    normalized === 'pair'
+      ? 'PAIR'
+      : normalized === 'rhythmic'
+        ? 'RHYTHMIC'
+        : 'ARTISTIC';
+
+  const lock =
+    LockService.getScriptLock();
+
+  try {
+    lock.waitLock(30000);
+
+    const current =
+      Number(
+        props.getProperty(propertyName) || 0
+      );
+
+    const next = current + 1;
+
+    props.setProperty(
+      propertyName,
+      String(next)
+    );
+
+    return (
+      prefix +
+      String(next).padStart(6, '0')
+    );
+  } finally {
+    if (lock.hasLock()) {
+      lock.releaseLock();
+    }
+  }
+}
+
+
+/* =========================================================
+   GROUP - CREATE PENDING SHEET3 RECORD
+========================================================= */
+function Group_CreatePendingPaymentReconciliation_(
+  ownerParticipant,
+  participants,
+  groupId,
+  mode,
+  selectedEvents,
+  razorpayData,
+  referenceId,
+  amount
+) {
+  const sheet =
+    getReconciliationSheet_();
+
+  const existing =
+    findReconciliationByPaymentLinkId_(
+      razorpayData.paymentLinkId
+    );
+
+  if (existing.found) {
+    return {
+      success: true,
+      recoveryId: existing.recoveryId || '',
+      alreadyExists: true
+    };
+  }
+
+  const recoveryId =
+    getNextRecoveryId_();
+
+  const normalized =
+    Group_NormalizeMode_(mode);
+
+  const displayMode =
+    normalized === 'pair'
+      ? 'Pair'
+      : normalized === 'rhythmic'
+        ? 'Rhythmic'
+        : 'Artistic';
+
+  const participantIds =
+    participants
+      .map(function(p) {
+        return String(
+          p.participantId || ''
+        ).trim();
+      })
+      .join(',');
+
+  const eventIdsText =
+    selectedEvents
+      .map(function(event) {
+        return String(event.eventId || '').trim();
+      })
+      .join(',');
+
+  const eventNames =
+    selectedEvents
+      .map(function(event) {
+        return String(event.eventName || '').trim();
+      })
+      .join(', ');
+
+  const remarks =
+    displayMode +
+    ' Group_ID=' +
+    groupId +
+    ' | Participants=' +
+    participantIds +
+    ' | Payment Link created; awaiting payment.';
+
+  sheet.appendRow([
+    recoveryId,
+    ownerParticipant.participantId || '',
+    ownerParticipant.email || '',
+    displayMode,
+    eventIdsText,
+    eventNames,
+    amount,
+    razorpayData.paymentLinkId || '',
+    razorpayData.referenceId || referenceId || '',
+    '',
+    'Pending',
+    'payment_link.created',
+    '',
+    new Date(),
+    'No',
+    '',
+    remarks
+  ]);
+
+  return {
+    success: true,
+    recoveryId: recoveryId,
+    alreadyExists: false
+  };
+}
+
+
+/* =========================================================
+   GROUP - CREATE RAZORPAY PAYMENT LINK
+   Common function for Pair, Rhythmic and Artistic.
+========================================================= */
+function Group_CreatePaymentLink_(
+  ownerParticipant,
+  mode,
+  participantIds,
+  eventIds
+) {
+  const rules = Group_GetRules_(mode);
+
+  if (!ownerParticipant) {
+    return {
+      success: false,
+      message: 'Primary participant information is missing.'
+    };
+  }
+
+  let normalizedParticipantIds;
+
+  try {
+    normalizedParticipantIds =
+      Group_ValidateParticipants_(
+        participantIds,
+        mode
+      );
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message
+    };
+  }
+
+  const ownerId =
+    String(
+      ownerParticipant.participantId || ''
+    )
+      .trim()
+      .toUpperCase();
+
+  if (!ownerId) {
+    return {
+      success: false,
+      message: 'Authenticated participant ID is missing.'
+    };
+  }
+
+  if (normalizedParticipantIds.indexOf(ownerId) === -1) {
+    return {
+      success: false,
+      message:
+        'The authenticated participant must be part of the group.'
+    };
+  }
+
+  normalizedParticipantIds =
+    normalizedParticipantIds.filter(function(id) {
+      return id !== ownerId;
+    });
+
+  normalizedParticipantIds.unshift(ownerId);
+
+  const participants = [];
+
+  for (
+    let i = 0;
+    i < normalizedParticipantIds.length;
+    i++
+  ) {
+    const participant =
+      Group_GetParticipantById_(
+        normalizedParticipantIds[i]
+      );
+
+    if (!participant.success || !participant.found) {
+      return {
+        success: false,
+        message:
+          'Participant ' +
+          normalizedParticipantIds[i] +
+          ' could not be found.'
+      };
+    }
+
+    const accountStatus =
+      String(
+        participant.accountStatus || 'Active'
+      )
+        .trim()
+        .toLowerCase();
+
+    if (accountStatus !== 'active') {
+      return {
+        success: false,
+        message:
+          'Participant ' +
+          normalizedParticipantIds[i] +
+          ' does not have an active account.'
+      };
+    }
+
+    participants.push(participant);
+  }
+
+  /*
+   * The owner object should contain the complete current
+   * participant profile. Replace it with the authoritative
+   * Master Sheet row when possible.
+   */
+  const authoritativeOwner =
+    participants[0];
+
+  if (
+    authoritativeOwner &&
+    authoritativeOwner.participantId
+  ) {
+    ownerParticipant =
+      authoritativeOwner;
+  }
+
+  if (!Array.isArray(eventIds)) {
+    return {
+      success: false,
+      message:
+        rules.mode === 'Pair'
+          ? 'Please select at least one Pair event.'
+          : 'Please select the group event.'
+    };
+  }
+
+  /*
+   * Pair may select one or both of the two events.
+   * Rhythmic and Artistic must select exactly one event.
+   */
+  if (
+    rules.mode === 'Pair' &&
+    (eventIds.length < 1 || eventIds.length > 2)
+  ) {
+    return {
+      success: false,
+      message:
+        'Please select one or both Pair events.'
+    };
+  }
+
+  if (
+    rules.mode !== 'Pair' &&
+    eventIds.length !== 1
+  ) {
+    return {
+      success: false,
+      message:
+        'Please select the group event.'
+    };
+  }
+
+  const catalogue =
+    Group_GetEventCatalogue_(mode);
+
+  const selectedEvents = [];
+
+  eventIds.forEach(function(eventId) {
+    const id =
+      String(eventId || '').trim();
+
+    const found =
+      catalogue.events.find(function(event) {
+        return String(event.eventId).trim() === id;
+      });
+
+    if (found) {
+      selectedEvents.push(found);
+    }
+  });
+
+  if (selectedEvents.length !== eventIds.length) {
+    return {
+      success: false,
+      message:
+        'One or more selected events are invalid.'
+    };
+  }
+
+  /*
+   * Prevent duplicate registrations.
+   */
+  const duplicateEvents = [];
+
+  selectedEvents.forEach(function(event) {
+    const duplicateParticipant =
+      participants.find(function(participant) {
+        return registrationAlreadyExists_(
+          participant.participantId,
+          event.eventId
+        );
+      });
+
+    if (duplicateParticipant) {
+      duplicateEvents.push({
+        event: event,
+        participantId:
+          duplicateParticipant.participantId
+      });
+    }
+  });
+
+  if (duplicateEvents.length > 0) {
+    const names =
+      duplicateEvents
+        .map(function(item) {
+          return item.event.eventName;
+        })
+        .filter(function(name, index, array) {
+          return array.indexOf(name) === index;
+        })
+        .join(', ');
+
+    return {
+      success: false,
+      message:
+        'One or more participants are already registered for: ' +
+        names +
+        '.'
+    };
+  }
+
+  let totalAmount = 0;
+
+  if (rules.feeType === 'pair') {
+    /*
+     * pair.json fee is the total fee for the pair.
+     */
+    selectedEvents.forEach(function(event) {
+      totalAmount +=
+        Number(event.fee || 0);
+    });
+  } else {
+    selectedEvents.forEach(function(event) {
+      totalAmount +=
+        Number(event.perPersonFee || 0) *
+        participants.length;
+    });
+  }
+
+  if (!isFinite(totalAmount) || totalAmount <= 0) {
+    return {
+      success: false,
+      message:
+        'The calculated group payment amount is invalid.'
+    };
+  }
+
+  const groupId =
+    Group_GetNextGroupId_(mode);
+
+  const referenceId =
+    rules.mode.toUpperCase() +
+    '-' +
+    Date.now().toString().slice(-10);
+
+  const eventNames =
+    selectedEvents
+      .map(function(event) {
+        return event.eventName;
+      })
+      .join(', ');
+
+  const keyId =
+    PropertiesService
+      .getScriptProperties()
+      .getProperty('RAZORPAY_KEY_ID');
+
+  const keySecret =
+    PropertiesService
+      .getScriptProperties()
+      .getProperty('RAZORPAY_KEY_SECRET');
+
+  if (!keyId || !keySecret) {
+    return {
+      success: false,
+      message:
+        'Razorpay test credentials are not configured.'
+    };
+  }
+
+  const notes = {
+    mode: rules.mode,
+    yoga_mode: rules.mode,
+    participant_id: ownerId,
+    participant_ids:
+      normalizedParticipantIds.join(','),
+    group_id: groupId,
+    event_ids:
+      selectedEvents
+        .map(function(event) {
+          return event.eventId;
+        })
+        .join(','),
+    event_names: eventNames,
+    participant_count:
+      String(participants.length)
+  };
+
+  if (rules.mode === 'Pair') {
+    notes.partner_participant_id =
+      normalizedParticipantIds[1] || '';
+  }
+
+  const payload = {
+    amount: totalAmount * 100,
+    currency: 'INR',
+    accept_partial: false,
+    reference_id: referenceId,
+    description:
+      'Global School of Yoga - National Level Yoga Festival 2026 - ' +
+      rules.mode +
+      ' Registration',
+    customer: {
+      name:
+        ownerParticipant.fullName ||
+        'GSY Participant',
+      email:
+        ownerParticipant.email ||
+        ''
+    },
+    notes: notes,
+    callback_url:
+      'https://portal.globalschoolofyoga.com/profile.html',
+    callback_method: 'get',
+    reminder_enable: false
+  };
+
+  const authHeader =
+    Utilities.base64Encode(
+      keyId + ':' + keySecret
+    );
+
+  const response =
+    UrlFetchApp.fetch(
+      'https://api.razorpay.com/v1/payment_links',
+      {
+        method: 'post',
+        contentType: 'application/json',
+        headers: {
+          Authorization:
+            'Basic ' + authHeader
+        },
+        payload:
+          JSON.stringify(payload),
+        muteHttpExceptions: true
+      }
+    );
+
+  const responseCode =
+    response.getResponseCode();
+
+  const responseText =
+    response.getContentText();
+
+  console.log(
+    'GROUP RAZORPAY HTTP STATUS:',
+    responseCode
+  );
+
+  console.log(
+    'GROUP RAZORPAY RESPONSE:',
+    responseText
+  );
+
+  if (
+    responseCode < 200 ||
+    responseCode >= 300
+  ) {
+    return {
+      success: false,
+      message:
+        'Unable to create ' +
+        rules.mode +
+        ' Razorpay payment link.',
+      razorpayHttpStatus:
+        responseCode,
+      razorpayResponse:
+        responseText
+    };
+  }
+
+  let data;
+
+  try {
+    data = JSON.parse(responseText);
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        'Razorpay returned an invalid response.',
+      razorpayResponse:
+        responseText
+    };
+  }
+
+  if (!data.id) {
+    return {
+      success: false,
+      message:
+        'Razorpay Payment Link ID was not returned.'
+    };
+  }
+
+  let reconciliationResult;
+
+  try {
+    reconciliationResult =
+      Group_CreatePendingPaymentReconciliation_(
+        ownerParticipant,
+        participants,
+        groupId,
+        mode,
+        selectedEvents,
+        {
+          paymentLinkId:
+            data.id || '',
+          referenceId:
+            data.reference_id ||
+            referenceId
+        },
+        referenceId,
+        totalAmount
+      );
+  } catch (reconciliationError) {
+    console.error(
+      'GROUP RECONCILIATION ERROR:',
+      reconciliationError
+    );
+
+    reconciliationResult = {
+      success: false,
+      recoveryId: '',
+      message:
+        reconciliationError.message
+    };
+  }
+
+  return {
+    success: true,
+    paymentLinkId:
+      data.id || '',
+    paymentUrl:
+      data.short_url || '',
+    referenceId:
+      data.reference_id ||
+      referenceId,
+    groupId:
+      groupId,
+    mode:
+      rules.mode,
+    participantIds:
+      normalizedParticipantIds,
+    participantCount:
+      participants.length,
+    eventIds:
+      selectedEvents.map(function(event) {
+        return event.eventId;
+      }),
+    eventNames:
+      eventNames,
+    amount:
+      totalAmount,
+    amountInPaise:
+      totalAmount * 100,
+    currency: 'INR',
+    recoveryId:
+      reconciliationResult.recoveryId || '',
+    reconciliationCreated:
+      reconciliationResult.success === true,
+    message:
+      rules.mode +
+      ' Razorpay payment link created successfully.'
+  };
+}
+
+
+/* =========================================================
+   GROUP - WRITE REGISTRATIONS TO SHEET 2
+   Idempotent for:
+   Participant + Event + Group ID
+========================================================= */
+function Group_WriteRegistrationsToSheet2_(
+  participants,
+  selectedEvents,
+  paymentId,
+  groupId,
+  mode
+) {
+  const sheet = getEventSheet_();
+  const lock = LockService.getScriptLock();
+
+  try {
+    lock.waitLock(30000);
+
+    if (
+      !Array.isArray(participants) ||
+      participants.length === 0
+    ) {
+      throw new Error(
+        'No group participants were supplied.'
+      );
+    }
+
+    if (
+      !Array.isArray(selectedEvents) ||
+      selectedEvents.length === 0
+    ) {
+      throw new Error(
+        'No group events were supplied.'
+      );
+    }
+
+    const normalized =
+      Group_NormalizeMode_(mode);
+
+    const category =
+      normalized === 'pair'
+        ? 'Pair'
+        : normalized === 'rhythmic'
+          ? 'Rhythmic'
+          : 'Artistic';
+
+    const lastRow =
+      sheet.getLastRow();
+
+    const existingRows =
+      lastRow >= 2
+        ? sheet
+            .getRange(
+              2,
+              1,
+              lastRow - 1,
+              16
+            )
+            .getValues()
+        : [];
+
+    const existingKeys = {};
+
+    existingRows.forEach(function(row) {
+      const participantId =
+        String(row[1] || '')
+          .trim()
+          .toUpperCase();
+
+      const eventId =
+        String(row[3] || '').trim();
+
+      const existingGroupId =
+        String(row[15] || '').trim();
+
+      if (
+        participantId &&
+        eventId &&
+        existingGroupId
+      ) {
+        existingKeys[
+          participantId +
+          '|' +
+          eventId +
+          '|' +
+          existingGroupId
+        ] = true;
+      }
+    });
+
+    const createdRows = [];
+    const skippedRows = [];
+    const registrationDate = new Date();
+
+    participants.forEach(function(participant, participantIndex) {
+      selectedEvents.forEach(function(event) {
+        const participantId =
+          String(
+            participant.participantId || ''
+          )
+            .trim()
+            .toUpperCase();
+
+        const eventId =
+          String(event.eventId || '').trim();
+
+        const key =
+          participantId +
+          '|' +
+          eventId +
+          '|' +
+          String(groupId || '').trim();
+
+        if (existingKeys[key]) {
+          skippedRows.push({
+            participantId: participantId,
+            eventId: eventId
+          });
+          return;
+        }
+
+        const registrationId =
+          getNextRegistrationId_();
+
+        const ageGroup =
+          getAgeGroupFromDateOfBirth_(
+            participant.dateOfBirth
+          );
+
+        const entryFee =
+          normalized === 'pair'
+            ? Number(event.fee || 0) / participants.length
+            : Number(event.perPersonFee || 0);
+
+        const row = [
+          registrationId,
+          participantId,
+          participant.email || '',
+          eventId,
+          event.eventName || '',
+          event.eventLocation || '',
+          event.eventDate || '',
+          category,
+          ageGroup,
+          entryFee,
+          'Paid',
+          paymentId || '',
+          registrationDate,
+          'Confirmed',
+          category +
+            ' Registration. Group_ID=' +
+            groupId +
+            ' | Member ' +
+            String(participantIndex + 1),
+          groupId || ''
+        ];
+
+        sheet.appendRow(row);
+
+        createdRows.push(registrationId);
+        existingKeys[key] = true;
+      });
+    });
+
+    return {
+      success: true,
+      createdCount: createdRows.length,
+      skippedCount: skippedRows.length,
+      registrationIds: createdRows,
+      skippedRows: skippedRows,
+      groupId: groupId,
+      category: category
+    };
+  } finally {
+    if (lock.hasLock()) {
+      lock.releaseLock();
+    }
+  }
+}
+
+
+/* =========================================================
+   GROUP - SEND SUCCESS EMAIL
+========================================================= */
+function Group_SendConfirmationEmail_(
+  ownerParticipant,
+  participants,
+  selectedEvents,
+  amount,
+  paymentId,
+  groupId,
+  mode
+) {
+  const normalized =
+    Group_NormalizeMode_(mode);
+
+  const yogaMode =
+    normalized === 'pair'
+      ? 'Pair'
+      : normalized === 'rhythmic'
+        ? 'Rhythmic Group'
+        : 'Artistic Group';
+
+  const participantText =
+    participants
+      .map(function(participant, index) {
+        return (
+          String(index + 1) +
+          '. ' +
+          String(participant.fullName || '') +
+          ' (' +
+          String(participant.participantId || '') +
+          ')'
+        );
+      })
+      .join('\n');
+
+  const eventText =
+    selectedEvents
+      .map(function(event) {
+        return String(event.eventName || '');
+      })
+      .join(', ');
+
+  const firstEvent =
+    selectedEvents[0] || {};
+
+  const subject =
+    'Global School of Yoga - ' +
+    yogaMode +
+    ' Registration Confirmed';
+
+  const body =
+`Dear ${ownerParticipant.fullName || 'Participant'},
+
+Your ${yogaMode} registration for the National Level Yoga Festival – 2026 has been successfully confirmed.
+
+Group ID:
+${groupId}
+
+Yoga Mode:
+${yogaMode}
+
+Event:
+${eventText}
+
+Participants:
+${participantText}
+
+Total Participants:
+${participants.length}
+
+Amount Paid:
+₹${Number(amount).toLocaleString('en-IN')}
+
+Payment ID:
+${paymentId}
+
+Event Location:
+${firstEvent.eventLocation || 'Bengaluru'}
+
+Event Date:
+${firstEvent.eventDate || '22 Nov 2026'}
+
+Thank you for registering with Global School of Yoga.
+
+We look forward to welcoming you at the National Level Yoga Festival – 2026.
+
+Global School of Yoga`;
+
+  MailApp.sendEmail(
+    ownerParticipant.email,
+    subject,
+    body
+  );
+}
+
+
+/* =========================================================
+   GROUP - NORMALIZE WHATSAPP NUMBER
+========================================================= */
+function Group_NormalizeWhatsAppNumber_(number) {
+  let destination =
+    String(number || '')
+      .replace(/[^\d]/g, '');
+
+  if (destination.length === 10) {
+    destination = '91' + destination;
+  }
+
+  if (
+    destination.length < 10 ||
+    destination.length > 15
+  ) {
+    return '';
+  }
+
+  return destination;
+}
+
+
+/* =========================================================
+   GROUP - SEND SUCCESS WHATSAPP
+========================================================= */
+function Group_SendConfirmationWhatsApp_(
+  ownerParticipant,
+  selectedEvents,
+  amount,
+  paymentId,
+  groupId,
+  mode
+) {
+  const props =
+    PropertiesService.getScriptProperties();
+
+  const apiKey =
+    props.getProperty('GUPSHUP_API_KEY');
+
+  const source =
+    props.getProperty('GUPSHUP_SOURCE') ||
+    '919384016800';
+
+  const appName =
+    props.getProperty('GUPSHUP_APP_NAME') ||
+    'GSYDLYC2026';
+
+  const templateId =
+    props.getProperty('GUPSHUP_TEMPLATE_ID') ||
+    'e0bf47b2-7f14-4b5f-8293-96552a276f77';
+
+  if (!apiKey) {
+    throw new Error(
+      'GUPSHUP_API_KEY is not configured.'
+    );
+  }
+
+  const destination =
+    Group_NormalizeWhatsAppNumber_(
+      ownerParticipant.mobileNumber
+    );
+
+  if (!destination) {
+    throw new Error(
+      'Invalid participant WhatsApp number.'
+    );
+  }
+
+  const normalized =
+    Group_NormalizeMode_(mode);
+
+  const yogaMode =
+    normalized === 'pair'
+      ? 'Pair'
+      : normalized === 'rhythmic'
+        ? 'Rhythmic Group'
+        : 'Artistic Group';
+
+  const eventNames =
+    selectedEvents
+      .map(function(event) {
+        return event.eventName || '';
+      })
+      .join(', ');
+
+  const templateParams = [
+    String(ownerParticipant.fullName || 'Participant'),
+    String(ownerParticipant.participantId || ''),
+    String(yogaMode),
+    String(eventNames),
+    String(Number(amount || 0).toLocaleString('en-IN')),
+    String(paymentId || '')
+  ];
+
+  const payload = {
+    channel: 'whatsapp',
+    source: source,
+    destination: destination,
+    'src.name': appName,
+    template: JSON.stringify({
+      id: templateId,
+      params: templateParams
+    })
+  };
+
+  const response =
+    UrlFetchApp.fetch(
+      'https://api.gupshup.io/wa/api/v1/template/msg',
+      {
+        method: 'post',
+        headers: {
+          apikey: apiKey
+        },
+        payload: payload,
+        muteHttpExceptions: true
+      }
+    );
+
+  const status =
+    response.getResponseCode();
+
+  const responseText =
+    response.getContentText();
+
+  console.log(
+    'GROUP GUPSHUP STATUS:',
+    status
+  );
+
+  console.log(
+    'GROUP GUPSHUP RESPONSE:',
+    responseText
+  );
+
+  if (
+    status < 200 ||
+    status >= 300
+  ) {
+    throw new Error(
+      'Gupshup WhatsApp API failed. HTTP ' +
+      status +
+      ': ' +
+      responseText
+    );
+  }
+
+  return {
+    success: true,
+    httpStatus: status,
+    response: responseText,
+    destination: destination,
+    groupId: groupId,
+    mode: normalized
+  };
+}
+
+
+/* =========================================================
+   GROUP - SEND SUCCESS NOTIFICATIONS
+========================================================= */
+function Group_SendSuccessNotifications_(
+  ownerParticipant,
+  participants,
+  selectedEvents,
+  amount,
+  paymentId,
+  groupId,
+  mode
+) {
+  let emailStatus = 'Not attempted';
+  let whatsappStatus = 'Not attempted';
+
+  try {
+    Group_SendConfirmationEmail_(
+      ownerParticipant,
+      participants,
+      selectedEvents,
+      amount,
+      paymentId,
+      groupId,
+      mode
+    );
+
+    emailStatus = 'Sent';
+  } catch (emailError) {
+    emailStatus = 'Failed';
+
+    console.error(
+      'GROUP EMAIL ERROR:',
+      emailError
+    );
+  }
+
+  try {
+    Group_SendConfirmationWhatsApp_(
+      ownerParticipant,
+      selectedEvents,
+      amount,
+      paymentId,
+      groupId,
+      mode
+    );
+
+    whatsappStatus = 'Sent';
+  } catch (whatsappError) {
+    whatsappStatus = 'Failed';
+
+    console.error(
+      'GROUP WHATSAPP ERROR:',
+      whatsappError
+    );
+  }
+
+  return {
+    emailStatus: emailStatus,
+    whatsappStatus: whatsappStatus
+  };
+}
+
+
+/* =========================================================
+   GROUP - DETECT GROUP WEBHOOK
+   Only payment_link.paid is allowed to complete registration.
+========================================================= */
+function Group_ShouldHandleWebhook_(request) {
+  if (
+    !request ||
+    String(request.event || '').trim() !==
+      'payment_link.paid'
+  ) {
+    return false;
+  }
+
+  const paymentLink =
+    request &&
+    request.payload &&
+    request.payload.payment_link &&
+    request.payload.payment_link.entity
+      ? request.payload.payment_link.entity
+      : null;
+
+  if (!paymentLink) {
+    return false;
+  }
+
+  const notes =
+    paymentLink.notes || {};
+
+  const mode =
+    String(
+      notes.mode ||
+      notes.yoga_mode ||
+      ''
+    ).trim().toLowerCase();
+
+  if (
+    mode === 'pair' ||
+    mode === 'rhythmic' ||
+    mode === 'artistic'
+  ) {
+    return true;
+  }
+
+  const referenceId =
+    String(
+      paymentLink.reference_id || ''
+    ).trim().toUpperCase();
+
+  return (
+    referenceId.indexOf('PAIR-') === 0 ||
+    referenceId.indexOf('RHYTHMIC-') === 0 ||
+    referenceId.indexOf('ARTISTIC-') === 0
+  );
+}
+
+
+/* =========================================================
+   GROUP - PROCESS SUCCESSFUL PAYMENT
+========================================================= */
+function Group_ProcessSuccessfulPayment_(payload) {
+  const payment =
+    payload &&
+    payload.payload &&
+    payload.payload.payment &&
+    payload.payload.payment.entity
+      ? payload.payload.payment.entity
+      : null;
+
+  if (!payment) {
+    throw new Error(
+      'Group payment payload does not contain payment information.'
+    );
+  }
+
+  const paymentId =
+    String(payment.id || '').trim();
+
+  if (!paymentId) {
+    throw new Error(
+      'Group payment ID is missing.'
+    );
+  }
+
+  const paymentLinkEntity =
+    payload &&
+    payload.payload &&
+    payload.payload.payment_link &&
+    payload.payload.payment_link.entity
+      ? payload.payload.payment_link.entity
+      : null;
+
+  const paymentLinkId =
+    String(
+      (
+        paymentLinkEntity &&
+        paymentLinkEntity.id
+          ? paymentLinkEntity.id
+          : ''
+      ) ||
+      payment.payment_link_id ||
+      (
+        payment.notes &&
+        payment.notes.payment_link_id
+          ? payment.notes.payment_link_id
+          : ''
+      ) ||
+      ''
+    ).trim();
+
+  if (!paymentLinkId) {
+    throw new Error(
+      'Group Payment Link ID is missing.'
+    );
+  }
+
+  /*
+   * The pending Sheet3 row is the authoritative registration record.
+   */
+  const reconciliation =
+    findReconciliationByPaymentLinkId_(
+      paymentLinkId
+    );
+
+  if (!reconciliation.found) {
+    throw new Error(
+      'Group payment reconciliation record could not be found for Payment Link: ' +
+      paymentLinkId
+    );
+  }
+
+  /*
+   * Idempotency:
+   * if the same Payment Link is already reconciled, do nothing again.
+   */
+  if (
+    String(
+      reconciliation.reconciled || ''
+    ).trim().toLowerCase() === 'yes'
+  ) {
+    return {
+      success: true,
+      alreadyProcessed: true,
+      event: 'payment_link.paid',
+      mode:
+        reconciliation.yogaMode || 'Group',
+      groupId:
+        reconciliation.remarks || '',
+      paymentId: paymentId,
+      paymentLinkId: paymentLinkId
+    };
+  }
+
+  /*
+   * Merge Payment and Payment Link notes.
+   */
+  const notes =
+    Object.assign(
+      {},
+      payment.notes || {},
+      (
+        paymentLinkEntity &&
+        paymentLinkEntity.notes
+          ? paymentLinkEntity.notes
+          : {}
+      )
+    );
+
+  let mode =
+    String(
+      notes.mode ||
+      notes.yoga_mode ||
+      reconciliation.yogaMode ||
+      ''
+    ).trim();
+
+  const normalizedMode =
+    Group_NormalizeMode_(mode);
+
+  const rules =
+    Group_GetRules_(normalizedMode);
+
+  let participantIdsText =
+    String(
+      notes.participant_ids || ''
+    ).trim();
+
+  let participantId =
+    String(
+      notes.participant_id ||
+      reconciliation.participantId ||
+      ''
+    ).trim();
+
+  let groupId =
+    String(
+      notes.group_id || ''
+    ).trim();
+
+  let eventIdsText =
+    String(
+      notes.event_ids ||
+      reconciliation.eventIds ||
+      ''
+    ).trim();
+
+  /*
+   * Recover missing data from Sheet3 remarks.
+   */
+  const remarks =
+    String(
+      reconciliation.remarks || ''
+    );
+
+  if (!participantIdsText && remarks) {
+    const participantMatch =
+      remarks.match(
+        /Participants=([^|]+)/i
+      );
+
+    if (
+      participantMatch &&
+      participantMatch[1]
+    ) {
+      participantIdsText =
+        String(
+          participantMatch[1]
+        ).trim();
+    }
+  }
+
+  if (!groupId && remarks) {
+    const groupMatch =
+      remarks.match(
+        /Group_ID=([^|]+)/i
+      );
+
+    if (
+      groupMatch &&
+      groupMatch[1]
+    ) {
+      groupId =
+        String(
+          groupMatch[1]
+        ).trim();
+    }
+  }
+
+  if (!participantId) {
+    participantId =
+      String(
+        reconciliation.participantId || ''
+      ).trim();
+  }
+
+  if (!participantIdsText && participantId) {
+    /*
+     * Pair can recover the partner from the notes.
+     * Group modes normally have participant_ids in notes
+     * and/or the Sheet3 remarks.
+     */
+    if (
+      normalizedMode === 'pair' &&
+      notes.partner_participant_id
+    ) {
+      participantIdsText =
+        participantId +
+        ',' +
+        String(
+          notes.partner_participant_id
+        ).trim();
+    }
+  }
+
+  if (!eventIdsText) {
+    throw new Error(
+      'Group payment does not contain Event ID information.'
+    );
+  }
+
+  if (!participantIdsText) {
+    throw new Error(
+      'Group payment does not contain participant information.'
+    );
+  }
+
+  if (!groupId) {
+    throw new Error(
+      'Group payment does not contain Group ID.'
+    );
+  }
+
+  const participantIds =
+    participantIdsText
+      .split(',')
+      .map(function(id) {
+        return String(id || '')
+          .trim()
+          .toUpperCase();
+      })
+      .filter(function(id) {
+        return id !== '';
+      });
+
+  const uniqueParticipantIds = [];
+
+  participantIds.forEach(function(id) {
+    if (
+      uniqueParticipantIds.indexOf(id) === -1
+    ) {
+      uniqueParticipantIds.push(id);
+    }
+  });
+
+  const validatedParticipantIds =
+    Group_ValidateParticipants_(
+      uniqueParticipantIds,
+      normalizedMode
+    );
+
+  const participants = [];
+
+  validatedParticipantIds.forEach(function(id) {
+    const participant =
+      Group_GetParticipantById_(id);
+
+    if (
+      !participant.success ||
+      !participant.found
+    ) {
+      throw new Error(
+        'Participant ' +
+        id +
+        ' could not be found.'
+      );
+    }
+
+    const status =
+      String(
+        participant.accountStatus || 'Active'
+      )
+        .trim()
+        .toLowerCase();
+
+    if (status !== 'active') {
+      throw new Error(
+        'Participant ' +
+        id +
+        ' does not have an active account.'
+      );
+    }
+
+    participants.push(participant);
+  });
+
+  /*
+   * Ensure the authenticated/record owner is first.
+   */
+  const ownerIndex =
+    participants.findIndex(function(participant) {
+      return (
+        String(
+          participant.participantId || ''
+        )
+          .trim()
+          .toUpperCase() ===
+        String(
+          participantId || ''
+        )
+          .trim()
+          .toUpperCase()
+      );
+    });
+
+  if (ownerIndex > 0) {
+    const owner =
+      participants.splice(ownerIndex, 1)[0];
+
+    participants.unshift(owner);
+  }
+
+  if (!participants.length) {
+    throw new Error(
+      'No valid group participants were found.'
+    );
+  }
+
+  /*
+   * Resolve official events.
+   */
+  const catalogue =
+    Group_GetEventCatalogue_(
+      normalizedMode
+    );
+
+  const requestedEventIds =
+    eventIdsText
+      .split(',')
+      .map(function(id) {
+        return String(id || '').trim();
+      })
+      .filter(function(id) {
+        return id !== '';
+      });
+
+  const selectedEvents = [];
+
+  requestedEventIds.forEach(function(id) {
+    const found =
+      catalogue.events.find(function(event) {
+        return (
+          String(event.eventId).trim() === id
+        );
+      });
+
+    if (found) {
+      selectedEvents.push(found);
+    }
+  });
+
+  if (
+    selectedEvents.length !==
+    requestedEventIds.length
+  ) {
+    throw new Error(
+      'One or more event IDs could not be resolved from the official catalogue.'
+    );
+  }
+
+  if (
+    normalizedMode !== 'pair' &&
+    selectedEvents.length !== 1
+  ) {
+    throw new Error(
+      rules.mode +
+      ' must contain exactly one selected event.'
+    );
+  }
+
+  if (
+    normalizedMode === 'pair' &&
+    (
+      selectedEvents.length < 1 ||
+      selectedEvents.length > 2
+    )
+  ) {
+    throw new Error(
+      'Pair can contain one or two selected events.'
+    );
+  }
+
+  /*
+   * Verify payment is captured and the amount is correct.
+   * The webhook is accepted only after Razorpay API verification.
+   */
+  const verifiedPaymentLink =
+    fetchRazorpayPaymentLink_(
+      paymentLinkId
+    );
+
+  if (!verifiedPaymentLink) {
+    throw new Error(
+      'Unable to verify Group Razorpay Payment Link.'
+    );
+  }
+
+  const verifiedPayment =
+    fetchRazorpayPayment_(
+      paymentId
+    );
+
+  if (!verifiedPayment) {
+    throw new Error(
+      'Unable to verify Group Razorpay Payment.'
+    );
+  }
+
+  const linkStatus =
+    String(
+      verifiedPaymentLink.status || ''
+    ).trim().toLowerCase();
+
+  const paymentStatus =
+    String(
+      verifiedPayment.status || ''
+    ).trim().toLowerCase();
+
+  if (linkStatus !== 'paid') {
+    throw new Error(
+      'Group Razorpay Payment Link is not marked as paid.'
+    );
+  }
+
+  if (paymentStatus !== 'captured') {
+    throw new Error(
+      'Group Razorpay payment is not captured.'
+    );
+  }
+
+  const paidAmount =
+    Number(
+      verifiedPayment.amount || 0
+    );
+
+  const linkAmount =
+    Number(
+      verifiedPaymentLink.amount || 0
+    );
+
+  if (
+    linkAmount <= 0 ||
+    paidAmount !== linkAmount
+  ) {
+    throw new Error(
+      'Group Razorpay payment amount verification failed.'
+    );
+  }
+
+  let expectedAmount = 0;
+
+  if (rules.feeType === 'pair') {
+    selectedEvents.forEach(function(event) {
+      expectedAmount +=
+        Number(event.fee || 0);
+    });
+  } else {
+    selectedEvents.forEach(function(event) {
+      expectedAmount +=
+        Number(event.perPersonFee || 0) *
+        participants.length;
+    });
+  }
+
+  if (
+    expectedAmount * 100 !==
+    paidAmount
+  ) {
+    throw new Error(
+      'Group payment amount does not match the selected events. Expected ₹' +
+      expectedAmount +
+      ', received ₹' +
+      (paidAmount / 100) +
+      '.'
+    );
+  }
+
+  /*
+   * Write Sheet2.
+   */
+  const sheet2Result =
+    Group_WriteRegistrationsToSheet2_(
+      participants,
+      selectedEvents,
+      paymentId,
+      groupId,
+      normalizedMode
+    );
+
+  if (!sheet2Result.success) {
+    throw new Error(
+      'Payment verified, but Group Sheet2 registration could not be completed.'
+    );
+  }
+
+  /*
+   * Reconcile Sheet3 BEFORE notifications.
+   */
+  updateReconciliationRow_(
+    reconciliation.rowNumber,
+    {
+      10: paymentId,
+      11: 'Paid',
+      12: 'payment_link.paid',
+      13: getWebhookEventId_(payload),
+      14: new Date(),
+      15: 'Yes',
+      16: new Date(),
+      17:
+        rules.mode +
+        ' registration completed. Group_ID=' +
+        groupId +
+        ' | Sheet2 created=' +
+        sheet2Result.createdCount +
+        ' | Sheet2 skipped=' +
+        sheet2Result.skippedCount
+    }
+  );
+
+  /*
+   * Notifications are isolated from successful registration.
+   */
+  const notifications =
+    Group_SendSuccessNotifications_(
+      participants[0],
+      participants,
+      selectedEvents,
+      paidAmount / 100,
+      paymentId,
+      groupId,
+      normalizedMode
+    );
+
+  updateReconciliationRow_(
+    reconciliation.rowNumber,
+    {
+      17:
+        rules.mode +
+        ' registration completed. Group_ID=' +
+        groupId +
+        ' | Sheet2 created=' +
+        sheet2Result.createdCount +
+        ' | Sheet2 skipped=' +
+        sheet2Result.skippedCount +
+        ' | Email=' +
+        notifications.emailStatus +
+        ' | WhatsApp=' +
+        notifications.whatsappStatus
+    }
+  );
+
+  return {
+    success: true,
+    alreadyProcessed: false,
+    event: 'payment_link.paid',
+    mode: rules.mode,
+    groupId: groupId,
+    participantIds:
+      participants.map(function(participant) {
+        return participant.participantId;
+      }),
+    participantCount:
+      participants.length,
+    eventIds:
+      selectedEvents.map(function(event) {
+        return event.eventId;
+      }),
+    eventNames:
+      selectedEvents.map(function(event) {
+        return event.eventName;
+      }),
+    paymentId: paymentId,
+    paymentLinkId: paymentLinkId,
+    amount: paidAmount / 100,
+    sheet2: sheet2Result,
+    notifications: notifications
+  };
+}
