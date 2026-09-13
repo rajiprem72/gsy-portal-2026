@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Find Participant</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #222;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.10);
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #1f4e79;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .search-label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: #1f4e79;
+      box-shadow: 0 0 0 2px rgba(31, 78, 121, 0.10);
+    }
+
+    .search-button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #1f4e79;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .search-button:hover {
+      background: #163a5c;
+    }
+
+    .search-button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    .message {
+      margin-top: 20px;
+      padding: 12px 15px;
+      border-radius: 8px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .message.error {
+      display: block;
+      background: #fdecec;
+      color: #a40000;
+      border: 1px solid #f2b8b8;
+    }
+
+    .message.success {
+      display: block;
+      background: #edf8ee;
+      color: #216b2a;
+      border: 1px solid #b9dfbd;
+    }
+
+    .result {
+      margin-top: 25px;
+      display: none;
+    }
+
+    .result-title {
+      font-size: 21px;
+      font-weight: bold;
+      color: #1f4e79;
+      margin-bottom: 15px;
+    }
+
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .details-table tr {
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .details-table td {
+      padding: 10px 8px;
+      vertical-align: top;
+    }
+
+    .details-table td:first-child {
+      width: 40%;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .details-table td:last-child {
+      color: #222;
+      word-break: break-word;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 15px auto;
+        padding: 10px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .details-table td:first-child {
+        width: 45%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="card">
+
+    <h1>Find Participant</h1>
+
+    <div class="subtitle">
+      Enter the registered mobile number or login email
+      to find the Participant ID.
+    </div>
+
+    <label
+      class="search-label"
+      for="participantSearch"
+    >
+      Mobile Number / Email ID
+    </label>
+
+    <input
+      type="text"
+      id="participantSearch"
+      class="search-input"
+      placeholder="Enter mobile number or email ID"
+      autocomplete="off"
+    >
+
+    <button
+      type="button"
+      id="searchButton"
+      class="search-button"
+      onclick="MasterParticipants_Search_()"
+    >
+      Search Participant
+    </button>
+
+    <div
+      id="message"
+      class="message"
+    ></div>
+
+    <div
+      id="result"
+      class="result"
+    >
+
+      <div class="result-title">
+        Participant Details
+      </div>
+
+      <table class="details-table">
+
+        <tr>
+          <td>Participant ID</td>
+          <td id="resultParticipantId"></td>
+        </tr>
+
+        <tr>
+          <td>Login Email</td>
+          <td id="resultLoginEmail"></td>
+        </tr>
+
+        <tr>
+          <td>Full Name</td>
+          <td id="resultFullName"></td>
+        </tr>
+
+        <tr>
+          <td>Father Name</td>
+          <td id="resultFatherName"></td>
+        </tr>
+
+        <tr>
+          <td>Mobile Number</td>
+          <td id="resultMobileNumber"></td>
+        </tr>
+
+        <tr>
+          <td>Date of Birth</td>
+          <td id="resultDateOfBirth"></td>
+        </tr>
+
+        <tr>
+          <td>Gender</td>
+          <td id="resultGender"></td>
+        </tr>
+
+        <tr>
+          <td>Address</td>
+          <td id="resultAddress"></td>
+        </tr>
+
+        <tr>
+          <td>City</td>
+          <td id="resultCity"></td>
+        </tr>
+
+        <tr>
+          <td>District</td>
+          <td id="resultDistrict"></td>
+        </tr>
+
+        <tr>
+          <td>State</td>
+          <td id="resultState"></td>
+        </tr>
+
+        <tr>
+          <td>Country</td>
+          <td id="resultCountry"></td>
+        </tr>
+
+        <tr>
+          <td>Pincode</td>
+          <td id="resultPincode"></td>
+        </tr>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  /*
+   * Existing GSY Apps Script Web App
+   */
+  const MASTER_PARTICIPANTS_APPS_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbyfo75KniotK2fpfh-zBGYeqwOw3sfLJh-gu1T5_j8U48BFxrZSIIBxo7d5wtgNypIN/exec";
+
+
+  function MasterParticipants_ShowMessage_(
+    message,
+    type
+  ) {
+
+    const messageElement =
+      document.getElementById("message");
+
+    messageElement.textContent =
+      message || "";
+
+    messageElement.className =
+      "message " + (type || "error");
+  }
+
+
+  function MasterParticipants_ClearMessage_() {
+
+    const messageElement =
+      document.getElementById("message");
+
+    messageElement.textContent = "";
+
+    messageElement.className =
+      "message";
+  }
+
+
+  function MasterParticipants_ClearResult_() {
+
+    const resultElement =
+      document.getElementById("result");
+
+    resultElement.style.display =
+      "none";
+
+    const fields = [
+      "resultParticipantId",
+      "resultLoginEmail",
+      "resultFullName",
+      "resultFatherName",
+      "resultMobileNumber",
+      "resultDateOfBirth",
+      "resultGender",
+      "resultAddress",
+      "resultCity",
+      "resultDistrict",
+      "resultState",
+      "resultCountry",
+      "resultPincode"
+    ];
+
+    fields.forEach(function(id) {
+
+      document.getElementById(id)
+        .textContent = "";
+
+    });
+  }
+
+
+  function MasterParticipants_SetResult_(
+    participant
+  ) {
+
+    document.getElementById(
+      "resultParticipantId"
+    ).textContent =
+      participant.participantId || "";
+
+    document.getElementById(
+      "resultLoginEmail"
+    ).textContent =
+      participant.loginEmail || "";
+
+    document.getElementById(
+      "resultFullName"
+    ).textContent =
+      participant.fullName || "";
+
+    document.getElementById(
+      "resultFatherName"
+    ).textContent =
+      participant.fatherName || "";
+
+    document.getElementById(
+      "resultMobileNumber"
+    ).textContent =
+      participant.mobileNumber || "";
+
+    document.getElementById(
+      "resultDateOfBirth"
+    ).textContent =
+      participant.dateOfBirth || "";
+
+    document.getElementById(
+      "resultGender"
+    ).textContent =
+      participant.gender || "";
+
+    document.getElementById(
+      "resultAddress"
+    ).textContent =
+      participant.address || "";
+
+    document.getElementById(
+      "resultCity"
+    ).textContent =
+      participant.city || "";
+
+    document.getElementById(
+      "resultDistrict"
+    ).textContent =
+      participant.district || "";
+
+    document.getElementById(
+      "resultState"
+    ).textContent =
+      participant.state || "";
+
+    document.getElementById(
+      "resultCountry"
+    ).textContent =
+      participant.country || "";
+
+    document.getElementById(
+      "resultPincode"
+    ).textContent =
+      participant.pincode || "";
+
+    document.getElementById(
+      "result"
+    ).style.display =
+      "block";
+  }
+
+
+  async function MasterParticipants_Search_() {
+
+    const input =
+      document.getElementById(
+        "participantSearch"
+      );
+
+    const button =
+      document.getElementById(
+        "searchButton"
+      );
+
+    const searchValue =
+      String(input.value || "").trim();
+
+    MasterParticipants_ClearMessage_();
+
+    MasterParticipants_ClearResult_();
+
+    if (!searchValue) {
+
+      MasterParticipants_ShowMessage_(
+        "Please enter your mobile number or email ID.",
+        "error"
+      );
+
+      input.focus();
+
+      return;
+    }
+
+    button.disabled = true;
+
+    button.textContent =
+      "Searching...";
+
+    try {
+
+      const response =
+        await fetch(
+          MASTER_PARTICIPANTS_APPS_SCRIPT_URL,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "text/plain;charset=utf-8"
+            },
+
+            body: JSON.stringify({
+
+              action:
+                "MasterParticipants_Search",
+
+              search:
+                searchValue
+
+            })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      console.log(
+        "MASTER PARTICIPANT SEARCH RESPONSE:",
+        data
+      );
+
+      if (
+        !data ||
+        data.success !== true ||
+        !data.participant
+      ) {
+
+        MasterParticipants_ShowMessage_(
+          "No record found.",
+          "error"
+        );
+
+        return;
+      }
+
+      MasterParticipants_SetResult_(
+        data.participant
+      );
+
+      MasterParticipants_ShowMessage_(
+        "Participant record found.",
+        "success"
+      );
+
+    } catch (error) {
+
+      console.error(
+        "MASTER PARTICIPANT SEARCH ERROR:",
+        error
+      );
+
+      MasterParticipants_ShowMessage_(
+        "Unable to search the participant record. Please try again.",
+        "error"
+      );
+
+    } finally {
+
+      button.disabled = false;
+
+      button.textContent =
+        "Search Participant";
+    }
+  }
+
+
+  document
+    .getElementById("participantSearch")
+    .addEventListener(
+      "keydown",
+      function(event) {
+
+        if (event.key === "Enter") {
+
+          event.preventDefault();
+
+          MasterParticipants_Search_();
+
+        }
+
+      }
+    );
+
+</script>
+
+</body>
+</html>
