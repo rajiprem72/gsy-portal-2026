@@ -672,7 +672,20 @@
 
 }
 
-    
+    .participant-id-lookup {
+  margin-top: 8px;
+}
+
+.participant-id-lookup a {
+  color: #2c5f2d;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.participant-id-lookup a:hover {
+  text-decoration: underline;
+}
   
     /* =========================================================
        PAIR REGISTRATION
@@ -1068,10 +1081,11 @@
             class="primary-action">
             🔎 Find Partner
           </button>
+	<div class="participant-id-lookup">
           <a href="https://portal.globalschoolofyoga.com/master_participants.html">
   		Find a Participant ID
-	  </a> <br>		
-
+	  </a>		
+	</div>
           <div
             id="Pair_PartnerResult_"
             class="pair-partner-result hidden">
@@ -1209,9 +1223,11 @@
             class="primary-action">
             🔎 Search Participant
           </button>
+          <div class="participant-id-lookup">		
           <a href="https://portal.globalschoolofyoga.com/master_participants.html">
   		Find a Participant ID
 	  </a>
+	  </div>	
           <div
             id="Group_SearchResult_"
             class="pair-partner-result hidden"
