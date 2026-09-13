@@ -230,6 +230,88 @@
         font-size: 16px;
     }
 }    
+
+
+    /* =========================
+   VIDEO TUTORIAL SECTION
+========================= */
+
+.video-tutorial-section {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 24px 18px;
+  background: #f8fbf5;
+  border: 1px solid #d8e8d2;
+  border-radius: 14px;
+}
+
+.video-tutorial-section h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  color: #2c5f2d;
+  text-align: center;
+}
+
+.video-tutorial-subtitle {
+  margin: 0 auto 20px;
+  max-width: 750px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #666;
+  text-align: center;
+}
+
+.video-tutorial-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.video-tutorial-card {
+  background: #ffffff;
+  border: 1px solid #d8e8d2;
+  border-radius: 12px;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.video-tutorial-title {
+  margin: 0 0 10px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #2c5f2d;
+}
+
+.video-tutorial-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  border-radius: 8px;
+  background: #000;
+  object-fit: contain;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+
+  .video-tutorial-section {
+    margin: 25px 10px;
+    padding: 20px 12px;
+  }
+
+  .video-tutorial-section h2 {
+    font-size: 22px;
+  }
+
+  .video-tutorial-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .video-tutorial-title {
+    font-size: 16px;
+  }
+}
   </style>
 
   
@@ -367,6 +449,110 @@
 </div>
 </div>
 
+<!-- =========================
+     VIDEO TUTORIAL
+========================= -->
+
+<section class="video-tutorial-section">
+
+  <h2>🎥 Video Tutorial</h2>
+
+  <p class="video-tutorial-subtitle">
+    Watch these videos to understand the registration process
+    and the different Yoga event categories.
+  </p>
+
+  <div class="video-tutorial-grid">
+
+    <!-- Event Signup -->
+    <div class="video-tutorial-card">
+      <h3 class="video-tutorial-title">
+        Event Signup
+      </h3>
+
+      <video
+        class="video-tutorial-video"
+        controls
+        preload="metadata"
+        playsinline>
+        <source src="video/event-signup.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+
+    <!-- Individual Events -->
+    <div class="video-tutorial-card">
+      <h3 class="video-tutorial-title">
+        Individual Events
+      </h3>
+
+      <video
+        class="video-tutorial-video"
+        controls
+        preload="metadata"
+        playsinline>
+        <source src="video/individual-events.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+
+    <!-- Pair Events -->
+    <div class="video-tutorial-card">
+      <h3 class="video-tutorial-title">
+        Pair Events
+      </h3>
+
+      <video
+        class="video-tutorial-video"
+        controls
+        preload="metadata"
+        playsinline>
+        <source src="video/pair-events.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+
+    <!-- Rhythmic Events -->
+    <div class="video-tutorial-card">
+      <h3 class="video-tutorial-title">
+        Rhythmic Events
+      </h3>
+
+      <video
+        class="video-tutorial-video"
+        controls
+        preload="metadata"
+        playsinline>
+        <source src="video/rythmic-events.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+
+    <!-- Artistic Events -->
+    <div class="video-tutorial-card">
+      <h3 class="video-tutorial-title">
+        Artistic Events
+      </h3>
+
+      <video
+        class="video-tutorial-video"
+        controls
+        preload="metadata"
+        playsinline>
+        <source src="video/artistic-events.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- END VIDEO TUTORIAL -->  
   
 <!-- =========================
      AMAZON YOGA MAT - HOME PREPARATION
