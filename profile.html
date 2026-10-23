@@ -3252,12 +3252,14 @@ function renderRegisteredEvents(
                 </div>
               </div>
 
-              <div class="registered-detail">
-                <div class="registered-detail-label">Event Date</div>
-                <div class="registered-detail-value">
-                  ${escapeHtml(first.eventDate || first.Event_Date || "22 Nov 2026")}
-                </div>
-              </div>
+              
+<div class="registered-detail">
+  <div class="registered-detail-label">Event Date</div>
+  <div class="registered-detail-value">
+    ${escapeHtml(formatEventDate(first.eventDate || first.Event_Date || "2026-11-22"))}
+  </div>
+</div>
+
             </div>
           </div>`;
       });
