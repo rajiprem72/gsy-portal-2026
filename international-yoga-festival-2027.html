@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>International Yoga Festival - 2027 | Global School of Yoga </title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    h1 { color: #2c5f2d; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background: #e8f5e9; }
+    .btn{
+    margin-top: 30px;
+    padding: 12px 20px;
+    font-size: 20px;   /* or 18px */
+    }
+
+/* center the button */
+    a.btn-wrap{
+      display: block;
+      text-align: center;
+      margin-top: 30px;  /* move margin here (optional) */
+      }
+     .syllabus-section{
+    max-width: 1100px;
+    margin: 28px auto;
+    padding: 18px;
+  }
+  .section-title{
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .section-subtitle{
+    margin: 0 0 16px;
+    opacity: 0.85;
+    font-size: 14px;
+  }
+  .syllabus-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .syllabus-card{
+    display: block;
+    text-decoration: none;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+    padding: 14px 14px;
+    background: #fff;
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .syllabus-card:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+    border-color: rgba(0,0,0,0.2);
+  }
+  .syllabus-name{
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #111;
+  }
+  .syllabus-action{
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.15);
+    color: #111;
+    background: rgba(0,0,0,0.03);
+  }
+
+/* =========================
+   AMAZON YOGA MAT SECTION
+========================= */
+.amazon-section {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 24px 18px;
+  background: #fff8e7;
+  border: 1px solid #ead9a6;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.amazon-section h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  color: #2c5f2d;
+}
+
+.amazon-section p {
+  margin: 0 auto 18px;
+  max-width: 750px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #444;
+}
+
+.amazon-product-card {
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.amazon-product-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.amazon-product-description {
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  color: #555;
+}
+
+.amazon-buy-btn {
+  display: inline-block;
+  padding: 13px 24px;
+  background: #ff9900;
+  color: #111;
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 700;
+  border-radius: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.amazon-buy-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.amazon-disclosure {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #777;
+}
+/* ================================
+   ONLINE REGISTRATION CLOSED BOX
+================================ */
+
+.registration-closed-box {
+    max-width: 1000px;
+    margin: 35px auto;
+    padding: 28px 25px;
+    text-align: center;
+
+    background: linear-gradient(135deg, #fff3e0, #ffebee);
+    border: 3px solid #d32f2f;
+    border-radius: 16px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.registration-closed-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #c62828;
+    margin-bottom: 15px;
+}
+
+.registration-closed-message {
+    font-size: 19px;
+    line-height: 1.7;
+    color: #222;
+    margin: 0 auto;
+}
+
+.registration-closed-message strong {
+    color: #b71c1c;
+}
+
+.spot-registration {
+    margin-top: 20px;
+    padding: 18px 20px;
+
+    background: #fff;
+    border: 2px solid #ef6c00;
+    border-radius: 12px;
+}
+
+.spot-registration-title {
+    font-size: 23px;
+    font-weight: 800;
+    color: #e65100;
+    margin-bottom: 10px;
+}
+
+.spot-registration-details {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.venue-highlight {
+    font-weight: 800;
+    color: #2c5f2d;
+}
+
+@media (max-width: 600px) {
+
+    .registration-closed-box {
+        margin: 25px 10px;
+        padding: 22px 15px;
+    }
+
+    .registration-closed-title {
+        font-size: 23px;
+    }
+
+    .registration-closed-message {
+        font-size: 17px;
+    }
+
+    .spot-registration-title {
+        font-size: 20px;
+    }
+
+    .spot-registration-details {
+        font-size: 16px;
+    }
+}    
+
+
+    /* =========================
+   VIDEO TUTORIAL SECTION
+========================= */
+
+.video-tutorial-section {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 24px 18px;
+  background: #f8fbf5;
+  border: 1px solid #d8e8d2;
+  border-radius: 14px;
+}
+
+.video-tutorial-section h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  color: #2c5f2d;
+  text-align: center;
+}
+
+.video-tutorial-subtitle {
+  margin: 0 auto 20px;
+  max-width: 750px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #666;
+  text-align: center;
+}
+
+.video-tutorial-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.video-tutorial-card {
+  background: #ffffff;
+  border: 1px solid #d8e8d2;
+  border-radius: 12px;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.video-tutorial-title {
+  margin: 0 0 10px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #2c5f2d;
+}
+
+.video-tutorial-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  border-radius: 8px;
+  background: #000;
+  object-fit: contain;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+
+  .video-tutorial-section {
+    margin: 25px 10px;
+    padding: 20px 12px;
+  }
+
+  .video-tutorial-section h2 {
+    font-size: 22px;
+  }
+
+  .video-tutorial-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .video-tutorial-title {
+    font-size: 16px;
+  }
+}
+  </style>
+
+  
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<h1>INTERNATIONAL YOGA FESTIVAL – 2027</h1>
+<p><strong>Organized by:</strong> Global School of Yoga</p>
+
+<h2>📅 Indian Yoga Festival -2026 Event Schedule</h2>
+
+<table>
+  <tr>
+    <th>Location</th>
+    <th class="nowrap">Day, Date &amp; Time</th>
+    <th>Address</th>
+    <th>Contact Number</th>
+  </tr>
+  <tr><td>Bengalure</td><td>Sun, 13 Feb 2027 <br> 10 am - 5 pm</td><td>Sri Lanka</td><td>For Tamil 9677162587 , For English 8248579145 , For Telugu 9677162580 , For Hindi 76038 89674</td></tr>
+  
+</table>
+
+<a class="btn-wrap" href="signup_international.html">
+  <button class="btn">🧘 Sign up</button>
+</a>
+ 
+<!-- =========================================
+     ONLINE REGISTRATION CLOSED
+========================================= 
+
+<div class="registration-closed-box">
+
+    <div class="registration-closed-title">
+        🔴 ONLINE REGISTRATION CLOSED
+    </div>
+
+    <p class="registration-closed-message">
+        Online Registration for the
+        <strong>INTERNATION YOGA FESTIVAL – 2027</strong>
+        is now closed.
+    </p>
+
+    <div class="spot-registration">
+
+        <div class="spot-registration-title">
+            🧘 SPOT REGISTRATION AVAILABLE
+        </div>
+
+        <div class="spot-registration-details">
+
+            Participants can still join the festival through
+            <strong>SPOT REGISTRATION at the Venue.</strong>
+
+            <br><br>
+
+            📍 <span class="venue-highlight">
+                Sri Lanka
+            </span>
+
+            <br>
+
+            📅 <strong>Sunday, 13 February 2027</strong>
+
+            <br>
+
+            ⏰ <strong>8:00 AM – 8:00 PM</strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =========================================
+     END ONLINE REGISTRATION CLOSED
+========================================= -->
+
+
+  
+<div class="sakara-box">  
+<div class="events-section-title">Yoga Mode - Work Flow</div>
+
+<div class="ypv">
+
+  <div class="ypv-card" onclick="openEventImage('images/individual-events-work-flow.png')">
+    <img src="images/individual-events-work-flow.png">
+    <div class="event-title">Individual Events - Work Flow</div>
+  </div>
+
+  <div class="ypv-card" onclick="openEventImage('images/pair-events-work-flow.png')">
+    <img src="images/pair-events-work-flow.png">
+    <div class="event-title">Pair Events - Work Flow</div>
+  </div>
+
+    <div class="ypv-card" onclick="openEventImage('images/rhythmic-events-work-flow.png')">
+    <img src="images/rhythmic-events-work-flow.png">
+    <div class="event-title">Rhythmic Events - Work Flow</div>
+  </div>
+
+  <div class="ypv-card" onclick="openEventImage('images/artistic-events-work-flow.png')">
+    <img src="images/artistic-events-work-flow.png">
+    <div class="event-title">Artistic Events - Work Flow</div>
+  </div>
+
+
+</div>
+</div>
+
+</div>
+</div>
+
+
+
+
+
+<div class="sakara-box">  
+<div class="events-section-title">Event Details - International Yoga Festival -2027 (Slide left to right)</div>
+
+<div class="ypv">
+
+  <div class="ypv-card" onclick="openEventImage('event-banner/indian-yoga-festival-2026-banner1.jpg')">
+    <img src="event-banner/indian-yoga-festival-2026-banner1.jpg">
+    <div class="event-title">Events Details</div>
+  </div>
+
+  <div class="ypv-card" onclick="openEventImage('event-banner/indian-yoga-festival-2026-banner2.jpg')">
+    <img src="event-banner/indian-yoga-festival-2026-banner2.jpg">
+    <div class="event-title">Yoga Mode & Event Fee</div>
+  </div>
+
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- =========================
+     VIDEO TUTORIAL
+========================= -->
+
+<section class="video-tutorial-section">
+
+  <h2>🎥 Video Tutorial</h2>
+
+  <p class="video-tutorial-subtitle">
+    Watch these videos to understand the registration process
+    and the different Yoga event categories.
+  </p>
+
+  <div class="video-tutorial-grid">
+
+    <!-- Gmail Signup -->
+    <div class="video-tutorial-card">
+      <h3 class="video-tutorial-title">
+        Gmail Signup
+      </h3>
+
+      <video
+        class="video-tutorial-video"
+        controls
+        preload="metadata"
+        playsinline>
+        <source src="videos/gmail-signup.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+ <!-- Email Signup -->
+    <div class="video-tutorial-card">
+      <h3 class="video-tutorial-title">
+        E-Mail Signup
+      </h3>
+
+      <video
+        class="video-tutorial-video"
+        controls
+        preload="metadata"
+        playsinline>
+        <source src="videos/email-signup.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+    <!-- Individual Events -->
+    <div class="video-tutorial-card">
+      <h3 class="video-tutorial-title">
+        Individual Events
+      </h3>
+
+      <video
+        class="video-tutorial-video"
+        controls
+        preload="metadata"
+        playsinline>
+        <source src="videos/individual-events.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+
+    <!-- Pair Events -->
+    <div class="video-tutorial-card">
+      <h3 class="video-tutorial-title">
+        Pair Events
+      </h3>
+
+      <video
+        class="video-tutorial-video"
+        controls
+        preload="metadata"
+        playsinline>
+        <source src="videos/pair-events.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+
+    <!-- Rhythmic Events -->
+    <div class="video-tutorial-card">
+      <h3 class="video-tutorial-title">
+        Rhythmic Events
+      </h3>
+
+      <video
+        class="video-tutorial-video"
+        controls
+        preload="metadata"
+        playsinline>
+        <source src="videos/rythmic-events.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+
+    <!-- Artistic Events -->
+    <div class="video-tutorial-card">
+      <h3 class="video-tutorial-title">
+        Artistic Events
+      </h3>
+
+      <video
+        class="video-tutorial-video"
+        controls
+        preload="metadata"
+        playsinline>
+        <source src="videos/artistic-events.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- END VIDEO TUTORIAL -->  
+  
+<!-- =========================
+     AMAZON YOGA MAT - HOME PREPARATION
+========================= -->
+
+<section class="amazon-section">
+
+  <div class="amazon-prep-badge">
+    🏆 COMPETITION PREPARATION
+  </div>
+
+  <h2>Prepare at Home. Perform with Confidence.</h2>
+
+  <p class="amazon-main-message">
+    <strong>Your Yoga Mat will be provided at the competition venue.</strong><br>
+    But your preparation starts at home! 🧘
+  </p>
+
+  <p class="amazon-prep-text">
+    Practise your prescribed asanas regularly, improve your balance,
+    flexibility and steadiness, and build confidence before the
+    13th Year Tamil Nadu Yoga Festival.
+  </p>
+
+  <div class="amazon-product-card">
+
+    <div class="amazon-product-icon">
+      🧘
+    </div>
+
+    <div class="amazon-product-title">
+      Get a Yoga Mat for Your Home Practice
+    </div>
+
+    <div class="amazon-product-description">
+      A good Yoga Mat can provide a comfortable and stable surface
+      for your daily yoga practice, asana training and competition
+      preparation.
+    </div>
+
+    <div class="amazon-benefits">
+
+      <div class="amazon-benefit">
+        ✓ Practise your asanas at home
+      </div>
+
+      <div class="amazon-benefit">
+        ✓ Improve balance &amp; stability
+      </div>
+
+      <div class="amazon-benefit">
+        ✓ Train regularly before competition day
+      </div>
+
+      <div class="amazon-benefit">
+        ✓ Prepare with confidence
+      </div>
+
+    </div>
+
+    <a
+      href="https://amzn.to/3TMXGRI"
+      target="_blank"
+      rel="nofollow sponsored noopener"
+      class="amazon-buy-btn">
+
+      🛒 Get Your Practice Mat on Amazon →
+
+    </a>
+
+    <div class="amazon-note">
+      The competition mat will be provided at the venue.
+      This recommendation is for your <strong>home practice and preparation.</strong>
+    </div>
+
+    <div class="amazon-disclosure">
+      As an Amazon Associate, we may earn from qualifying purchases.
+    </div>
+
+  </div>
+
+</section>
+
+<!-- END AMAZON YOGA MAT - HOME PREPARATION -->  
+
+
+<div id="eventOverlay"  
+
+  <div id="eventOverlay" onclick="closeEventImage()"
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.8);
+            align-items:center; justify-content:center; z-index:9999;">
+  <img id="eventOverlayImg" src=""
+       style="max-width:90%; max-height:90%; border-radius:12px;">
+  </div>
+
+ <!-- =========================
+     SYLLABUS / ASANAS LIST
+========================= -->
+<section id="syllabus" class="syllabus-section">
+  <h2 class="section-title">Syllabus – Asanas List (PDF)</h2>
+  <p class="section-subtitle">Download the official asanas lists for each event category.</p>
+
+  <div class="syllabus-grid">
+
+    
+    <a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/World-Record-Chart-Revised-2026.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">World Record Attempt</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+ <a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/Traditional-Yogasana-Individual-Event.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Traditional Yogasana Event</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/FRONT-BEND-YOGASANA-INDIVIDUAL-EVENT.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Front Bend Individual Event</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/BACK-BEND-YOGASANA-INDIVIDUAL-EVENT.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Back Bend Individual Event</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/TWISTING-BODY-YOGASANA-INDIVIDUAL-EVENT.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Twisting Body Individual Event</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/HAND-BALANCE-YOGASANA-INDIVIDUAL-EVENT.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Hand Balance Individual Event</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/LEG-BALANCE-YOGASANA-INDIVIDUAL-EVENT.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Leg Balance Individual Event</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/INVERTED-YOGASANA-INDIVIDUAL-EVENT.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Inverted Individual Event</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/CHAMPION-YOGASANA-EVENT-RULES.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Champion Event</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/CHAMPION-OF-CHAMPIONS.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Champion of Champion Round</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/ARTISTIC-YOGASANA-EVENT.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Artistic Yogasana Event</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/RYTHMIC-YOGASANA-INDIVIDUAL-EVENT.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Rythmic Yogasana Event</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+    
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/Indian_Yoga_Festival_2026_Final_Rules.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Indian Yoga Festival Competition Rules & Regulation</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>
+
+<a class="syllabus-card" href="https://portal.globalschoolofyoga.com/syllabus/indian-yoga-festival-2026/Common_Yoga_Event_Rules.pdf"
+       download target="_blank" rel="noopener">
+      <div class="syllabus-name">Common Yoga Event</div>
+      <div class="syllabus-action">Download PDF</div>
+</a>    
+    
+  </div>
+</section>
+
+
+  
+<script>
+function openEventImage(src) {
+  document.getElementById("eventOverlayImg").src = src;
+  document.getElementById("eventOverlay").style.display = "flex";
+}
+
+function closeEventImage() {
+  document.getElementById("eventOverlay").style.display = "none";
+}
+</script>  
+<!--  
+<p style="margin-top:40px;">
+  📧 Contact: globalschoolofyoga@gmail.com
+</p>
+-->
+
+<section id="state-yoga-championship-2026">
+
+  <h2>INTERNATIONAL YOGA FESTIVAL – 2027</h2>
+  <h3>COMPETITION RULES &amp; REGULATIONS</h3>
+
+  <!-- =====================================================
+       1. COMPETITION RULES
+       ===================================================== -->
+  <h4>1. COMPETITION RULES</h4>
+
+  <ul>
+    <li>Open to all individuals, including students of schools, colleges, recognised yoga institutions, and yoga practitioners.</li>
+    <li>All competitions will be conducted strictly in accordance with the rules and regulations laid down by the organisers.</li>
+    <li>The decision of the judges shall be final and binding.</li>
+    <li>Participants with serious or chronic medical conditions are advised not to participate.</li>
+  </ul>
+
+
+  <!-- =====================================================
+       2. DRESS CODE
+       ===================================================== -->
+  <h4>2. DRESS CODE <span style="font-weight: normal;">(Optional)</span></h4>
+
+  <p><strong>Male Participants:</strong> Bottom wear (half shorts) only.</p>
+
+  <p><strong>Female Participants:</strong> Round-neck T-shirt with tights/leggings.</p>
+
+  <p>
+    <strong>Note:</strong>
+    Bangles, chains, rings, watches, and other accessories are not permitted
+    during the performance.
+  </p>
+
+
+  <!-- =====================================================
+       3. EVENT FORMAT
+       ===================================================== -->
+  <h4>3. EVENT FORMAT</h4>
+
+  <p>
+    <strong>Performance Duration:</strong>
+    Maximum 3 minutes per event.
+  </p>
+
+  <p>
+    <strong>Asana Holding Time:</strong>
+    Each asana must be held for a minimum of 6 seconds.
+  </p>
+
+  <h5>Common Asana Category</h5>
+
+  <ul>
+    <li>Five asanas of the participant's own choice.</li>
+  </ul>
+
+  <h5>Other Individual Categories</h5>
+
+  <ul>
+    <li>Three compulsory asanas from the prescribed chart.</li>
+    <li>Two asanas of the participant's own choice.</li>
+  </ul>
+
+  <h5>Champion Round</h5>
+
+  <ul>
+    <li>Three asanas of the participant's own choice.</li>
+  </ul>
+
+  <h5>Champion of Champions Round</h5>
+
+  <ul>
+    <li>Two compulsory asanas from the prescribed chart.</li>
+    <li>One asana of the participant's own choice.</li>
+  </ul>
+
+  <p>
+    <strong>Important:</strong>
+    A separate entry fee is applicable for each event.
+    Male and female participants will be judged separately based on the marks
+    awarded by the judging panel.
+  </p>
+
+
+  <!-- =====================================================
+       4. CATEGORIES OF YOGA EVENTS
+       ===================================================== -->
+  <h4>4. CATEGORIES OF YOGA EVENTS</h4>
+
+  <h5>A. INDIVIDUAL EVENTS</h5>
+
+  <ol>
+    <li>Yoga World Record – Individual</li>
+    <li>Common Asana Category – Individual</li>
+    <li>Traditional Asanas – Individual</li>
+    <li>Forward Bending Asanas – Individual</li>
+    <li>Backward Bending Asanas – Individual</li>
+    <li>Twisting Asanas – Individual</li>
+    <li>Hand Balance Asanas – Individual</li>
+    <li>Leg Balance Asanas – Individual</li>
+    <li>Inverted Asanas – Individual</li>
+  </ol>
+
+  <h5>B. CHAMPION ROUND</h5>
+
+  <ol>
+    <li>Forward Asanas – Individual</li>
+    <li>Backward Asanas – Individual</li>
+    <li>Twisting Asanas – Individual</li>
+    <li>Leg Balance Asanas – Individual</li>
+    <li>Hand Balance Asanas – Individual</li>
+  </ol>
+
+  <h5>C. CHAMPION OF CHAMPIONS ROUND</h5>
+
+  <ol>
+    <li>Forward Asanas – Individual</li>
+    <li>Backward Asanas – Individual</li>
+    <li>Twisting Asanas – Individual</li>
+    <li>Leg Balance Asanas – Individual</li>
+    <li>Hand Balance Asanas – Individual</li>
+  </ol>
+
+  <p>
+    <strong>Note:</strong>
+    Participants may register for one or more categories by paying the
+    applicable entry fee separately for each event, including Individual,
+    Pair, and Group Events.
+  </p>
+
+
+  <!-- =====================================================
+       5. SCORING CRITERIA
+       ===================================================== -->
+  <h4>5. SCORING CRITERIA</h4>
+
+  <p>
+    Participants will be evaluated based on the following criteria:
+  </p>
+
+  <ul>
+    <li>Posture</li>
+    <li>Balance</li>
+    <li>Holding Time</li>
+    <li>Breathing</li>
+    <li>Steadiness</li>
+  </ul>
+
+  <h5>PRIZE CRITERIA</h5>
+
+  <ul>
+    <li>1st, 2nd, 3rd, 4th, and 5th Prizes will be awarded in all applicable competition categories.</li>
+    <li>No consolation prizes will be awarded.</li>
+  </ul>
+
+  <h5>Winner &amp; Runner-Up Prizes</h5>
+
+  <p>
+    Winner and Runner-Up prizes will be awarded exclusively in the Champion
+    Round and Champion of Champions Round.
+  </p>
+
+
+  <!-- =====================================================
+       6. ENTRANCE FEE & REGISTRATION
+       ===================================================== -->
+  <h4>6. ENTRANCE FEE &amp; REGISTRATION</h4>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Event</th>
+        <th>Entry Fee</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>Individual Events</td>
+        <td>₹1,000 per participant, per event</td>
+      </tr>
+
+      <tr>
+        <td>Pair &amp; Group Events</td>
+        <td>₹1,000 per participant, per event</td>
+      </tr>
+
+      <tr>
+        <td>Champion Round</td>
+        <td>₹1,500 per participant, per event</td>
+      </tr>
+
+      <tr>
+        <td>Champion of Champions Round</td>
+        <td>₹1,800 per participant, per event</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h5>Registration Guidelines</h5>
+
+  <ul>
+    <li>No spot registrations available.</li>
+    <li>Participants are requested to register in advance.</li>
+    <li>Registration must be completed on or before the announced last date.</li>
+    <li>Once paid, the registration fee is strictly non-refundable.</li>
+    <li>For Pair and Group Events, each participant must complete and submit an individual registration form separately.</li>
+  </ul>
+
+  <h5>Note</h5>
+
+  <ul>
+    <li>First time user Sign up is must.</li>
+    <li>So next time you need not fill all your personal details for our future any event.</li>
+    <li>Once you signed up Then only you can choose events and pay.</li>
+    <li>Participants also can see your results in your portal by your mail ids.</li>
+    <li>Google mail id users can directly sign up. Other mail id users create user id and password and Sign up.</li>
+    <li>One person can't do group students registration but they can do group students registration if they know mail id and password of each participant.</li>
+  </ul>
+
+
+  <!-- =====================================================
+       7. AGE GROUPS
+       ===================================================== -->
+  <h4>7. AGE GROUPS</h4>
+
+  <table>
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>Age Category</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr><td>1</td><td>Below 6 Years</td></tr>
+      <tr><td>2</td><td>6–7 Years</td></tr>
+      <tr><td>3</td><td>8–9 Years</td></tr>
+      <tr><td>4</td><td>10–11 Years</td></tr>
+      <tr><td>5</td><td>12–13 Years</td></tr>
+      <tr><td>6</td><td>14–15 Years</td></tr>
+      <tr><td>7</td><td>16–21 Years</td></tr>
+      <tr><td>8</td><td>22–35 Years</td></tr>
+      <tr><td>9</td><td>36–45 Years</td></tr>
+      <tr><td>10</td><td>46–55 Years</td></tr>
+      <tr><td>11</td><td>56 Years &amp; Above</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    <strong>Note:</strong>
+    Age categories for the Champion Round and Champion of Champions Round are
+    different. Participants must refer to the official age chart for eligibility.
+  </p>
+
+
+  <!-- =====================================================
+       8. SPECIAL AGE CATEGORY NOTES
+       ===================================================== -->
+  <h4>8. SPECIAL AGE CATEGORY NOTES</h4>
+
+  <h5>Common Asana Category</h5>
+
+  <p>
+    The Common Asana Category is open to all age groups, from Below 6 Years to
+    56 Years &amp; Above. Participants may perform five asanas of their own choice.
+  </p>
+
+  <h5>Traditional Asana Category</h5>
+
+  <p>
+    The Traditional Asana Category is not available for participants in the
+    Below 6 Years and 56 Years &amp; Above age groups.
+  </p>
+
+  <h5>Other Categories</h5>
+
+  <p>
+    All age groups are eligible for the remaining categories, except where
+    specific age restrictions are mentioned in the official rules.
+  </p>
+
+
+  <!-- =====================================================
+       9. GENERAL RULES
+       ===================================================== -->
+  <h4>9. GENERAL RULES</h4>
+
+  <ol>
+    <li>Participants must report at least 30 minutes before their scheduled reporting time.</li>
+    <li>No external props or support will be permitted unless specifically authorised by the organisers.</li>
+    <li>Mobile phones, music systems, and other electronic devices are not permitted in the performance area unless officially required.</li>
+    <li>Any misconduct, misbehaviour, or argument with judges will result in immediate disqualification.</li>
+    <li>Participants must carry a valid photo ID proof and produce it for verification whenever required by the Jury or organisers.</li>
+    <li>Participants must strictly follow the instructions of the event coordinators and judging panel.</li>
+  </ol>
+
+
+  <!-- =====================================================
+       10. RECOGNITION & SELECTION
+       ===================================================== -->
+  <h4>10. RECOGNITION &amp; SELECTION</h4>
+
+  <h5>Certificates</h5>
+
+  <ul>
+    <li>Form 2 Certificate: Awarded to participants aged 14 years and above. Participants who win in multiple events will receive a Form 2 certificate for each event.</li>
+    <li>Only participants who win one of the first three prizes will receive a Form 2 certificate.</li>
+    <li>Eligibility for the Form 2 certificate is subject to institutional acceptance. If an institution rejects the certificate for sports quota purposes or fee concessions, such rejection shall not be binding on the organisers.</li>
+    <li>All winners will receive certificates and Trophies.</li>
+    <li>Certificate &amp; medals will be given for Yoga World Record.</li>
+  </ul>
+
+
+  <!-- =====================================================
+       11. ORGANISERS' RIGHTS
+       ===================================================== -->
+  <h4>11. ORGANISERS' RIGHTS</h4>
+
+  <p>
+    The organisers reserve the right to amend, modify, clarify, or interpret
+    any of the above rules and regulations whenever deemed necessary.
+  </p>
+
+  <p>
+    All decisions taken by the organisers in the interest of the fair and
+    smooth conduct of the competition shall be final.
+  </p>
+
+
+  <!-- =====================================================
+       CLOSING MESSAGE
+       ===================================================== -->
+  <div class="festival-closing-message">
+
+    <h2>INTERNATIONAL YOGA FESTIVAL – 2027</h2>
+
+    <p>
+      <strong>Participate • Compete • Excel • Celebrate Yoga</strong>
+    </p>
+
+    <p>
+      Wishing all participants the very best!
+    </p>
+
+  </div>
+
+</section>
+</body>
+</html>
