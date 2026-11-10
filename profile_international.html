@@ -672,7 +672,6 @@
 
 }
 
-    
   
     /* =========================================================
        PAIR REGISTRATION
@@ -708,8 +707,27 @@
     .pair-partner-detail strong {
       color: #2c5f2d;
     }
+.pair-partner-detail strong {
+  color: #2c5f2d;
+}
 
-  </style>
+/* Participant ID Lookup Link */
+.participant-id-lookup {
+  margin-top: 8px;
+}
+
+.participant-id-lookup a {
+  color: #2c5f2d;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.participant-id-lookup a:hover {
+  text-decoration: underline;
+}
+
+</style>
 </head>
 
 <body>
@@ -1068,7 +1086,11 @@
             class="primary-action">
             🔎 Find Partner
           </button>
-
+	<div class="participant-id-lookup">
+          <a href="https://portal.globalschoolofyoga.com/master_participants.html">
+  		Find a Participant ID
+	  </a>		
+	</div>
           <div
             id="Pair_PartnerResult_"
             class="pair-partner-result hidden">
@@ -1206,7 +1228,11 @@
             class="primary-action">
             🔎 Search Participant
           </button>
-
+          <div class="participant-id-lookup">		
+          <a href="https://portal.globalschoolofyoga.com/master_participants.html">
+  		Find a Participant ID
+	  </a>
+	  </div>	
           <div
             id="Group_SearchResult_"
             class="pair-partner-result hidden"
@@ -1788,6 +1814,12 @@
     let currentMode = "";
     let currentEventData = null;
 
+    /* =========================================================
+       INDIVIDUAL - ALREADY REGISTERED EVENT TRACKING
+       Used only by the Individual event catalogue.
+    ========================================================== */
+    let registeredEventIds = new Set();
+
 
     function formatINR(amount) {
 
@@ -1968,6 +2000,25 @@
                 );
 
 
+          /*
+           * Prevent re-registration of an Individual event
+           * that this participant has already joined.
+           * Other Yoga Modes are not affected.
+           */
+          const isAlreadyRegisteredIndividualEvent =
+            String(mode).toLowerCase() === "individual" &&
+            registeredEventIds.has(
+              String(
+                event.eventId ||
+                ""
+              ).trim()
+            );
+
+          if (isAlreadyRegisteredIndividualEvent) {
+            checkbox.disabled = true;
+          }
+
+
           const label =
             document.createElement(
               "label"
@@ -1976,6 +2027,10 @@
 
           label.className =
             "event-option-label";
+
+          if (isAlreadyRegisteredIndividualEvent) {
+            label.style.cursor = "not-allowed";
+          }
 
 
           label.htmlFor =
@@ -1995,6 +2050,12 @@
           name.textContent =
             event.eventName ||
             "Event";
+
+          if (isAlreadyRegisteredIndividualEvent) {
+            name.style.textDecoration = "line-through";
+            name.style.textDecorationThickness = "2px";
+            name.style.opacity = "0.65";
+          }
 
 
           label.appendChild(
@@ -2863,6 +2924,20 @@ onAuthStateChanged(
         const profile =
           await getAuthenticatedParticipantProfile();
 
+        registeredEventIds =
+          new Set(
+            (profile.registeredEvents || [])
+              .map(function(event) {
+                return String(
+                  event.eventId ||
+                  event.Event_ID ||
+                  ""
+                ).trim();
+              })
+              .filter(function(eventId) {
+                return eventId !== "";
+              })
+          );
 
         welcomeTitle.textContent =
           "Welcome, " +
@@ -3180,8 +3255,8 @@ function renderRegisteredEvents(
               <div class="registered-detail">
                 <div class="registered-detail-label">Event Date</div>
                 <div class="registered-detail-value">
-                  ${escapeHtml(first.eventDate || first.Event_Date || "22 Nov 2026")}
-                </div>
+                 22 Nov 2026
+				</div>
               </div>
             </div>
           </div>`;
