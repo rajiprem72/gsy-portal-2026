@@ -1,0 +1,126 @@
+{
+  "festival": "International Yoga Festival 2027",
+  "event_date": "2027-02-14",
+  "event_location": "Sri Lanka",
+  "age_calculation": {
+    "source": "MASTER_PARTICIPANTS",
+    "date_of_birth_column": "F",
+    "calculated_as_of": "2027-02-14",
+    "method": "completed_years"
+  },
+  "registration_fee_policy": {
+    "currency": "INR",
+    "total_fee": {
+      "up_to_3_events": 3000,
+      "each_event_beyond_3": 2000
+    },
+    "online_advance_collected_now": 3000,
+    "remaining_balance": "Collected manually by GSY staff and tracked separately.",
+    "later_additional_events": "Added manually by GSY staff; ₹2,000 per additional event."
+  },
+  "general_rules": {
+    "individual": {
+      "participants": "One person",
+      "gender": "Male or female"
+    },
+    "pair": {
+      "participants": "Exactly 2 people"
+    },
+    "group_artistic": {
+      "participants": "Minimum 5 people",
+      "gender": "Mixed gender",
+      "touching_allowed": true,
+      "time_limit_seconds": 150
+    },
+    "group_rhythmic": {
+      "participants": "Exactly 5 people",
+      "gender": "Mixed gender",
+      "touching_allowed": false
+    },
+    "group_cultural_dance_yoga": {
+      "participants": "Minimum 5 people",
+      "gender": "Mixed gender",
+      "touching_allowed": true,
+      "time_limit_seconds": 150
+    },
+    "partner_group_details": {
+      "required_for": [
+        "Pair",
+        "Group"
+      ],
+      "format_pair": "Name - Age",
+      "format_group": "Name - Age - Sex",
+      "separator": "Comma-separated entries",
+      "main_participant_reentry": false,
+      "external_members_allowed": true,
+      "automatic_group_validation": false,
+      "verification": "GSY staff will verify details and make corrections manually if required."
+    }
+  },
+  "age_group": "Sub-Junior",
+  "age_eligibility": {
+    "min_age": 0,
+    "max_age_exclusive": 12,
+    "description": "Below 12 years"
+  },
+  "events": [
+    {
+      "event_id": "SUB-IND-EASY",
+      "event_name": "Individual — Easy Entry",
+      "category": "Individual",
+      "discipline": "Easy Entry",
+      "selectable": true,
+      "participant_rule": {
+        "participants": "One person",
+        "gender": "Male or female"
+      }
+    },
+    {
+      "event_id": "SUB-IND-ART",
+      "event_name": "Individual — Artistic Yoga",
+      "category": "Individual",
+      "discipline": "Artistic Yoga",
+      "selectable": true,
+      "participant_rule": {
+        "participants": "One person",
+        "gender": "Male or female"
+      }
+    },
+    {
+      "event_id": "SUB-PAIR-ART",
+      "event_name": "Pair — Artistic Yoga",
+      "category": "Pair",
+      "discipline": "Artistic Yoga",
+      "selectable": true,
+      "participant_rule": {
+        "participants": "Exactly 2 people"
+      },
+      "partner_details_required": true
+    },
+    {
+      "event_id": "SUB-PAIR-RHY",
+      "event_name": "Pair — Rhythmic Yoga",
+      "category": "Pair",
+      "discipline": "Rhythmic Yoga",
+      "selectable": true,
+      "participant_rule": {
+        "participants": "Exactly 2 people"
+      },
+      "partner_details_required": true
+    },
+    {
+      "event_id": "SUB-GRP-CULT",
+      "event_name": "Group — Cultural Dance Yoga",
+      "category": "Group",
+      "discipline": "Cultural Dance Yoga",
+      "selectable": true,
+      "participant_rule": {
+        "participants": "Minimum 5 people",
+        "gender": "Mixed gender",
+        "touching_allowed": true,
+        "time_limit_seconds": 150
+      },
+      "partner_details_required": true
+    }
+  ]
+}
